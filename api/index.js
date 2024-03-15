@@ -1,7 +1,7 @@
 import express from "express";
 const app = express();
 import cors from "cors";
-const port = 8000;
+
 import dotenv from "dotenv";
 dotenv.config();
 import multer from "multer";
@@ -25,7 +25,7 @@ import {
 } from "firebase/firestore";
 
 import config from "../api/firebase.config.js";
-
+const port = process.env.PORT || 8000;
 const fbApp = initializeApp(config.firebaseConfig);
 
 const storage = getStorage();
