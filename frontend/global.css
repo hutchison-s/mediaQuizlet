@@ -43,7 +43,7 @@
   }
   h1 {
     margin: 2rem;
-    font-size: clamp(14px, 4vw, 32px);
+    font-size: clamp(24px, 8vw, 60px);
     text-align: center;
   }
   h1 > a,
