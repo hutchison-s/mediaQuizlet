@@ -515,6 +515,7 @@ body {
   #sidebar,
   #root {
     overflow-y: auto;
+    width: 100vw;
   }
   #restart {
     position: fixed;
