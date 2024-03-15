@@ -133,7 +133,7 @@ const handleFiles = (files) => {
     if (f.size / 1048576 > 4) {
       upload.value = "";
       alert("One or more files are too large. Max size allowed is 4 MB")
-      window.location.reload();
+      resetPage();
       return;
     }
   }
