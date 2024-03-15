@@ -1,0 +1,57 @@
+  body {
+    width: 100vw;
+    min-height: 100vh;
+    display: grid;
+    place-content: center;
+    gap: 10vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    background: var(--background);
+  }
+
+  #motto {
+    color: var(--primary-half);
+    font-size: large;
+    text-align: center;
+  }
+  #options {
+    padding: 1rem;
+    width: clamp(350px, 80vw, 800px);
+    min-height: 400px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 2rem;
+    margin: auto;
+    box-shadow: var(--shadow);
+    background-color: var(--background);
+  }
+  .buttonBox {
+    text-align: center;
+  }
+  .buttonLink {
+    display: block;
+    padding: 1rem 4rem;
+    width: clamp(250px, 50vw, 600px);
+    font-size: 2rem;
+    margin: 0.5rem auto;
+    background: var(--secondary);
+    border: none;
+    color: var(--background);
+    text-decoration: none;
+    border-radius: 0.5rem;
+    cursor: pointer;
+    transition: transform 0.2s;
+  }
+  .buttonLink:hover {
+    background-color: var(--light-secondary);
+    color: var(--secondary);
+    outline: 2px solid var(--secondary);
+    transform: scale(1.05);
+  }
+  .buttonBox p {
+    margin-top: 1rem;
+    color: var(--primary);
+    opacity: 0.7;
+  }

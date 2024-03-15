@@ -1,0 +1,21 @@
+# Ignore node_modules directory
+/node_modules
+*/node_modules
+
+# Ignore logs and temp files
+*.log
+*.tmp
+*.temp
+
+# Ignore environment configuration files
+.env
+
+# Ignore macOS system files
+.DS_Store
+
+# Ignore package-lock.json for npm
+package-lock.json
+
+# Ignore virtual environment directories
+venv/
+.env/

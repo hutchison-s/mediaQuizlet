@@ -1,0 +1,106 @@
+body {
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  overflow: hidden;
+}
+#root {
+  position: relative;
+  min-width: 300px;
+  width: 100%;
+  background: var(--background);
+}
+#resBox {
+  background: var(--background);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+  width: clamp(300px, 50vw, 700px);
+  max-height: 70vh;
+  overflow: auto;
+  margin: 10vh auto;
+}
+.response {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.5rem 0.5rem;
+  border-bottom: 1px dashed var(--light-secondary);
+}
+
+.response > p:nth-of-type(even) {
+  margin-left: 1rem;
+}
+p:has(.fa-circle-check),
+p:has(.fa-circle-check) * {
+  color: var(--success);
+}
+p:has(.fa-circle-xmark),
+p:has(.fa-circle-xmark) * {
+  color: var(--warning);
+}
+#introDialog {
+  width: clamp(300px, 60vw, 800px);
+  height: 60vh;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  background: var(--secondary);
+  backdrop-filter: blur(8px);
+  --webkit-backdrop-filter: blur(8px);
+  text-align: center;
+  font-size: large;
+  padding: 2rem 1rem;
+}
+#introDialog p {
+  margin: 2rem auto;
+  color: var(--background);
+}
+#viewResponses {
+  border: none;
+  padding: 1rem 2rem;
+  font-size: large;
+  background: var(--background);
+  color: var(--primary);
+  box-shadow: var(--shadow);
+  margin-top: 2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+#viewResponses:hover {
+  transform: scale(1.3);
+}
+#viewResponses:disabled {
+  opacity: 0.5;
+  transform: none;
+  cursor: not-allowed;
+}
+
+#passBox {
+  position: relative;
+}
+#peek {
+  position: absolute;
+  top: 50%;
+  right: 25%;
+  translate: -20% -50%;
+  color: var(--primary);
+  cursor: pointer;
+}
+#password {
+  font-size: 16px;
+  padding: 1rem;
+  width: 50%;
+  margin: -1rem auto;
+  border: none;
+  background: var(--light-secondary);
+  color: var(--primary-half);
+}
+#viewResponses {
+  background: var(--primary);
+  color: var(--light-secondary);
+}
+.score,
+.score * {
+  color: var(--secondary);
+}
+

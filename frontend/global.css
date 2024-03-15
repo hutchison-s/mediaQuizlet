@@ -1,0 +1,52 @@
+:root {
+    --primary: #000000;
+    --primary-half: #000000;
+    --secondary: #000000;
+    --light-secondary: #000000;
+    --background: #000000;
+    --success: #32a852;
+    --warning: #96184b;
+    --shadow: 2px 2px 20px var(--primary-half);
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    color: var(--primary);
+    font-family: Rubik;
+  }
+  #lightDark {
+    position: fixed;
+    z-index: 1;
+    font-size: 2rem;
+    top: 0.5rem;
+    right: 0.5rem;
+    color: var(--primary);
+    opacity: 0.5;
+    cursor: pointer;
+  }
+  .rounded {
+    border-radius: 2rem;
+  }
+  .softCorner {
+    border-radius: 0.5rem;
+  }
+  .shadow {
+    box-shadow: var(--shadow);
+  }
+  .fa-circle-play::before {
+    background-image: linear-gradient(var(--secondary), var(--light-secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    margin-right: 0.5rem;
+  }
+  h1 {
+    margin: 2rem;
+    font-size: 3rem;
+    text-align: center;
+  }
+  h1 > a,
+  h2 > a {
+    text-decoration: none;
+  }
