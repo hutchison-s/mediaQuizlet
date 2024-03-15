@@ -87,7 +87,7 @@ app.post("/upload", upload.array("files", 12), async (req, res) => {
   }
   res.send({
     message: "Upload successful",
-    url: `http://127.0.0.1:3000/audioQuizlet/frontend/quizzer?id=` + code,
+    url: `https://audioquizlet.netlify.app/quizzer?id=` + code,
   });
 });
 
@@ -132,5 +132,5 @@ app.post("/quiz/:code/response", async (req, res) => {
 
 // Start the server
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+  console.log(`Server is running at port ${port}`);
 });
