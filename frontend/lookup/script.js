@@ -13,14 +13,14 @@ codeForm.addEventListener("submit", (e)=>{
 })
 
 function navigateToQuiz(code) {
-    fetch("http://localhost:8000/quiz/" + code)
+    fetch("https://audio-quizlet.vercel.app/quiz/" + code)
         .then((response) => {
             try {
                 if (!response.ok) {
                     throw new Error("No such code")
                 }
                 console.log("redrecting to quiz.")
-                window.location.href = "http://127.0.0.1:3000/audioQuizlet/frontend/quizzer/index.html?id="+code
+                window.location.href = "https://audioquizlet.netlify.app/quizzer?id="+code
             } catch (err) {
                 codeInput.style.outline = "4px solid var(--warning)"
                 codeInput.value = "invalid code"

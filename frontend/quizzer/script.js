@@ -74,7 +74,7 @@ function submitAll() {
     responses: Array.from(checks).map((check) => check.value),
   };
   quizTimer && clearInterval(quizTimer?.interval);
-  fetch(`http://localhost:8000/quiz/${thisQuizId}/response`, {
+  fetch(`https://audio-quizlet.vercel.app/quiz/${thisQuizId}/response`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -155,7 +155,7 @@ function createQuiz(quiz) {
 }
 
 function apiCall(quizId) {
-  fetch("http://localhost:8000/quiz/" + quizId)
+  fetch("https://audio-quizlet.vercel.app/quiz/" + quizId)
     .then((data) => {
       return data.json();
     })
@@ -164,7 +164,7 @@ function apiCall(quizId) {
       thisQuizId = quizId;
       createQuiz(quizObject, quizId);
       viewResponses.addEventListener("click", ()=>{
-        window.location.href = "http://127.0.0.1:3000/audioQuizlet/frontend/viewer/index.html?id="+quizId
+        window.location.href = "https://audioquizlet.netlify.app/viewer?id="+quizId
       });
     })
     .catch((err) => {

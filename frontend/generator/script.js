@@ -183,7 +183,7 @@ const onSubmitQuiz = (e) => {
   let tlimit = timeLimit.value == "" ? null : timeLimit.value;
   data.append("timeLimit", tlimit);
 
-  fetch("http://localhost:8000/upload", {
+  fetch("https://audio-quizlet.vercel.app/upload", {
     method: "POST",
     body: data,
   })

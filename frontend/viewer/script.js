@@ -14,7 +14,7 @@ const introDialog = elid("introDialog")
 
 
 function apiCall(quizId) {
-  fetch("http://localhost:8000/quiz/" + quizId)
+  fetch("https://audio-quizlet.vercel.app/quiz/" + quizId)
     .then((data) => {
       return data.json();
     })
