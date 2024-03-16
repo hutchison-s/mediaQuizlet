@@ -18,7 +18,7 @@ import admin from 'firebase-admin'
 import {credential} from "../api/firebaseAdmin.config.js"
 
 const port = process.env.PORT || 8000;
-const fbApp = admin.initializeApp({credential: admin.credential.cert(credential)});
+const fbApp = admin.initializeApp({credential: admin.credential.cert(credential), storageBucket: "audioquizlet.appspot.com"});
 
 const db = admin.firestore(fbApp);
 const storage = admin.storage(fbApp);
@@ -38,7 +38,8 @@ app.get("/", (req, res) => {
   res.send("Hello, Express!");
 });
 
-async function handleFileUploads({files, body}) {
+async function handleFileUploads(req) {
+  const {files, body} = req;
   const dt = Date.now();
   const expires = new Date();
   expires.setFullYear(expires.getFullYear()+1)
@@ -52,11 +53,12 @@ async function handleFileUploads({files, body}) {
       console.log("link retrieved: "+downLink)
       qList[i].file = downLink;
     }
+    return qList;
   } catch (err) {
     console.log("Error uploading files. "+err);
     throw new Error("Error uploading files");
   }
-  return qList;
+  
 }
 
 async function createDocument(qList, timeLimit, password) {
@@ -83,16 +85,16 @@ async function createDocument(qList, timeLimit, password) {
 
 // Upload Files
 app.post("/upload", upload.array("files", 12), async (req, res) => {
+  console.log("called upload")
   try {
     const {timeLimit, password} = req.body;
-    console.log("body\n"+req.body)
-    console.log("files\n"+req.files)
     const qList = await handleFileUploads(req);
     console.log("qList\n"+qList)
     const message = await createDocument(qList, timeLimit, password);
     console.log("received\n"+message)
     res.send(message);
   } catch (err) {
+    console.log(err)
     res.status(500).send(err)
   }
 });
