@@ -13,7 +13,7 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 
-import { initializeApp } from "firebase/app";
+// import { initializeApp } from "firebase/app";
 import {
   getFirestore,
   collection,
@@ -24,12 +24,17 @@ import {
   arrayUnion
 } from "firebase/firestore";
 
-import config from "../api/firebase.config.js";
-const port = process.env.PORT || 8000;
-const fbApp = initializeApp(config.firebaseConfig);
+import admin from 'firebase-admin'
 
-const storage = getStorage();
-const db = getFirestore(fbApp);
+// import config from "../api/firebase.config.js";
+import {credential} from "../api/firebaseAdmin.config.js"
+
+const port = process.env.PORT || 8000;
+const fbApp = admin.initializeApp({credential: admin.credential.cert(credential)});
+
+const db = admin.firestore();
+const storage = admin.storage();
+
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -94,9 +99,8 @@ app.post("/upload", upload.array("files", 12), async (req, res) => {
 app.get("/quiz/:code", async (req, res) => {
   try {
     console.log(req.params.code + " requested");
-    const dRef = doc(db, "quizzes", req.params.code);
-    const snapshot = await getDoc(dRef);
-    const data = snapshot.data();
+    const docReq = await db.collection("quizzes").doc(req.params.code).get()
+    const data = docReq.data()
     if (data == null) {
       throw new Error("No such document")
     }
