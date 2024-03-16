@@ -7,29 +7,24 @@ dotenv.config();
 import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage() });
 import {
-  getStorage,
   ref,
   uploadBytesResumable,
   getDownloadURL,
 } from "firebase/storage";
 
-import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  addDoc,
-  getDoc,
-  doc,
-  updateDoc,
-  arrayUnion
-} from "firebase/firestore";
+import admin from 'firebase-admin'
 
-import config from "../api/firebase.config.js";
+// import config from "../api/firebase.config.js";
+import {credential} from "../api/firebaseAdmin.config.js"
+
 const port = process.env.PORT || 8000;
-const fbApp = initializeApp(config.firebaseConfig);
+const fbApp = admin.initializeApp({credential: admin.credential.cert(credential)});
 
-const storage = getStorage();
-const db = getFirestore(fbApp);
+const db = admin.firestore(fbApp);
+const storage = admin.storage(fbApp);
+const qCol = db.collection("quizzes");
+const fv = admin.firestore.FieldValue;
+
 
 // Middleware to parse JSON requests
 app.use(express.json());
@@ -43,18 +38,11 @@ app.get("/", (req, res) => {
   res.send("Hello, Express!");
 });
 
-// Log Form Data
-app.post("/", (req, res) => {
-  console.log(req.body);
-  res.end();
-});
-
 // Upload Files
 app.post("/upload", upload.array("files", 12), async (req, res) => {
   const dt = Date.now();
   const { password, timeLimit, questions } = req.body;
   const qList = JSON.parse(questions);
-  console.log(qList);
   try {
     for (let i = 0; i < req.files.length; i++) {
       const fRef = ref(storage, "files/" + req.files[i].originalname.split(".")[0] + dt);
@@ -71,14 +59,15 @@ app.post("/upload", upload.array("files", 12), async (req, res) => {
 
   let code;
   try {
-    const docRef = await addDoc(collection(db, "quizzes"), {
+    const newDoc = {
       questions: qList,
       timeLimit: timeLimit || null,
       password: password,
       responses: new Array(),
-    });
-    console.log("Document written with ID: ", docRef.id);
-    code = docRef.id;
+    }
+    const docAdded = await qCol.add(newDoc)
+    console.log("Document written with ID: ", docAdded.id);
+    code = docAdded.id;
   } catch (err) {
     console.error("Error adding document.");
     res
@@ -94,9 +83,8 @@ app.post("/upload", upload.array("files", 12), async (req, res) => {
 app.get("/quiz/:code", async (req, res) => {
   try {
     console.log(req.params.code + " requested");
-    const dRef = doc(db, "quizzes", req.params.code);
-    const snapshot = await getDoc(dRef);
-    const data = snapshot.data();
+    const docReq = await qCol.doc(req.params.code).get()
+    const data = docReq.data()
     if (data == null) {
       throw new Error("No such document")
     }
@@ -113,18 +101,15 @@ app.get("/quiz/:code", async (req, res) => {
 app.post("/quiz/:code/response", async (req, res) => {
   try {
     const id = req.params.code;
-    const dRef = doc(db, "quizzes", req.params.code);
     const { user, timestamp, responses } = req.body;
-    const update = {
-      responses: arrayUnion({
-        user: user,
-        timestamp: timestamp,
-        responses: responses,
-      }),
-    };
-    const updated = await updateDoc(dRef, update);
-    res.send(updated);
-    console.log("New Response to Quiz " + id + " received."); 
+    const updateData = {
+      user: user,
+      timestamp: timestamp,
+      responses: responses,
+    }
+    const docUpdate = await qCol.doc(id).update('responses', fv.arrayUnion(updateData));
+    res.send(docUpdate);
+    console.log("New Response to quiz " + id + " received."); 
   } catch(err) {
     res.status(400).send({message: "Error in sending response", error: err})
   }
