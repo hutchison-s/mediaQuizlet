@@ -46,12 +46,14 @@ async function handleFileUploads({files, body}) {
   try {
     for (let i = 0; i < files.length; i++) {
       const cloudFile = storage.bucket().file("files/" + files[i].originalname.split(".")[0] + dt)
+      console.log("file ref:"+cloudFile)
       await cloudFile.save(files[i].buffer, {contentType: files[i].mimetype})
       const downLink = await cloudFile.getSignedUrl({action: "read", expires: expires.toISOString()})
+      console.log("link retrieved: "+downLink)
       qList[i].file = downLink;
     }
   } catch (err) {
-    console.log("Error uploading files.");
+    console.log("Error uploading files. "+err);
     throw new Error("Error uploading files");
   }
   return qList;
@@ -83,8 +85,12 @@ async function createDocument(qList, timeLimit, password) {
 app.post("/upload", upload.array("files", 12), async (req, res) => {
   try {
     const {timeLimit, password} = req.body;
+    console.log("body\n"+req.body)
+    console.log("files\n"+req.files)
     const qList = await handleFileUploads(req);
+    console.log("qList\n"+qList)
     const message = await createDocument(qList, timeLimit, password);
+    console.log("received\n"+message)
     res.send(message);
   } catch (err) {
     res.status(500).send(err)
