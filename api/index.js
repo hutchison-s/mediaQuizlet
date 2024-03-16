@@ -38,46 +38,57 @@ app.get("/", (req, res) => {
   res.send("Hello, Express!");
 });
 
-// Upload Files
-app.post("/upload", upload.array("files", 12), async (req, res) => {
+async function handleFileUploads({files, body}) {
   const dt = Date.now();
-  const { password, timeLimit, questions } = req.body;
-  const qList = JSON.parse(questions);
+  const expires = new Date();
+  expires.setFullYear(expires.getFullYear()+1)
+  const qList = JSON.parse(body.questions);
   try {
-    for (let i = 0; i < req.files.length; i++) {
-      const fRef = ref(storage, "files/" + req.files[i].originalname.split(".")[0] + dt);
-      const snapshot = await uploadBytesResumable(fRef, req.files[i].buffer, {
-        contentType: req.files[0].mimetype,
-      });
-      const downLink = await getDownloadURL(snapshot.ref);
+    for (let i = 0; i < files.length; i++) {
+      const cloudFile = storage.bucket().file("files/" + files[i].originalname.split(".")[0] + dt)
+      await cloudFile.save(files[i].buffer, {contentType: files[i].mimetype})
+      const downLink = await cloudFile.getSignedUrl({action: "read", expires: expires.toISOString()})
       qList[i].file = downLink;
     }
   } catch (err) {
     console.log("Error uploading files.");
-    res.status(400).send({ message: "Error uploading files", error: err });
+    throw new Error("Error uploading files");
   }
+  return qList;
+}
 
-  let code;
+async function createDocument(qList, timeLimit, password) {
   try {
     const newDoc = {
       questions: qList,
       timeLimit: timeLimit || null,
       password: password,
-      responses: new Array(),
+      responses: []
+    };
+
+    const docAdded = await qCol.add(newDoc);
+    console.log("Document written with ID:", docAdded.id);
+    const code = docAdded.id;
+    return {
+      message: "Upload successful",
+      url: `https://audioquizlet.netlify.app/quizzer?id=${code}`
     }
-    const docAdded = await qCol.add(newDoc)
-    console.log("Document written with ID: ", docAdded.id);
-    code = docAdded.id;
   } catch (err) {
-    console.error("Error adding document.");
-    res
-      .status(400)
-      .send({ message: "Error creating quiz document", error: err });
+    console.error("Error adding document:", err);
+    throw new Error("Error occurred while attempting to create new document.")
   }
-  res.send({
-    message: "Upload successful",
-    url: `https://audioquizlet.netlify.app/quizzer?id=` + code,
-  });
+}
+
+// Upload Files
+app.post("/upload", upload.array("files", 12), async (req, res) => {
+  try {
+    const {timeLimit, password} = req.body;
+    const qList = await handleFileUploads(req);
+    const message = await createDocument(qList, timeLimit, password);
+    res.send(message);
+  } catch (err) {
+    res.status(500).send(err)
+  }
 });
 
 app.get("/quiz/:code", async (req, res) => {
