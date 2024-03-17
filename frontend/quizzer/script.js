@@ -122,7 +122,6 @@ function createQuestion(q) {
 // Iterate through questions and append their required elements to the provided box element
 
 function populateQuestions(box, qList) {
-  console.log(qList);
   for (const q of qList) {
     const [player, form] = createQuestion(q);
     root.append(player.audio);
@@ -159,7 +158,6 @@ function apiCall(quizId) {
       return data.json();
     })
     .then((quizObject) => {
-      console.log("object: \n" + quizObject);
       thisQuizId = quizId;
       createQuiz(quizObject, quizId);
       viewResponses.addEventListener("click", ()=>{

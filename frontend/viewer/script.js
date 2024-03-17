@@ -19,7 +19,6 @@ function apiCall(quizId) {
       return data.json();
     })
     .then((quizObject) => {
-      console.log("object: \n" + quizObject);
       const handleCorrect = ()=>{
         if (passwordInput.value == quizObject.password) {
             showResponses(quizObject);
