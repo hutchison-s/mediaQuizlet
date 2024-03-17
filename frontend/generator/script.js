@@ -1,6 +1,6 @@
 // DOM Utilities
 import {changeMode, setInitialStyle} from "../modules/darkmode.js";
-import { elid, newEl } from "../modules/domFuncs.js";
+import { elid, elsel, newEl } from "../modules/domFuncs.js";
 import MCQuestion from "../modules/MCQuestion.js";
 
 setInitialStyle();
@@ -201,6 +201,7 @@ const onSubmitQuiz = (e) => {
       qList.innerHTML = "";
       activeQ = 0;
       root.innerHTML = ""
+      restartBtn.style.display = "none";
       root.append(success(data.url));
       elid("copyLink").addEventListener("click", (e)=>{
         navigator.clipboard.writeText(data.url)
@@ -218,12 +219,13 @@ function success(url) {
   const box = newEl("div", "successBox", "softCorner");
   box.classList.add("shadow")
   box.innerHTML = `
-      <h2>Quizlet Successfully Created</h2>
-      <p>Link to Quizlet:</p>
-      <div><a id="successLink" href="${url}">${url}</a><button id="copyLink"><i class="fa-solid fa-copy"></i></button></div>
-      <p>Quizlet Code:</p>
-      <div><p id="successCode">${url.substring(url.length-20)}</p><button id="copyCode"><i class="fa-solid fa-copy"></i></button></div>
-      <button id="createAnother" onclick="window.location.reload()" class="softCorner">Create another Quizlet</button>`
+      <div class="successWrap">
+        <h2>Quizlet Successfully Created</h2>
+        <p>Link to Quizlet:</p>
+        <div><a id="successLink" href="${url}">${url}</a><button id="copyLink"><i class="fa-solid fa-copy"></i></button></div>
+        <p>Quizlet Code:</p>
+        <div><p id="successCode">${url.substring(url.length-20)}</p><button id="copyCode"><i class="fa-solid fa-copy"></i></button></div>
+        <button id="createAnother" onclick="window.location.reload()" class="softCorner primaryBtn">Create another Quizlet</button></div>`
   return box
 }
 
@@ -357,6 +359,15 @@ passwordInput.addEventListener("invalid", function (event) {
 passwordInput.addEventListener("change", function (event) {
   event.target.setCustomValidity("");
 });
+
+passwordInput.addEventListener("input", ()=>{
+  if (passwordInput.value.length < 4) {
+    elsel("#submissionTool button[type='submit']").setAttribute("disabled", true)
+  } else {
+    elsel("#submissionTool button[type='submit']").removeAttribute("disabled");
+
+  }
+})
 
 // Event listener for form submission on submissionForm
 submissionForm.addEventListener("submit", onSubmitQuiz);

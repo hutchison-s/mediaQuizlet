@@ -22,8 +22,8 @@
     <i id="lightDark" class="fa-solid fa-circle-half-stroke"></i>
     <aside id="sidebar">
       <h1><a href="../"><i class="fa-solid fa-circle-play"></i>Audio&nbsp;Quizlet</a></h1>
-      <label class="softCorner" for="upload" id="uploadLabel">
-        <span>Upload Files</span>
+      <label class="softCorner primaryBtn" for="upload" id="uploadLabel">
+        Upload Files
         <input
           type="file"
           accept="audio/mp3, audio/mp4, audio/mpeg, audio/wav"
@@ -41,7 +41,7 @@
         </div>
       </div>
       <button id="launchSubmission" class="softCorner">Generate Link</button>
-      <button id="restart" class="softCorner">Start Over</button>
+      <button id="restart" class="warningButton softCorner">Start Over</button>
     </aside>
     <section id="root">
       <button id="leftForm" disabled>
@@ -54,7 +54,7 @@
         <div id="formCar"></div>
       </div>
       <div id="introText">
-        <p>Drag and drop files to the toolbar or click 'Upload&nbsp;Files' to start creating an Audio&nbsp;Quizlet</p>
+        <p>Drag and drop files to the toolbar on the left or click 'Upload&nbsp;Files' to start creating an Audio&nbsp;Quizlet</p>
       </div>
     </section>
     <dialog id="submissionTool" class="softCorner">
@@ -69,6 +69,7 @@
               class="softCorner"
               id="password"
               pattern="^[a-zA-Z0-9!@#%^&*]{4,16}$"
+              placeholder="Password..."
             />
             <i id="peek" class="fa-solid fa-eye"></i>
           </div>
@@ -87,9 +88,9 @@
             hidden
           />
         </label>
-        <button type="submit" class="softCorner">Generate Quiz Link</button>
+        <button type="submit" class="softCorner primaryBtn" disabled>Generate Quiz Link</button>
       </form>
-      <button id="cancelSubmission">Cancel</button>
+      <button id="cancelSubmission" class="softCorner warningButton">Cancel</button>
     </dialog>
     <div id="spinner" class="hidden">
       <div class="spinOut"></div>

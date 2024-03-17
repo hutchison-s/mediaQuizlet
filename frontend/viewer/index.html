@@ -22,21 +22,27 @@
     <i id="lightDark" class="fa-solid fa-circle-half-stroke"></i>
 
     <div id="root"><h1><a href="../"><i class="fa-solid fa-circle-play"></i>Audio&nbsp;Quizlet</a></h1></div>
-    <dialog id="introDialog" class="softCorner">
-      <h2><a href="../"><i class="fa-solid fa-circle-play"></i>Audio&nbsp;Quizlet</a></h2>
-      <p>Enter password to view responses</p>
-      <div id="passBox">
-        <input
-          required
-          type="password"
-          class="softCorner"
-          id="password"
-        />
-        <i id="peek" class="fa-solid fa-eye"></i>
+    <dialog id="introDialog" class="softCorner dialog">
+      <div class="dialogContent">
+        <div class="dialogLogo">
+          <h2><a href="../"><i class="fa-solid fa-circle-play"></i>Audio&nbsp;Quizlet</a></h2>
+        </div>
+        <div class="dialogInstructions">
+          <p>Enter password to view responses</p>
+        </div>
+        <div id="passBox">
+          <input
+            required
+            type="password"
+            class="softCorner"
+            id="password"
+            placeholder="Password..."
+          />
+          <i id="peek" class="fa-solid fa-eye"></i>
+        </div>
+        <button id="viewResponses" class="softCorner primaryBtn" disabled>View Responses</button>
       </div>
-      <button id="viewResponses" class="softCorner" disabled>View Responses</button>
     </dialog>
-    <div id="filter"></div>
 
   </body>
 </html>

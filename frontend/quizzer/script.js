@@ -12,7 +12,6 @@ const totalTime = elid("totalTime");
 const beginBtn = elid("beginQuiz");
 const nameInput = elid("nameInput");
 const introDialog = elid("introDialog");
-const filter = elid("filter");
 const numQuestions = elid("numQuestions");
 const viewResponses = elid("viewResponses");
 const lightDark = elid("lightDark");
@@ -182,7 +181,6 @@ function gatherInfo(time, questions) {
   numQuestions.textContent =
     questions == 1 ? "1 question" : questions + " questions";
   introDialog.showModal();
-  filter.style.display = "block";
   nameInput.addEventListener("input", () => {
     if (nameInput.value.length < 3) {
       beginBtn.setAttribute("disabled", true);
@@ -207,7 +205,6 @@ function beginQuiz() {
   user = name;
   userDisplay.textContent = user;
   introDialog.close();
-  elid("filter").style.display = "none";
   quizTimer && quizTimer.startTimer();
 }
 

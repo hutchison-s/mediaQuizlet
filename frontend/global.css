@@ -1,52 +1,144 @@
 :root {
-    --primary: #000000;
-    --primary-half: #000000;
-    --secondary: #000000;
-    --light-secondary: #000000;
-    --background: #000000;
-    --success: #32a852;
-    --warning: #96184b;
-    --shadow: 2px 2px 20px var(--primary-half);
-  }
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    color: var(--primary);
-    font-family: Rubik;
-  }
-  #lightDark {
-    position: fixed;
-    z-index: 1;
-    font-size: 2rem;
-    top: 0.5rem;
-    right: 0.5rem;
-    color: var(--primary);
-    opacity: 0.5;
-    cursor: pointer;
-  }
-  .rounded {
-    border-radius: 2rem;
-  }
-  .softCorner {
-    border-radius: 0.5rem;
-  }
-  .shadow {
-    box-shadow: var(--shadow);
-  }
-  .fa-circle-play::before {
-    background-image: linear-gradient(var(--secondary), var(--light-secondary));
-    background-clip: text;
-    -webkit-background-clip: text;
-    color: transparent;
-    margin-right: 0.5rem;
-  }
-  h1 {
-    margin: 2rem;
-    font-size: clamp(24px, 8vw, 60px);
-    text-align: center;
-  }
-  h1 > a,
-  h2 > a {
-    text-decoration: none;
-  }
+
+  --success: #32a852;
+  --warning: #96184b;
+  --danger: linear-gradient(45deg, rgb(35,35,110),rgb(89, 31, 56),rgb(4,5,44));
+  --shadow: 4px 4px 25px var(--primary-half);
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: var(--primary);
+  font-family: Rubik;
+}
+body {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+#lightDark {
+  position: fixed;
+  z-index: 1;
+  font-size: 2rem;
+  top: 0.5rem;
+  right: 0.5rem;
+  color: var(--primary);
+  opacity: 0.5;
+  cursor: pointer;
+}
+.rounded {
+  border-radius: 2rem;
+}
+.softCorner {
+  border-radius: 0.5rem;
+}
+.shadow {
+  box-shadow: var(--shadow);
+}
+.fa-circle-play::before {
+  background-image: linear-gradient(var(--secondary), var(--light-secondary));
+  background-clip: text;
+  -webkit-background-clip: text;
+  color: transparent;
+  margin-right: 0.5rem;
+}
+h1 {
+  margin: 2rem;
+  font-size: clamp(24px, 8vw, 60px);
+  text-align: center;
+}
+h1 > a,
+h2 > a {
+  text-decoration: none;
+}
+body {
+  background-image: var(--texture);
+}
+.warningButton {
+  padding: 0.5rem 1rem;
+  background-image: var(--danger);
+  border: none;
+  color: #ffffffcc;
+  cursor: pointer;
+  outline: 1px solid #ffffff33;
+}
+.warningButton:hover {
+  scale: 1.02;
+  outline: 2px solid #ffffffcc;
+  box-shadow: var(--shadow);
+}
+.dialog {
+  background-image: var(--sidebar);
+  width: clamp(300px, 75vw, 800px);
+  height: 60vh;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+}
+.dialog::backdrop {
+  background: #00000088;
+  filter: blur(4px);
+}
+.dialogContent {
+  display: grid;
+  grid-template-rows: 1.5fr 1fr 1fr 2fr;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+  padding: 2rem 1rem;
+  height: 100%;
+}
+.dialog p,
+.dialog span {
+  color: var(--secondary);
+  font-size: clamp(16px, 4vw, 24px);
+}
+.dialog button {
+  width: clamp(200px, 50%, 350px);
+  margin: auto;
+}
+.dialogLogo {
+  font-size: clamp(1.2rem, 5vw, 3.5rem);
+}
+.dialogInstructions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin: clamp(0.5rem, 4vw, 3rem) auto;
+}
+.dialog .buttonWrap {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.primaryBtn,
+.secondaryBtn {
+  border: none;
+  padding: 1rem 2rem;
+  font-size: large;
+  box-shadow: var(--shadow);
+  margin-top: 2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.primaryBtn {
+  background: var(--secondary);
+  color: var(--background);
+}
+
+.secondaryBtn {
+  background: var(--primary);
+  color: var(--background);
+}
+.primaryBtn:hover,
+.secondaryBtn:hover {
+  transform: scale(1.1);
+}
+.primaryBtn:disabled,
+.secondaryBtn:disabled {
+  opacity: 0.2;
+  filter: grayscale(50%);
+  transform: none;
+  cursor: not-allowed;
+}
