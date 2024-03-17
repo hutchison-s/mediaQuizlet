@@ -6,11 +6,6 @@ import dotenv from "dotenv";
 dotenv.config();
 import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage() });
-import {
-  ref,
-  uploadBytesResumable,
-  getDownloadURL,
-} from "firebase/storage";
 
 import admin from 'firebase-admin'
 
