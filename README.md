@@ -56,6 +56,9 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
 - HTML
 - CSS
 - JavaScript
+- Node.js
+- Express
+- Firebase
 
 ## Contributors
 
