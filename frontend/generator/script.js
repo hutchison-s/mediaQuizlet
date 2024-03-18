@@ -129,6 +129,12 @@ const qSubmit = (e, quest, form, box) => {
 
 // Function to handle uploaded files
 const handleFiles = (files) => {
+  if (files.length > 12) {
+    upload.value = "";
+      alert("Limit of 12 files per quiz.")
+      resetPage();
+      return;
+  }
   for (const f of files) {
     if (f.size / 1048576 > 4) {
       upload.value = "";
