@@ -14,35 +14,30 @@ const introDialog = elid("introDialog")
 
 
 function apiCall(quizId) {
-  fetch("https://audio-quizlet.vercel.app/quiz/" + quizId)
-    .then((data) => {
-      return data.json();
-    })
+  fetch("https://audio-quizlet.vercel.app/quiz/admin", {
+    headers: {
+        Authorization: 'Basic ' + btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(passwordInput.value)}`)
+    }
+  })
+    .then(data => data.json())
     .then((quizObject) => {
-      const handleCorrect = ()=>{
-        if (passwordInput.value == quizObject.password) {
-            showResponses(quizObject);
-        } else {
-            passwordInput.style.outline = "4px solid var(--warning)"
-            passwordInput.value = "incorrect password"
-            passwordInput.type = "text"
-            setTimeout(()=>{
-                passwordInput.value = ""
-                passwordInput.type = "password"
-                passwordInput.style.outline = "none"
-            }, 2000)
-        }
-      }
-      passwordInput.addEventListener("keyup", (e) => {
-        if (e.key == "Enter") {
-          handleCorrect();
-        }
-      })
-      viewRes.addEventListener("click", handleCorrect);
+      showResponses(quizObject)
     })
     .catch((err) => {
       console.log(err);
-      root.innerHTML = "<h2 class='status'>Error reaching server</h2>";
+      if (err.status == 401) {
+          passwordInput.style.outline = "4px solid var(--warning)"
+          passwordInput.value = "incorrect password"
+          passwordInput.type = "text"
+          setTimeout(()=>{
+              passwordInput.value = ""
+              passwordInput.type = "password"
+              passwordInput.style.outline = "none"
+          }, 2000)
+      } else {
+        root.innerHTML = "<h2 class='status'>Server Error. Please refresh and try again.</h2>";
+      }
+      
     });
 }
 
@@ -78,7 +73,7 @@ function showResponses(quiz) {
   introDialog.close()
 }
 
-window.addEventListener("load", () => {
+function handleSendPassword() {
   const queryString = window.location.search;
   const urlParams = new URLSearchParams(queryString);
   if (urlParams.has("id")) {
@@ -87,6 +82,10 @@ window.addEventListener("load", () => {
   } else {
     root.innerHTML = "<h2 class='status'>Invalid Quiz ID</h2>";
   }
+}
+
+window.addEventListener("load", () => {
+  introDialog.showModal();
 });
 
 lightDark.addEventListener("click", changeMode);
@@ -105,5 +104,10 @@ passwordInput.addEventListener("input", () => {
     viewRes.removeAttribute("disabled");
   }
 });
+passwordInput.addEventListener("keyup", (e) => {
+  if (e.key == "Enter") {
+    handleSendPassword();
+  }
+})
+viewRes.addEventListener("click", handleSendPassword);
 
-introDialog.showModal();
