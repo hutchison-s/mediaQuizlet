@@ -102,14 +102,25 @@ app.get("/quiz/:code", async (req, res) => {
     if (data == null) {
       throw new Error("No such document")
     }
-    console.log(data);
-    res.send(data);
+    const sendData = {
+      questions: new Array(),
+      timeLimit: data.timeLimit
+    }
+    for (const q of data.questions) {
+      sendData.questions.push({
+        title: q.title,
+        options: q.options,
+        limit: q.limit,
+        file: q.file
+      })
+    }
+    console.log(sendData);
+    res.send(sendData);
   } catch(err) {
     res
       .status(400)
       .send({ message: "Error retrieving quiz document", error: err });
   }
-  
 });
 
 app.post("/quiz/:code/response", async (req, res) => {
@@ -128,6 +139,41 @@ app.post("/quiz/:code/response", async (req, res) => {
     res.status(400).send({message: "Error in sending response", error: err})
   }
 });
+
+app.get("/quiz/admin", async (req, res) => {
+  const authheader = req.headers.authorization;
+    console.log(req.headers);
+  try {
+      console.log(req.params.code + " requested");
+      if (!authheader) {
+          let err = new Error('You are not authenticated!');
+          res.setHeader('WWW-Authenticate', 'Basic');
+          err.status = 401;
+          throw err;
+      }
+      const decodedCreds = Buffer.from(authheader.split(' ')[1],'base64').toString()
+      const [code, pass] = decodedCreds.split(':')
+      const docReq = await qCol.doc(code).get()
+      const data = docReq.data()
+      if (data == null) {
+        let err = new Error("No such document");
+        err.status = 400;
+        throw err;
+      }
+      if (pass == data.password) {
+          console.log(data);
+          res.send(data);
+      } else {
+          let err = new Error('You are not authenticated!');
+          res.setHeader('WWW-Authenticate', 'Basic');
+          err.status = 401;
+          throw err;
+      }
+  } catch(err) {
+    res
+      .status(err.status).send({ message: "Error retrieving quiz document", error: err });
+  }
+})
 
 // Start the server
 app.listen(port, () => {
