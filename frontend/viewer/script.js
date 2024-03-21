@@ -14,9 +14,10 @@ const introDialog = elid("introDialog")
 
 
 function apiCall(quizId) {
-  fetch("https://audio-quizlet.vercel.app/quiz/admin", {
+  const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(passwordInput.value)}`);
+  fetch(`https://audio-quizlet.vercel.app/quiz/${quizId}/admin`, {
     headers: {
-        Authorization: 'Basic ' + btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(passwordInput.value)}`)
+        Authorization: 'Basic ' + encoding
     }
   })
     .then(data => data.json())
