@@ -146,10 +146,6 @@ app.get("/quiz/:code/admin", async (req, res) => {
   
   try {
       const authheader = req.headers['authorization']
-      console.log("headers: "+req.headers);
-      for (let key in req.headers) {
-        console.log(key+": "+req.headers[key])
-      }
       console.log(req.params.code + " requested");
       if (!authheader) {
           let err = new Error('You are not authenticated! No header present');
