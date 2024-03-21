@@ -23,7 +23,9 @@ const fv = admin.firestore.FieldValue;
 
 // Middleware to parse JSON requests
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  
+}));
 
 // Middleware to handle form data
 app.use(express.urlencoded({ extended: true }));
@@ -140,23 +142,29 @@ app.post("/quiz/:code/response", async (req, res) => {
   }
 });
 
-app.get("/quiz/admin", async (req, res) => {
-  const authheader = req.headers.authorization;
-    console.log(req.headers);
+app.get("/quiz/:code/admin", async (req, res) => {
+  
   try {
+      const authheader = req.headers['authorization']
+      console.log("headers: "+req.headers);
+      for (let key in req.headers) {
+        console.log(key+": "+req.headers[key])
+      }
       console.log(req.params.code + " requested");
       if (!authheader) {
-          let err = new Error('You are not authenticated!');
+          let err = new Error('You are not authenticated! No header present');
           res.setHeader('WWW-Authenticate', 'Basic');
           err.status = 401;
           throw err;
       }
       const decodedCreds = Buffer.from(authheader.split(' ')[1],'base64').toString()
       const [code, pass] = decodedCreds.split(':')
+      console.log(code+":"+pass)
       const docReq = await qCol.doc(code).get()
       const data = docReq.data()
       if (data == null) {
         let err = new Error("No such document");
+        console.log("no such document")
         err.status = 400;
         throw err;
       }
@@ -170,8 +178,9 @@ app.get("/quiz/admin", async (req, res) => {
           throw err;
       }
   } catch(err) {
+    console.log(err)
     res
-      .status(err.status).send({ message: "Error retrieving quiz document", error: err });
+      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
   }
 })
 
