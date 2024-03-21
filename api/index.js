@@ -43,7 +43,7 @@ async function handleFileUploads(req) {
   const qList = JSON.parse(body.questions);
   try {
     for (let i = 0; i < files.length; i++) {
-      const cloudFile = storage.bucket().file("files/" + files[i].originalname.split(".")[0] + dt)
+      const cloudFile = storage.bucket().file("files/" + files[i].originalname.split(".")[0] + dt+i)
       console.log("file ref:"+cloudFile)
       await cloudFile.save(files[i].buffer, {contentType: files[i].mimetype})
       const downLink = await cloudFile.getSignedUrl({action: "read", expires: expires.toISOString()})
