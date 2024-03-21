@@ -21,6 +21,7 @@ const players = [];
 let quizTimer = null;
 let thisQuizId = null;
 let user = null;
+let hasBeenWarned = false;
 
 // Store current time remaining, checked responses, and listen limits in localStorage
 
@@ -84,6 +85,7 @@ function submitAll() {
       root.innerHTML = `<h2 class='status'>Submitted Successfully</h2>`;
       user = null;
       quizTimer = null;
+      exitFullScreen();
     })
     .catch((err) => {
       alert("Error reaching server:" + err);
@@ -146,6 +148,10 @@ function createQuiz(quiz) {
   container.appendChild(subBtn);
   const oldState = window.localStorage.getItem("quizState"+thisQuizId);
   if (oldState) {
+    if (!window.sessionStorage.getItem("quizUser")) {
+      root.innerHTML = "<h2 class='status'>Quiz already in session elsewhere.</h2>";
+      return;
+    }
       restoreState(JSON.parse(oldState));
   } else {
     gatherInfo(quiz.timeLimit, quiz.questions.length);
@@ -159,6 +165,9 @@ function apiCall(quizId) {
     })
     .then((quizObject) => {
       thisQuizId = quizId;
+      if (window.localStorage.getItem("quizState"+quizId)) {
+        console.log("exists")
+      }
       createQuiz(quizObject, quizId);
       viewResponses.addEventListener("click", ()=>{
         window.location.href = "https://audioquizlet.netlify.app/viewer?id="+quizId
@@ -203,6 +212,8 @@ function beginQuiz() {
   user = name;
   userDisplay.textContent = user;
   introDialog.close();
+  requestFullScreen();
+  window.sessionStorage.setItem("quizUser", user)
   quizTimer && quizTimer.startTimer();
 }
 
@@ -217,10 +228,47 @@ window.addEventListener("load", () => {
   }
 });
 
-window.addEventListener("beforeunload", ()=>{
+window.addEventListener("beforeunload", (e)=>{
   if (user) {
     updateStorage();
   }
 });
+window.addEventListener("blur", (e)=>{
+  if (user) {
+    if (!hasBeenWarned) {
+      let agrees = confirm("This is your only warning. Navigating away from this page will result in your quiz being submitted as-is. Do you agree to keep your focus on the current page?")
+      if (!agrees) {
+        submitAll();
+      }
+      hasBeenWarned = true;
+    } else {
+      submitAll();
+    }
+  }
+})
 lightDark.addEventListener("click", changeMode);
  
+function requestFullScreen() {
+  const element = document.documentElement; // Get the root element of the document (typically <html>)
+if (element.requestFullscreen) {
+  element.requestFullscreen(); // Request fullscreen
+} else if (element.mozRequestFullScreen) { /* Firefox */
+  element.mozRequestFullScreen();
+} else if (element.webkitRequestFullscreen) { /* Chrome, Safari and Opera */
+  element.webkitRequestFullscreen();
+} else if (element.msRequestFullscreen) { /* IE/Edge */
+  element.msRequestFullscreen();
+}
+}
+
+function exitFullScreen(){
+  if (document.exitFullscreen) {
+    document.exitFullscreen(); // Exit fullscreen mode
+  } else if (document.mozCancelFullScreen) { /* Firefox */
+    document.mozCancelFullScreen();
+  } else if (document.webkitExitFullscreen) { /* Chrome, Safari and Opera */
+    document.webkitExitFullscreen();
+  } else if (document.msExitFullscreen) { /* IE/Edge */
+    document.msExitFullscreen();
+  }
+}
