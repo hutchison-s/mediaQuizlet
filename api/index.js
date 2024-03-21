@@ -23,7 +23,9 @@ const fv = admin.firestore.FieldValue;
 
 // Middleware to parse JSON requests
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+  
+}));
 
 // Middleware to handle form data
 app.use(express.urlencoded({ extended: true }));
@@ -41,7 +43,7 @@ async function handleFileUploads(req) {
   const qList = JSON.parse(body.questions);
   try {
     for (let i = 0; i < files.length; i++) {
-      const cloudFile = storage.bucket().file("files/" + files[i].originalname.split(".")[0] + dt)
+      const cloudFile = storage.bucket().file("files/" + files[i].originalname.split(".")[0] + dt+i)
       console.log("file ref:"+cloudFile)
       await cloudFile.save(files[i].buffer, {contentType: files[i].mimetype})
       const downLink = await cloudFile.getSignedUrl({action: "read", expires: expires.toISOString()})
@@ -102,14 +104,25 @@ app.get("/quiz/:code", async (req, res) => {
     if (data == null) {
       throw new Error("No such document")
     }
-    console.log(data);
-    res.send(data);
+    const sendData = {
+      questions: new Array(),
+      timeLimit: data.timeLimit
+    }
+    for (const q of data.questions) {
+      sendData.questions.push({
+        title: q.title,
+        options: q.options,
+        limit: q.limit,
+        file: q.file
+      })
+    }
+    console.log(sendData);
+    res.send(sendData);
   } catch(err) {
     res
       .status(400)
       .send({ message: "Error retrieving quiz document", error: err });
   }
-  
 });
 
 app.post("/quiz/:code/response", async (req, res) => {
@@ -128,6 +141,44 @@ app.post("/quiz/:code/response", async (req, res) => {
     res.status(400).send({message: "Error in sending response", error: err})
   }
 });
+
+app.get("/quiz/:code/admin", async (req, res) => {
+  
+  try {
+      const authheader = req.headers['authorization']
+      console.log(req.params.code + " requested");
+      if (!authheader) {
+          let err = new Error('You are not authenticated! No header present');
+          res.setHeader('WWW-Authenticate', 'Basic');
+          err.status = 401;
+          throw err;
+      }
+      const decodedCreds = Buffer.from(authheader.split(' ')[1],'base64').toString()
+      const [code, pass] = decodedCreds.split(':')
+      console.log(code+":"+pass)
+      const docReq = await qCol.doc(code).get()
+      const data = docReq.data()
+      if (data == null) {
+        let err = new Error("No such document");
+        console.log("no such document")
+        err.status = 400;
+        throw err;
+      }
+      if (pass == data.password) {
+          console.log(data);
+          res.send(data);
+      } else {
+          let err = new Error('You are not authenticated!');
+          res.setHeader('WWW-Authenticate', 'Basic');
+          err.status = 401;
+          throw err;
+      }
+  } catch(err) {
+    console.log(err)
+    res
+      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
+  }
+})
 
 // Start the server
 app.listen(port, () => {
