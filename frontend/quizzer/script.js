@@ -236,10 +236,7 @@ window.addEventListener("beforeunload", (e)=>{
 window.addEventListener("blur", (e)=>{
   if (user) {
     if (!hasBeenWarned) {
-      let agrees = confirm("This is your only warning. Navigating away from this page will result in your quiz being submitted as-is. Do you agree to keep your focus on the current page?")
-      if (!agrees) {
-        submitAll();
-      }
+      alert("This is your only warning. Navigating away from this page will result in your quiz being submitted as-is.")
       hasBeenWarned = true;
     } else {
       submitAll();
