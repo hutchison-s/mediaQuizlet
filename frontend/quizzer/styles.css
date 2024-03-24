@@ -115,6 +115,10 @@ body {
 .status {
   font-size: 3rem;
   text-align: center;
+  
+}
+#root:has(.status) {
+  background: transparent;
 }
 .remaining {
   text-align: center;

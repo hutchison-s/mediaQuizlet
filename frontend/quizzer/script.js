@@ -135,6 +135,11 @@ function populateQuestions(box, qList) {
 // Create timer and quiz container elements and add to DOM.
 
 function createQuiz(quiz) {
+  if (quiz.status == "closed") {
+    displayClosed();
+    introDialog.showModal();
+    return;
+  }
   const container = newEl("article", "quizBox", "softCorner");
   if (quiz.timeLimit != "null") {
     quizTimer = new Timer(quiz.timeLimit, thisQuizId, submitAll);
@@ -168,8 +173,9 @@ function apiCall(quizId) {
       if (window.localStorage.getItem("quizState"+quizId)) {
         console.log("exists")
       }
+      console.log("status: "+quizObject.status)
       createQuiz(quizObject, quizId);
-      viewResponses.addEventListener("click", ()=>{
+      elid("viewResponses").addEventListener("click", ()=>{
         window.location.href = "https://audioquizlet.netlify.app/viewer?id="+quizId
       });
     })
@@ -177,6 +183,22 @@ function apiCall(quizId) {
       console.log(err);
       root.innerHTML = "<h2 class='status'>Error reaching server</h2>";
     });
+}
+
+function displayClosed() {
+  introDialog.innerHTML = `
+  <div class="dialogContent">
+        <div class="dialogLogo">
+          <h2><a href="../"><i class="fa-solid fa-circle-play"></i>Audio&nbsp;Quizlet</a></h2>
+        </div>
+        <div class="dialogInstructions">
+        
+          <p>Quiz is currently closed</p>
+          <p>...</p>
+        <div class="buttonWrap">
+          <button id="viewResponses" class="softCorner secondaryBtn">View Responses</button>
+        </div>
+      </div>`
 }
 
 function gatherInfo(time, questions) {

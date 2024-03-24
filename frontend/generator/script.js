@@ -182,6 +182,8 @@ const markIncomplete = (idx) => {
 
 const onSubmitQuiz = (e) => {
   e.preventDefault();
+  const nextYear = new Date();
+  nextYear.setFullYear(nextYear.getFullYear()+1);
   spinner.classList.remove("hidden")
   submissionTool.close();
   const data = new FormData();
@@ -192,6 +194,8 @@ const onSubmitQuiz = (e) => {
   data.append("password", passwordInput.value);
   let tlimit = timeLimit.value == "" ? null : timeLimit.value;
   data.append("timeLimit", tlimit);
+  data.append("expires", nextYear.toISOString())
+  data.append("status", "open");
 
   fetch("https://audio-quizlet.vercel.app/upload", {
     method: "POST",

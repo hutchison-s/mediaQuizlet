@@ -10,7 +10,10 @@ const peek = elid("peek");
 const viewRes = elid("viewResponses");
 const passwordInput = elid("password");
 const lightDark = elid("lightDark");
-const introDialog = elid("introDialog")
+const introDialog = elid("introDialog");
+const optBox = elid("optBox");
+
+let auth = null;
 
 
 function apiCall(quizId) {
@@ -22,7 +25,9 @@ function apiCall(quizId) {
   })
     .then(data => data.json())
     .then((quizObject) => {
+      optBox.append(statusOptions(quizObject, quizId))
       showResponses(quizObject)
+      auth = passwordInput.value;
     })
     .catch((err) => {
       console.log(err);
@@ -40,6 +45,41 @@ function apiCall(quizId) {
       }
       
     });
+}
+
+function changeStatus(quizId, newStatus) {
+  const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
+  fetch(`https://audio-quizlet.vercel.app/quiz/${quizId}/admin`, {
+    method: "PATCH",
+    headers: {
+        "Authorization": 'Basic ' + encoding,
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({status: newStatus})
+  }).then(res => res.json())
+    .then(quiz => {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const id = urlParams.get("id")
+      console.log(id+" status set to "+quiz.status);
+      optBox.innerHTML = "";
+      optBox.append(statusOptions(quiz, id))
+    })
+    .catch(err => {
+      console.log(err)
+    })
+}
+
+function statusOptions(quiz, id) {
+  let isOpen = quiz.status == "open";
+  const changeBtn = newEl("button", "changeStatus", "primaryBtn");
+  changeBtn.classList.add("softCorner");
+  let newStatus = isOpen ? "closed" : "open"
+  changeBtn.addEventListener("click", ()=>{
+    changeStatus(id, newStatus);
+  })
+  changeBtn.textContent = isOpen ? "Close Quiz" : "Re-Open Quiz";
+  return changeBtn;
 }
 
 function showResponses(quiz) {

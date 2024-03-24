@@ -58,13 +58,15 @@ async function handleFileUploads(req) {
   
 }
 
-async function createDocument(qList, timeLimit, password) {
+async function createDocument(qList, timeLimit, password, expires, status) {
   try {
     const newDoc = {
       questions: qList,
       timeLimit: timeLimit || null,
       password: password,
-      responses: []
+      responses: [],
+      expires: expires,
+      status: status
     };
 
     const docAdded = await qCol.add(newDoc);
@@ -84,10 +86,10 @@ async function createDocument(qList, timeLimit, password) {
 app.post("/upload", upload.array("files", 12), async (req, res) => {
   console.log("called upload")
   try {
-    const {timeLimit, password} = req.body;
+    const {timeLimit, password, expires, status} = req.body;
     const qList = await handleFileUploads(req);
     console.log("qList\n"+qList)
-    const message = await createDocument(qList, timeLimit, password);
+    const message = await createDocument(qList, timeLimit, password, expires, status);
     console.log("received\n"+message)
     res.send(message);
   } catch (err) {
@@ -106,14 +108,15 @@ app.get("/quiz/:code", async (req, res) => {
     }
     const sendData = {
       questions: new Array(),
-      timeLimit: data.timeLimit
+      timeLimit: data.timeLimit,
+      status: data.status
     }
     for (const q of data.questions) {
       sendData.questions.push({
         title: q.title,
         options: q.options,
         limit: q.limit,
-        file: q.file
+        file: q.file,
       })
     }
     console.log(sendData);
@@ -178,6 +181,51 @@ app.get("/quiz/:code/admin", async (req, res) => {
     res
       .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
   }
+})
+
+app.patch("/quiz/:code/admin", async (req, res) => {
+  try {
+    const authheader = req.headers['authorization']
+    console.log(req.params.code + " requested");
+    if (!authheader) {
+        let err = new Error('You are not authenticated! No header present');
+        res.setHeader('WWW-Authenticate', 'Basic');
+        err.status = 401;
+        throw err;
+    }
+    const decodedCreds = Buffer.from(authheader.split(' ')[1],'base64').toString()
+    const [code, pass] = decodedCreds.split(':')
+    console.log(code+":"+pass)
+    const myDoc = qCol.doc(code)
+    const docReq = await myDoc.get()
+    const data = docReq.data()
+    if (data == null) {
+      let err = new Error("No such document");
+      console.log("no such document")
+      err.status = 400;
+      throw err;
+    }
+    if (pass == data.password) {
+        console.log(data);
+        const {status} = req.body;
+        if (status) {
+          await myDoc.update({status: status})
+          const updated = await myDoc.get();
+          res.send(updated.data())
+        } else {
+          console.log("No status present in request body")
+        }
+    } else {
+        let err = new Error('You are not authenticated!');
+        res.setHeader('WWW-Authenticate', 'Basic');
+        err.status = 401;
+        throw err;
+    }
+} catch(err) {
+  console.log(err)
+  res
+    .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
+}
 })
 
 // Start the server

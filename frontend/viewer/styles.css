@@ -61,3 +61,8 @@ p:has(.fa-circle-xmark) * {
   color: var(--secondary);
 }
 
+#optBox {
+  margin: auto;
+  text-align: center;
+}
+
