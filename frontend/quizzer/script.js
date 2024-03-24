@@ -168,6 +168,13 @@ function apiCall(quizId) {
       if (window.localStorage.getItem("quizState"+quizId)) {
         console.log("exists")
       }
+      if (quizObject.status == "closed") {
+        displayClosed();
+        viewResponses.addEventListener("click", ()=>{
+          window.location.href = "https://audioquizlet.netlify.app/viewer?id="+quizId
+        });
+        return;
+      }
       createQuiz(quizObject, quizId);
       viewResponses.addEventListener("click", ()=>{
         window.location.href = "https://audioquizlet.netlify.app/viewer?id="+quizId
@@ -177,6 +184,12 @@ function apiCall(quizId) {
       console.log(err);
       root.innerHTML = "<h2 class='status'>Error reaching server</h2>";
     });
+}
+
+function displayClosed() {
+  introDialog.innerHTML = `
+  <h3>Quiz is closed</h3>
+  <div id='buttonWrap'><button id="viewResponses" class="softCorner secondaryBtn">View Responses</button></div>`
 }
 
 function gatherInfo(time, questions) {
