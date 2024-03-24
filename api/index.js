@@ -108,14 +108,15 @@ app.get("/quiz/:code", async (req, res) => {
     }
     const sendData = {
       questions: new Array(),
-      timeLimit: data.timeLimit
+      timeLimit: data.timeLimit,
+      status: data.status
     }
     for (const q of data.questions) {
       sendData.questions.push({
         title: q.title,
         options: q.options,
         limit: q.limit,
-        file: q.file
+        file: q.file,
       })
     }
     console.log(sendData);
@@ -195,7 +196,8 @@ app.patch("/quiz/:code/admin", async (req, res) => {
     const decodedCreds = Buffer.from(authheader.split(' ')[1],'base64').toString()
     const [code, pass] = decodedCreds.split(':')
     console.log(code+":"+pass)
-    const docReq = await qCol.doc(code).get()
+    const myDoc = qCol.doc(code)
+    const docReq = await myDoc.get()
     const data = docReq.data()
     if (data == null) {
       let err = new Error("No such document");
@@ -207,7 +209,8 @@ app.patch("/quiz/:code/admin", async (req, res) => {
         console.log(data);
         const {status} = req.body;
         if (status) {
-          const updated = await qCol.doc(code).update({status: status})
+          await myDoc.update({status: status})
+          const updated = await myDoc.get();
           res.send(updated.data())
         } else {
           console.log("No status present in request body")
