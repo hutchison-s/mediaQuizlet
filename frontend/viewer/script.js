@@ -10,7 +10,10 @@ const peek = elid("peek");
 const viewRes = elid("viewResponses");
 const passwordInput = elid("password");
 const lightDark = elid("lightDark");
-const introDialog = elid("introDialog")
+const introDialog = elid("introDialog");
+const optBox = elid("optBox");
+
+let auth = null;
 
 
 function apiCall(quizId) {
@@ -22,7 +25,9 @@ function apiCall(quizId) {
   })
     .then(data => data.json())
     .then((quizObject) => {
+      optBox.append(statusOptions(quizObject))
       showResponses(quizObject)
+      auth = passwordInput.value;
     })
     .catch((err) => {
       console.log(err);
@@ -40,6 +45,35 @@ function apiCall(quizId) {
       }
       
     });
+}
+
+function changeStatus(quizId, newStatus) {
+  const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
+  fetch(`http://localhost:8000/quiz/${quizId}/admin`, {
+    method: "PATCH",
+    headers: {
+        Authorization: 'Basic ' + encoding
+    },
+    body: JSON.stringify({status: newStatus})
+  }).then(res => res.json())
+    .then(quiz => {
+      console.log(quiz.id+" status set to "+quiz.status);
+      optBox.innerHTML = "";
+      optBox.append(statusOptions(quiz))
+    })
+    .catch(err => {
+      console.log(err)
+    })
+}
+
+function statusOptions(quiz) {
+  let isOpen = quiz.status == "open";
+  const changeBtn = newEl("button", "changeStatus", "buttonPrimary");
+  changeBtn.addEventListener("click", ()=>{
+    changeStatus(quiz.id, isOpen ? "closed" : "open");
+  })
+  changeBtn.textContent = isOpen ? "Close Quiz" : "Re-Open Quiz";
+  return changeBtn;
 }
 
 function showResponses(quiz) {
