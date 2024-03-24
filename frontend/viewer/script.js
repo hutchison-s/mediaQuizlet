@@ -25,7 +25,7 @@ function apiCall(quizId) {
   })
     .then(data => data.json())
     .then((quizObject) => {
-      optBox.append(statusOptions(quizObject))
+      optBox.append(statusOptions(quizObject, quizId))
       showResponses(quizObject)
       auth = passwordInput.value;
     })
@@ -49,28 +49,34 @@ function apiCall(quizId) {
 
 function changeStatus(quizId, newStatus) {
   const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
-  fetch(`http://localhost:8000/quiz/${quizId}/admin`, {
+  fetch(`https://audio-quizlet.vercel.app/quiz/${quizId}/admin`, {
     method: "PATCH",
     headers: {
-        Authorization: 'Basic ' + encoding
+        "Authorization": 'Basic ' + encoding,
+        "Content-Type": "application/json"
     },
     body: JSON.stringify({status: newStatus})
   }).then(res => res.json())
     .then(quiz => {
-      console.log(quiz.id+" status set to "+quiz.status);
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const id = urlParams.get("id")
+      console.log(id+" status set to "+quiz.status);
       optBox.innerHTML = "";
-      optBox.append(statusOptions(quiz))
+      optBox.append(statusOptions(quiz, id))
     })
     .catch(err => {
       console.log(err)
     })
 }
 
-function statusOptions(quiz) {
+function statusOptions(quiz, id) {
   let isOpen = quiz.status == "open";
-  const changeBtn = newEl("button", "changeStatus", "buttonPrimary");
+  const changeBtn = newEl("button", "changeStatus", "primaryBtn");
+  changeBtn.classList.add("softCorner");
+  let newStatus = isOpen ? "closed" : "open"
   changeBtn.addEventListener("click", ()=>{
-    changeStatus(quiz.id, isOpen ? "closed" : "open");
+    changeStatus(id, newStatus);
   })
   changeBtn.textContent = isOpen ? "Close Quiz" : "Re-Open Quiz";
   return changeBtn;
