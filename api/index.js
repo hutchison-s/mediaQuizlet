@@ -58,13 +58,15 @@ async function handleFileUploads(req) {
   
 }
 
-async function createDocument(qList, timeLimit, password) {
+async function createDocument(qList, timeLimit, password, expires, status) {
   try {
     const newDoc = {
       questions: qList,
       timeLimit: timeLimit || null,
       password: password,
-      responses: []
+      responses: [],
+      expires: expires,
+      status: status
     };
 
     const docAdded = await qCol.add(newDoc);
@@ -84,10 +86,10 @@ async function createDocument(qList, timeLimit, password) {
 app.post("/upload", upload.array("files", 12), async (req, res) => {
   console.log("called upload")
   try {
-    const {timeLimit, password} = req.body;
+    const {timeLimit, password, expires, status} = req.body;
     const qList = await handleFileUploads(req);
     console.log("qList\n"+qList)
-    const message = await createDocument(qList, timeLimit, password);
+    const message = await createDocument(qList, timeLimit, password, expires, status);
     console.log("received\n"+message)
     res.send(message);
   } catch (err) {
