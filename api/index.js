@@ -207,13 +207,20 @@ app.patch("/quiz/:code/admin", async (req, res) => {
     }
     if (pass == data.password) {
         console.log(data);
-        const {status} = req.body;
+        const {status, responses} = req.body;
         if (status) {
           await myDoc.update({status: status})
           const updated = await myDoc.get();
           res.send(updated.data())
         } else {
           console.log("No status present in request body")
+        }
+        if (responses) {
+          await myDoc.update({responses: responses})
+          const updated = await myDoc.get();
+          res.send(updated.data());
+        } else {
+          console.log("No responses present in request body")
         }
     } else {
         let err = new Error('You are not authenticated!');
