@@ -47,9 +47,11 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
 ### 5. Viewer Page
 
 - **URL**: [audioquizlet.netlify.app/viewer](https://audioquizlet.netlify.app/viewer) + quiz code
-- **Description**: Page for viewing quiz responses.
+- **Description**: Page for viewing quiz responses and managing quiz.
 - **Features**:
   - Enter the password chosen during quiz generation to view responses.
+  - Close or Re-Open Quiz to new responses.
+  - Reset quiz and erase all responses.
 
 ## Technologies Used
 
