@@ -207,7 +207,7 @@ app.patch("/quiz/:code/admin", async (req, res) => {
     }
     if (pass == data.password) {
         console.log(data);
-        const {status, responses} = req.body;
+        const {status, reset} = req.body;
         if (status) {
           await myDoc.update({status: status})
           const updated = await myDoc.get();
@@ -215,8 +215,8 @@ app.patch("/quiz/:code/admin", async (req, res) => {
         } else {
           console.log("No status present in request body")
         }
-        if (responses) {
-          await myDoc.update({responses: responses})
+        if (reset) {
+          await myDoc.update({responses: new Array()})
           const updated = await myDoc.get();
           res.send(updated.data());
         } else {

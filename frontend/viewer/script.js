@@ -86,17 +86,19 @@ function eraseResponses(quizId) {
         "Authorization": 'Basic ' + encoding,
         "Content-Type": "application/json"
     },
-    body: JSON.stringify({responses: []})
+    body: JSON.stringify({reset: true})
   }).then(res => res.json())
     .then(quiz => {
       const queryString = window.location.search;
       const urlParams = new URLSearchParams(queryString);
       const id = urlParams.get("id")
       console.log(id+" responses reset");
+      elid("resBox").remove()
       optBox.innerHTML = "";
       const [change, reset] = adminOptions(quiz, id)
       optBox.append(change);
       optBox.append(reset);
+      showResponses(quiz)
     })
     .catch(err => {
       console.log(err)
@@ -113,6 +115,7 @@ function adminOptions(quiz, id) {
   })
   changeBtn.textContent = isOpen ? "Close Quiz" : "Re-Open Quiz";
   const resetBtn = newEl("button", "resetQuiz", "secondaryBtn");
+  resetBtn.classList.add("softCorner")
   resetBtn.textContent = "Reset Quiz";
   resetBtn.addEventListener("click", ()=>{
     eraseResponses(id);
