@@ -25,7 +25,9 @@ function apiCall(quizId) {
   })
     .then(data => data.json())
     .then((quizObject) => {
-      optBox.append(statusOptions(quizObject, quizId))
+      const [change, reset] = adminOptions(quizObject, quizId)
+      optBox.append(change);
+      optBox.append(reset);
       showResponses(quizObject)
       auth = passwordInput.value;
     })
@@ -63,23 +65,62 @@ function changeStatus(quizId, newStatus) {
       const id = urlParams.get("id")
       console.log(id+" status set to "+quiz.status);
       optBox.innerHTML = "";
-      optBox.append(statusOptions(quiz, id))
+      const [change, reset] = adminOptions(quiz, id)
+      optBox.append(change);
+      optBox.append(reset);
     })
     .catch(err => {
       console.log(err)
     })
 }
 
-function statusOptions(quiz, id) {
+function eraseResponses(quizId) {
+  const goOn = confirm("Clicking ok will erase all responses and reset the quiz. Responses cannot be recovered. Do you wish to continue?")
+  if (!goOn) {
+    return;
+  }
+  const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
+  fetch(`https://audio-quizlet.vercel.app/quiz/${quizId}/admin`, {
+    method: "PATCH",
+    headers: {
+        "Authorization": 'Basic ' + encoding,
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({reset: true})
+  }).then(res => res.json())
+    .then(quiz => {
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const id = urlParams.get("id")
+      console.log(id+" responses reset");
+      elid("resBox").remove()
+      optBox.innerHTML = "";
+      const [change, reset] = adminOptions(quiz, id)
+      optBox.append(change);
+      optBox.append(reset);
+      showResponses(quiz)
+    })
+    .catch(err => {
+      console.log(err)
+    })
+}
+
+function adminOptions(quiz, id) {
   let isOpen = quiz.status == "open";
   const changeBtn = newEl("button", "changeStatus", "primaryBtn");
   changeBtn.classList.add("softCorner");
-  let newStatus = isOpen ? "closed" : "open"
+  let newStatus = isOpen ? "closed" : "open";
   changeBtn.addEventListener("click", ()=>{
     changeStatus(id, newStatus);
   })
   changeBtn.textContent = isOpen ? "Close Quiz" : "Re-Open Quiz";
-  return changeBtn;
+  const resetBtn = newEl("button", "resetQuiz", "secondaryBtn");
+  resetBtn.classList.add("softCorner")
+  resetBtn.textContent = "Reset Quiz";
+  resetBtn.addEventListener("click", ()=>{
+    eraseResponses(id);
+  })
+  return [changeBtn, resetBtn];
 }
 
 function showResponses(quiz) {
