@@ -1,5 +1,6 @@
 import {changeMode, setInitialStyle} from "../modules/darkmode.js";
 import { elid } from "../modules/domFuncs.js";
+import {apiURL} from '../urls.js';
 
 setInitialStyle();
 
@@ -13,7 +14,7 @@ codeForm.addEventListener("submit", (e)=>{
 })
 
 function navigateToQuiz(code) {
-    fetch("https://audio-quizlet.vercel.app/quiz/" + code)
+    fetch(apiURL+"/quiz/" + code)
         .then((response) => {
             try {
                 if (!response.ok) {
