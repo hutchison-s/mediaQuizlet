@@ -1,3 +1,5 @@
+import { db } from "../firebase/firebaseConnect.js";
+
 export default async function authenticate(req, res, next) {
     try {
       const authheader = req.headers['authorization'];
@@ -9,7 +11,7 @@ export default async function authenticate(req, res, next) {
       }
       const decodedCreds = Buffer.from(authheader.split(' ')[1],'base64').toString();
       const [code, pass] = decodedCreds.split(':');
-      const docReq = await qCol.doc(code).get();
+      const docReq = await db.collection("quizzes").doc(code).get();
       const data = docReq.data();
       if (data == null) {
         let err = new Error("No such document");

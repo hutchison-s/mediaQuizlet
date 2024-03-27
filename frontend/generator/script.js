@@ -2,6 +2,7 @@
 import {changeMode, setInitialStyle} from "../modules/darkmode.js";
 import { elid, elsel, newEl } from "../modules/domFuncs.js";
 import MCQuestion from "../modules/MCQuestion.js";
+import {apiURL} from '../urls.js';
 
 setInitialStyle();
 
@@ -197,7 +198,7 @@ const onSubmitQuiz = (e) => {
   data.append("expires", nextYear.toISOString())
   data.append("status", "open");
 
-  fetch("https://audio-quizlet.vercel.app/upload", {
+  fetch(apiURL+"/upload", {
     method: "POST",
     body: data,
   })

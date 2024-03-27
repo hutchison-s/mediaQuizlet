@@ -7,8 +7,7 @@ import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage() });
 
 import authenticate from "./middleware/auth.js";
-import { handleFileUploads, createDocument, getQuizzerInfo, addResponse, updateQuiz } from "./firebase/docFuncs.js";
-import deleteExpired from "./crons/deleteExpired.js";
+import { handleFileUploads, createDocument, getQuizzerInfo, addResponse, updateQuiz, resetQuiz, deleteExpired } from "./firebase/docFuncs.js";
 
 const port = process.env.PORT || 8000;
 
@@ -29,9 +28,8 @@ app.post("/upload", upload.array("files", 12), async (req, res) => {
   console.log("called upload")
   try {
     const {timeLimit, password, expires, status} = req.body;
-    const qList = await handleFileUploads(req);
-    console.log("qList\n"+qList)
-    const message = await createDocument(qList, timeLimit, password, expires, status);
+    const [qList, fileIds] = await handleFileUploads(req);
+    const message = await createDocument(qList, timeLimit, password, expires, status, fileIds);
     console.log("received\n"+message)
     res.send(message);
   } catch (err) {
@@ -45,7 +43,7 @@ app.post("/upload", upload.array("files", 12), async (req, res) => {
 app.get("/quiz/:code", async (req, res) => {
   try {
     console.log(req.params.code + " requested");
-    const data = getQuizzerInfo(req.params.code)
+    const data = await getQuizzerInfo(req.params.code)
     res.send(data);
   } catch(err) {
     res
@@ -59,7 +57,7 @@ app.get("/quiz/:code", async (req, res) => {
 app.post("/quiz/:code/response", async (req, res) => {
   try {
     const id = req.params.code;
-    const update = addResponse(req.body, id);
+    const update = await addResponse(req.body, id);
     res.send(update);
     console.log("New Response to quiz " + id + " received."); 
   } catch(err) {

@@ -2,6 +2,7 @@
 
 import { elid, newEl } from "../modules/domFuncs.js";
 import {changeMode, setInitialStyle} from "../modules/darkmode.js";
+import {apiURL} from '../urls.js';
 
 setInitialStyle();
 
@@ -18,7 +19,7 @@ let auth = null;
 
 function apiCall(quizId) {
   const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(passwordInput.value)}`);
-  fetch(`https://audio-quizlet.vercel.app/quiz/${quizId}/admin`, {
+  fetch(apiURL+`/quiz/${quizId}/admin`, {
     headers: {
         Authorization: 'Basic ' + encoding
     }
@@ -51,7 +52,7 @@ function apiCall(quizId) {
 
 function changeStatus(quizId, newStatus) {
   const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
-  fetch(`https://audio-quizlet.vercel.app/quiz/${quizId}/admin`, {
+  fetch(apiURL+`/quiz/${quizId}/admin`, {
     method: "PATCH",
     headers: {
         "Authorization": 'Basic ' + encoding,
@@ -80,13 +81,12 @@ function eraseResponses(quizId) {
     return;
   }
   const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
-  fetch(`https://audio-quizlet.vercel.app/quiz/${quizId}/admin`, {
+  fetch(apiURL+`/quiz/${quizId}/admin/reset`, {
     method: "PATCH",
     headers: {
         "Authorization": 'Basic ' + encoding,
         "Content-Type": "application/json"
-    },
-    body: JSON.stringify({reset: true})
+    }
   }).then(res => res.json())
     .then(quiz => {
       const queryString = window.location.search;

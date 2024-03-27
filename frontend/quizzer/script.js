@@ -4,6 +4,7 @@ import { elid, elall, newEl } from "../modules/domFuncs.js";
 import {changeMode, setInitialStyle} from "../modules/darkmode.js";
 import LimitedPlayer from '../modules/LimitedPlayer.js';
 import Timer from '../modules/Timer.js';
+import {apiURL} from '../urls.js';
 
 setInitialStyle();
 
@@ -74,7 +75,7 @@ function submitAll() {
     responses: Array.from(checks).map((check) => check.value),
   };
   quizTimer && clearInterval(quizTimer?.interval);
-  fetch(`https://audio-quizlet.vercel.app/quiz/${thisQuizId}/response`, {
+  fetch(apiURL+`/quiz/${thisQuizId}/response`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(data),
@@ -164,7 +165,7 @@ function createQuiz(quiz) {
 }
 
 function apiCall(quizId) {
-  fetch("https://audio-quizlet.vercel.app/quiz/" + quizId)
+  fetch(apiURL+"/quiz/" + quizId)
     .then((data) => {
       return data.json();
     })

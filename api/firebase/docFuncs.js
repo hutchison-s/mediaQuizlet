@@ -1,33 +1,50 @@
-import {db, storage} from "./firebaseConnect";
+import {db, storage, fieldValue} from './firebaseConnect.js'
 const qCol = db.collection("quizzes");
 
 export async function handleFileUploads(req) {
-    const {files, body} = req;
+    const { files } = req;
     const dt = Date.now();
     const expires = new Date();
-    expires.setFullYear(expires.getFullYear()+1)
-    const qList = JSON.parse(body.questions);
+    expires.setFullYear(expires.getFullYear() + 1);
+    const qList = JSON.parse(req.body.questions);
+    const fileUploadPromises = [];
+
     try {
-      for (let i = 0; i < files.length; i++) {
-        const cloudFile = storage.bucket().file("files/" + files[i].originalname.split(".")[0] + dt+i)
-        console.log("file ref:"+cloudFile)
-        await cloudFile.save(files[i].buffer, {contentType: files[i].mimetype})
-        const downLink = await cloudFile.getSignedUrl({action: "read", expires: expires.toISOString()})
-        console.log("link retrieved: "+downLink)
-        qList[i].file = downLink;
-      }
-      return qList;
+        for (let i = 0; i < files.length; i++) {
+            let fileName = "files/" + files[i].originalname.split(".")[0] + dt + i;
+            const cloudFile = storage.bucket().file(fileName);
+            console.log("file ref:" + cloudFile);
+            const uploadPromise = cloudFile.save(files[i].buffer, { contentType: files[i].mimetype })
+                .then(() => {
+                    return cloudFile.getSignedUrl({ action: "read", expires: expires.toISOString() });
+                })
+                .then((downLink) => {
+                    console.log("link retrieved: " + downLink);
+                    qList[i].file = downLink;
+                    return cloudFile.name;
+                })
+                .catch((err) => {
+                    console.log("Error uploading file:", err);
+                    throw new Error("Error uploading file");
+                });
+            fileUploadPromises.push(uploadPromise);
+        }
+
+        // Wait for all file upload promises to resolve
+        const fileIds = await Promise.all(fileUploadPromises);
+        return [qList, fileIds];
     } catch (err) {
-      console.log("Error uploading files. "+err);
-      throw new Error("Error uploading files");
+        console.log("Error uploading files:", err);
+        throw new Error("Error uploading files");
     }
     
   }
   
-  export async function createDocument(qList, timeLimit, password, expires, status) {
+  export async function createDocument(qList, timeLimit, password, expires, status, associatedFiles) {
     try {
       const newDoc = {
         questions: qList,
+        associatedFiles: associatedFiles,
         timeLimit: timeLimit || null,
         password: password,
         responses: [],
@@ -47,6 +64,44 @@ export async function handleFileUploads(req) {
       throw new Error("Error occurred while attempting to create new document.")
     }
   }
+
+  export async function deleteExpired() {
+    const today = new Date().toISOString();
+    try {
+        const expQuery = qCol.where("expires", "<", today);
+        const snapshots = await expQuery.get();
+        
+        if (snapshots.empty) {
+            console.log("No expired documents found in database.");
+            return;
+        }
+
+        for (const doc of snapshots.docs) {
+            const quiz = doc.data();
+            
+            if (quiz.associatedFiles) {
+                for (const fileName of quiz.associatedFiles) {
+                    try {
+                        await storage.bucket().file(fileName).delete();
+                        console.log("File deleted: " + fileName);
+                    } catch (err) {
+                        console.log("Couldn't delete file: " + fileName);
+                    }
+                }
+            }
+
+            try {
+                await doc.ref.delete();
+                console.log("Document deleted: " + doc.id);
+            } catch (err) {
+                console.log("Error deleting document: " + doc.id);
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        throw new Error("Error occurred during deletion.");
+    }
+}
 
   export async function getQuizzerInfo(code) {
     const docReq = await qCol.doc(code).get()
@@ -77,13 +132,13 @@ export async function handleFileUploads(req) {
         timestamp: timestamp,
         responses: responses,
       }
-      const docUpdate = await qCol.doc(code).update('responses', fv.arrayUnion(updateData));
+      const docUpdate = await qCol.doc(code).update('responses', fieldValue.arrayUnion(updateData));
       return docUpdate;
   }
 
   export async function updateQuiz(body, code) {
-    const {status} = body;
-    if (status) {
+    if (body.status) {
+      const {status} = body;
       const myDoc = qCol.doc(code)
       await myDoc.update({status: status})
       const updated = await myDoc.get();
