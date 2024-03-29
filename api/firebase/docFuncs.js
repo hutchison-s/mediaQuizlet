@@ -121,13 +121,15 @@ export async function handleFileUploads(req) {
           options: q.options,
           limit: q.limit,
           file: q.file,
+          type: q.type
         })
       } else if (q.type = "shortAnswer") {
         sendData.questions.push({
           title: q.title,
           correct: q.correct,
           limit: q.limit,
-          file: q.file
+          file: q.file,
+          type: q.type
         })
       }
       

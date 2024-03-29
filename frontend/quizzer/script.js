@@ -31,13 +31,7 @@ function updateStorage() {
         user: user,
         timeRemaining: quizTimer.remaining,
         listenLimits: players.map(p=>p.remaining),
-        selected: qList.map(form=>{
-            if (form.querySelector("input:checked")) {
-                return form.querySelector("input:checked").value
-            } else {
-                return null
-            }
-        })
+        responses: qList.map(form=>form.answer.value)
     }
     localStorage.setItem("quizState"+thisQuizId, JSON.stringify(stateUpdate))
 }
@@ -59,8 +53,8 @@ function restoreState(state) {
         if (state.listenLimits[i] <= 0) {
           players[i].button.setAttribute("disabled", true);
         }
-        if (state.selected[i]) {
-            qList[i].querySelector(`label:nth-of-type(${parseInt(state.selected[i])+1})`).querySelector("input").checked = true;
+        if (state.responses[i]) {
+            qList[i].answer.value = state.responses[i]
         }
     }
 }
@@ -68,11 +62,12 @@ function restoreState(state) {
 // Retrieve all indexes of checked radio buttons and submit with username and timestamp to API
 
 function submitAll() {
-  const checks = elall("input[type='radio']:checked");
+  const qForms = elall(".questionForm");
+  const responses = Array.from(qForms).map(form => form.answer.value)
   const data = {
     user,
     timestamp: new Date().toTimeString(),
-    responses: Array.from(checks).map((check) => check.value),
+    responses: responses
   };
   quizTimer && clearInterval(quizTimer?.interval);
   fetch(apiURL+`/quiz/${thisQuizId}/response`, {
@@ -107,13 +102,20 @@ function createPlayer(file, limit) {
 function createQuestion(q) {
   const form = newEl("form", null, "questionForm");
   const player = createPlayer(q.file, q.limit);
-  
+
   form.innerHTML += `<h2 class="qTitle">${q.title}</h2>`;
-  for (const [value, opt] of q.options.entries()) {
-    form.innerHTML += `<label>${opt}<input required type="radio" value="${value}" name="${
-      q.title + "option"
-    }"></label>`;
+  console.log(q.type)
+  if (q.type == "multipleChoice") {
+    form.classList.add("mc")
+    for (const [value, opt] of q.options.entries()) {
+      form.innerHTML += `<label>${opt}<input required type="radio" value="${value}" name="answer"
+      }"></label>`;
+    }
+  } else if (q.type = "shortAnswer") {
+    form.classList.add("sa")
+    form.innerHTML += `<label><input required type="text" placeholder="Your answer..." name="answer">Answer Here: </label>`
   }
+  
   form.addEventListener("submit", (e) => {
     e.preventDefault();
   });
