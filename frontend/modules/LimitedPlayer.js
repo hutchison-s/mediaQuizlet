@@ -48,6 +48,12 @@ class LimitedPlayer {
       this.button.addEventListener("click", (e) => {
         e.preventDefault();
         console.log("clicked");
+        document.querySelectorAll("audio").forEach(a => {
+          if (a.currentTime != 0) {
+            a.pause();
+            a.currentTime = 0;
+          }
+        })
         this.audio.play();
       });
       this.progressBar.appendChild(this.button);
