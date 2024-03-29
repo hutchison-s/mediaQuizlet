@@ -77,6 +77,7 @@ const changeQType = (e) => {
 // Change Question Type
 const qTypeSelect = (file)=>{
   const sel = newEl("select", null, "softCorner");
+  sel.classList.add("qTypeSelect")
   sel.innerHTML = "<option value='mc'>Multiple Choice</option><option value='sa'>Short Answer</option>"
   sel.onchange = changeQType;
   return sel;
@@ -96,7 +97,7 @@ const generateSAForm = (quest) => {
       <button type="submit" class="softCorner">Submit</button>`;
   const select = qTypeSelect(quest.file);
   select.value = 'sa'
-  form.prepend(select);
+  form.querySelector("p").insertAdjacentElement("afterend", select);
   form.onsubmit = (e) => qSubmit(e, quest, form);
   return form;
 };
@@ -122,7 +123,7 @@ const generateMCForm = (quest) => {
       <button type="submit" class="softCorner">Submit</button>`;
   const select = qTypeSelect(quest.file);
   select.value = 'mc'
-  form.prepend(select);
+  form.querySelector("p").insertAdjacentElement("afterend", select);
   form.onsubmit = (e) => qSubmit(e, quest, form);
   return form;
 };

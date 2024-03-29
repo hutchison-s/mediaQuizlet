@@ -113,7 +113,7 @@ function createQuestion(q) {
     }
   } else if (q.type = "shortAnswer") {
     form.classList.add("sa")
-    form.innerHTML += `<label><input required type="text" placeholder="Your answer..." name="answer">Answer Here: </label>`
+    form.innerHTML += `<label><input required type="text" placeholder="Your answer..." name="answer"></label>`
   }
   
   form.addEventListener("submit", (e) => {

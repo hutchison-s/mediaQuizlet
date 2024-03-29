@@ -81,6 +81,16 @@ body {
   gap: 0.5rem;
   flex-direction: row-reverse;
   justify-content: flex-end;
+  align-items: center;
+}
+.questionForm input[type="text"] {
+  padding: 0.5rem;
+  font-size: 16px;
+  border-radius: 0.25rem;
+  background: var(--background);
+  color: var(--primary);
+  border: 1px solid var(--secondary);
+  width: 100%;
 }
 .playerBox {
   padding: 2rem 0 0;
