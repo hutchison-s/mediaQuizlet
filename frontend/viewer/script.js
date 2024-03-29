@@ -24,7 +24,14 @@ function apiCall(quizId) {
         Authorization: 'Basic ' + encoding
     }
   })
-    .then(data => data.json())
+    .then(data => {
+      if (data.ok) {
+        return data.json()
+      } else {
+        throw new Error("Not authorized");
+      }
+      
+    })
     .then((quizObject) => {
       const [change, reset] = adminOptions(quizObject, quizId)
       optBox.append(change);
@@ -34,7 +41,7 @@ function apiCall(quizId) {
     })
     .catch((err) => {
       console.log(err);
-      if (err.status == 401) {
+      if (err.message == "Not authorized") {
           passwordInput.style.outline = "4px solid var(--warning)"
           passwordInput.value = "incorrect password"
           passwordInput.type = "text"
@@ -132,6 +139,7 @@ function showResponses(quiz) {
     introDialog.close()
     return;
   }
+  console.log(quiz)
   for (const res of quiz.responses) {
     const resBox = newEl("div", null, "response")
     resBox.innerHTML += `
@@ -141,12 +149,24 @@ function showResponses(quiz) {
       </div>
     `
     for (let i=0; i<res.responses.length; i++) {
-      resBox.innerHTML += `
-        <p>Question ${i+1}: ${quiz.questions[i].title}</p>
-        <p>\tAnswered: ${quiz.questions[i].options[res.responses[i]]}
-          <i class="fa-solid ${res.responses[i] == quiz.questions[i].correct ? "fa-circle-check" : "fa-circle-xmark"}"></i>
-        </p>
-        `
+      const answer = res.responses[i];
+      const quest = quiz.questions[i];
+      console.log("question: ")
+      console.log(quest)
+      console.log("answer: "+answer)
+      resBox.innerHTML += `<p>Question ${i+1}: ${quest.title}</p>`
+      if (quest.type == "multipleChoice") {
+        resBox.innerHTML += `
+        <p>\tAnswered: ${quest.options[answer]}
+          <i class="fa-solid ${answer == quest.correct ? "fa-circle-check" : "fa-circle-xmark"}"></i>
+        </p>`
+      } else if (quest.type == "shortAnswer") {
+        resBox.innerHTML += `
+        <p>\tAnswered: ${answer}
+          <i class="fa-solid ${answer.toLowerCase().trim() == quest.correct.toLowerCase().trim() ? "fa-circle-check" : "fa-circle-xmark"}"></i>
+        </p>`
+      }
+        
     }
     resBox.querySelector(".numCorrect").textContent = resBox.querySelectorAll(".fa-circle-check").length
     box.appendChild(resBox)

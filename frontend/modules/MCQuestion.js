@@ -19,6 +19,7 @@ class MCQuestion {
       this.limit = 0;
       this.qDataList = qDataList;
       this.optDataList = optDataList;
+      this.type = "multipleChoice";
     }
     // Method to get question data as FormData object
     getData() {
@@ -39,6 +40,7 @@ class MCQuestion {
       this.options.push(data.get("optB"));
       this.options.push(data.get("optC"));
       this.options.push(data.get("optD"));
+      console.log(data.get("correct"))
       this.correct = parseInt(data.get("correct"));
       this.isComplete = true;
       this.limit = data.get("limit");
