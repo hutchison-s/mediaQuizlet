@@ -1,7 +1,8 @@
 // DOM Utilities
 import {changeMode, setInitialStyle} from "../modules/darkmode.js";
-import { elid, elsel, newEl } from "../modules/domFuncs.js";
+import { elall, elid, elsel, newEl } from "../modules/domFuncs.js";
 import MCQuestion from "../modules/MCQuestion.js";
+import ShortAnswerQuestion from "../modules/SAQuestion.js"
 import {apiURL} from '../urls.js';
 
 setInitialStyle();
@@ -53,8 +54,59 @@ const generateQListItem = (title) => {
   qList.appendChild(item);
 };
 
-// Function to generate question form
-const generateForm = (file) => {
+const changeQType = (e) => {
+  const box = elall(".qFormBox")[activeQ];
+  const oldQ = questions[activeQ];
+  const file = oldQ.file;
+  if (e.target.value == 'mc') {
+    box.innerHTML = "";
+    const newQuestion = new MCQuestion(file, qPrompts, optHistory);
+    questions[activeQ] = newQuestion;
+    const newForm = generateMCForm(newQuestion);
+    box.append(newForm);
+  } else {
+    box.innerHTML = "";
+    const newQuestion = new ShortAnswerQuestion(file, qPrompts);
+    questions[activeQ] = newQuestion;
+    const newForm = generateSAForm(newQuestion);
+    box.append(newForm);
+    console.log(box)
+  }
+}
+
+// Change Question Type
+const qTypeSelect = (file)=>{
+  const sel = newEl("select", null, "softCorner");
+  sel.innerHTML = "<option value='mc'>Multiple Choice</option><option value='sa'>Short Answer</option>"
+  sel.onchange = changeQType;
+  return sel;
+}
+
+// Function to generate short answer form
+const generateSAForm = (quest) => {
+  const form = newEl("form", null, "qForm");
+  form.classList.add("shadow");
+  form.classList.add("softCorner");
+  form.innerHTML = `
+      <audio controls src="${URL.createObjectURL(quest.file)}"></audio>
+      <p class="fileName">${quest.file.name}</p>
+      <input type="text" list="qPrompts" placeholder="Title or Question..." name="title" class="title" required>
+      <input required type="text" placeholder="Correct Answer..." name="correct" class="title">
+      <label for="limit">Listen Limit: <input required type="number" min="1" max="100" value="3" name="limit"></label>
+      <button type="submit" class="softCorner">Submit</button>`;
+  const select = qTypeSelect(quest.file);
+  select.value = 'sa'
+  form.prepend(select);
+  form.onsubmit = (e) => qSubmit(e, quest, form);
+  return form;
+};
+
+
+// Function to generate multiple choice form
+const generateMCForm = (quest) => {
+  console.log(quest)
+  const {file} = quest
+  console.log(file)
   const form = newEl("form", null, "qForm");
   form.classList.add("shadow");
   form.classList.add("softCorner");
@@ -68,6 +120,10 @@ const generateForm = (file) => {
       <input required type="text" list="optHistory" placeholder="Option D..." name="optD" class="option"><input value=3 type="radio" name="correct">
       <label for="limit">Listen Limit: <input required type="number" min="1" max="100" value="3" name="limit"></label>
       <button type="submit" class="softCorner">Submit</button>`;
+  const select = qTypeSelect(quest.file);
+  select.value = 'mc'
+  form.prepend(select);
+  form.onsubmit = (e) => qSubmit(e, quest, form);
   return form;
 };
 
@@ -98,25 +154,35 @@ const editActive = () => {
   quest.isComplete = false;
   markIncomplete(activeQ);
   const box = formCar.children[activeQ];
-  const form = generateForm(quest.file);
-  form.title.value = quest.title;
-  form.limit.value = quest.limit;
-  form.optA.value = quest.options[0];
-  form.optB.value = quest.options[1];
-  form.optC.value = quest.options[2];
-  form.optD.value = quest.options[3];
-  form.querySelectorAll("input[type='radio']")[quest.correct].checked = true;
-  form.onsubmit = (e) => qSubmit(e, quest, form, box);
+  let form;
+  if (quest instanceof MCQuestion) {
+    form = generateMCForm(quest);
+    console.log(quest, form)
+    form.title.value = quest.title;
+    form.limit.value = quest.limit;
+    form.optA.value = quest.options[0];
+    form.optB.value = quest.options[1];
+    form.optC.value = quest.options[2];
+    form.optD.value = quest.options[3];
+    form.querySelectorAll("input[type='radio']")[quest.correct].checked = true;
+  } else if (quest instanceof ShortAnswerQuestion) {
+    form = generateSAForm(quest);
+    form.title.value = quest.title;
+    form.limit.value = quest.limit;
+    form.correct.value = quest.correct;
+  }
   box.innerHTML = "";
   box.appendChild(form);
 };
 
 // Function to handle question submission
-const qSubmit = (e, quest, form, box) => {
+const qSubmit = (e, quest, form) => {
   e.preventDefault();
   const data = new FormData(form);
+  console.log("data: "+data.get("title"))
   quest.formResponse(data);
   markComplete(activeQ);
+  const box = elall(".qFormBox")[activeQ];
   box.innerHTML = generateSubmitted(quest.getData());
   box.querySelector(".edit").addEventListener("click", () => {
     editActive();
@@ -150,8 +216,7 @@ const handleFiles = (files) => {
     const quest = new MCQuestion(f, qPrompts, optHistory);
     questions.push(quest);
     const box = newEl("article", null, "qFormBox");
-    const form = generateForm(f);
-    form.onsubmit = (e) => qSubmit(e, quest, form, box);
+    const form = generateMCForm(quest);
     box.append(form);
     formCar.append(box);
   }
