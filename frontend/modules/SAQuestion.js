@@ -17,6 +17,7 @@ class ShortAnswerQuestion {
         this.isComplete = null;
         this.qDataList = qDataList;
         this.limit = null;
+        this.type = "shortAnswer"
     }
 
     getData() {

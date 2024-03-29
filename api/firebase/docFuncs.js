@@ -115,12 +115,22 @@ export async function handleFileUploads(req) {
       status: data.status
     }
     for (const q of data.questions) {
-      sendData.questions.push({
-        title: q.title,
-        options: q.options,
-        limit: q.limit,
-        file: q.file,
-      })
+      if (q.type == "multipleChoice") {
+        sendData.questions.push({
+          title: q.title,
+          options: q.options,
+          limit: q.limit,
+          file: q.file,
+        })
+      } else if (q.type = "shortAnswer") {
+        sendData.questions.push({
+          title: q.title,
+          correct: q.correct,
+          limit: q.limit,
+          file: q.file
+        })
+      }
+      
     }
     return sendData;
   }

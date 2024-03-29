@@ -19,6 +19,7 @@ class MCQuestion {
       this.limit = 0;
       this.qDataList = qDataList;
       this.optDataList = optDataList;
+      this.type = "multipleChoice";
     }
     // Method to get question data as FormData object
     getData() {
