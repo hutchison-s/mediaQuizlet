@@ -104,7 +104,6 @@ function createQuestion(q) {
   const player = createPlayer(q.file, q.limit);
 
   form.innerHTML += `<h2 class="qTitle">${q.title}</h2>`;
-  console.log(q.type)
   if (q.type == "multipleChoice") {
     form.classList.add("mc")
     for (const [value, opt] of q.options.entries()) {

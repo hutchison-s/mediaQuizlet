@@ -139,7 +139,6 @@ function showResponses(quiz) {
     introDialog.close()
     return;
   }
-  console.log(quiz)
   for (const res of quiz.responses) {
     const resBox = newEl("div", null, "response")
     resBox.innerHTML += `
@@ -151,9 +150,6 @@ function showResponses(quiz) {
     for (let i=0; i<res.responses.length; i++) {
       const answer = res.responses[i];
       const quest = quiz.questions[i];
-      console.log("question: ")
-      console.log(quest)
-      console.log("answer: "+answer)
       resBox.innerHTML += `<p>Question ${i+1}: ${quest.title}</p>`
       if (quest.type == "multipleChoice") {
         resBox.innerHTML += `

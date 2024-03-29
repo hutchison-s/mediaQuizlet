@@ -70,7 +70,6 @@ const changeQType = (e) => {
     questions[activeQ] = newQuestion;
     const newForm = generateSAForm(newQuestion);
     box.append(newForm);
-    console.log(box)
   }
 }
 
@@ -105,9 +104,7 @@ const generateSAForm = (quest) => {
 
 // Function to generate multiple choice form
 const generateMCForm = (quest) => {
-  console.log(quest)
   const {file} = quest
-  console.log(file)
   const form = newEl("form", null, "qForm");
   form.classList.add("shadow");
   form.classList.add("softCorner");
@@ -158,7 +155,6 @@ const editActive = () => {
   let form;
   if (quest instanceof MCQuestion) {
     form = generateMCForm(quest);
-    console.log(quest, form)
     form.title.value = quest.title;
     form.limit.value = quest.limit;
     form.optA.value = quest.options[0];
@@ -180,7 +176,6 @@ const editActive = () => {
 const qSubmit = (e, quest, form) => {
   e.preventDefault();
   const data = new FormData(form);
-  console.log("data: "+data.get("title"))
   quest.formResponse(data);
   markComplete(activeQ);
   const box = elall(".qFormBox")[activeQ];
@@ -270,7 +265,6 @@ const onSubmitQuiz = (e) => {
   })
     .then((response) => response.json())
     .then((data) => {
-      console.log("Data:", data);
       spinner.classList.add("hidden")
       launchSubmission.style.display = "none";
       questions.length = 0;
