@@ -177,7 +177,7 @@ const editActive = () => {
   const box = formCar.children[activeQ];
   let form;
   switch (quest.type) {
-    case "mc":
+    case "multipleChoice":
       form = generateMCForm(quest);
       form.title.value = quest.title;
       form.limit.value = quest.limit;
@@ -187,7 +187,7 @@ const editActive = () => {
       form.optD.value = quest.options[3];
       form.querySelectorAll("input[type='radio']")[quest.correct].checked = true;
       break;
-    case "sa":
+    case "shortAnswer":
       form = generateSAForm(quest);
       form.title.value = quest.title;
       form.limit.value = quest.limit;

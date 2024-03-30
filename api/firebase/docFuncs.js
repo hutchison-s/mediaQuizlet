@@ -1,5 +1,7 @@
+import compressImages from '../middleware/compressImages.js';
 import {db, storage, fieldValue} from './firebaseConnect.js'
 const qCol = db.collection("quizzes");
+
 
 export async function handleFileUploads(req) {
     const { files } = req;
@@ -115,36 +117,42 @@ export async function handleFileUploads(req) {
       status: data.status
     }
     for (const q of data.questions) {
-      if (q.type == "multipleChoice") {
-        sendData.questions.push({
-          title: q.title,
-          options: q.options,
-          limit: q.limit,
-          file: q.file,
-          type: q.type
-        })
-      } else if (q.type = "shortAnswer") {
-        sendData.questions.push({
-          title: q.title,
-          correct: q.correct,
-          limit: q.limit,
-          file: q.file,
-          type: q.type
-        })
+      const qData = {
+        title: q.title,
+        file: q.file,
+        limit: q.limit,
+        type: q.type,
       }
-      
+      if (q.type == "multipleChoice") {
+        qData.options = q.options
+      } else if (q.type == "shortAnswer") {
+        qData.correct = q.correct
+      }
+      sendData.questions.push(qData)
     }
     return sendData;
   }
 
-  export async function addResponse(body, code) {
-    const { user, timestamp, responses } = body;
+  export async function addResponse(req, code) {
+    const { user, timestamp, responses } = req.body;
+    const photos = req.photos;
+    const filesToAssociate = [];
+    if (photos) {
+      const photoNames = await compressImages(photos)
+      for (const res of responses) {
+        if (res == "#photoUpload#") {
+          const pic = photoNames.shift();
+          res = pic.link;
+          filesToAssociate.push(pic.name)
+        }
+      }
+    }
     const updateData = {
         user: user,
         timestamp: timestamp,
         responses: responses,
       }
-      const docUpdate = await qCol.doc(code).update('responses', fieldValue.arrayUnion(updateData));
+      const docUpdate = await qCol.doc(code).update('responses', fieldValue.arrayUnion(updateData), 'associatedFiles', fieldValue.arrayUnion(filesToAssociate));
       return docUpdate;
   }
 
