@@ -1,51 +1,60 @@
 import sharp from "sharp";
-export default async function compressImages(photos) {
+
+async function compressOne(photo) {
+    try {
+        const comp = await sharp(photo).jpeg({ quality: 50 }).toBuffer();
+        return {
+            originalname: photo.originalName,
+            buffer: comp,
+            mimetype: 'image/jpeg'
+        };
+    } catch (err) {
+        throw new Error(`Error compressing photo "${photo.originalName}": ${err.message}`);
+    }
+}
+
+async function compressAll(photos) {
+    try {
+        const compressed = await Promise.all(photos.map(photo => compressOne(photo)));
+        return compressed;
+    } catch (err) {
+        console.error("Error compressing photos:", err);
+        throw new Error("Error compressing photos: " + err.message);
+    }
+}
+
+async function uploadPhotos(compressed) {
     const dt = Date.now();
     const expires = new Date();
     expires.setFullYear(expires.getFullYear() + 1);
 
+    const photoUploadPromises = compressed.map((photo, index) => {
+        const fileName = `files/${photo.originalname.split(".")[0]}_${dt}_${index}`;
+        const cloudFile = storage.bucket().file(fileName);
+
+        return cloudFile.save(photo.buffer, { contentType: photo.mimetype })
+            .then(() => cloudFile.getSignedUrl({ action: "read", expires: expires.toISOString() }))
+            .then((downLink) => ({ name: cloudFile.name, link: downLink }))
+            .catch((err) => {
+                console.error("Error uploading file:", err);
+                throw new Error("Error uploading file: " + err.message);
+            });
+    });
+
     try {
-        const compressed = [];
-        for (const photo of photos) {
-
-            const comp = await sharp(photo).jpeg({quality: 50}).toBuffer()
-            compressed.push({
-                originalname: photo.originalName,
-                buffer: comp,
-                mimetype: 'image/jpeg'
-            })
-        }
-    } catch (err) {
-        console.log("Error compressing photos: "+err.message);
-        throw new Error("Error compressing photos: "+err.message);
-    }
-
-    const photoUploadPromises = [];
-    try {
-        for (let i = 0; i < compressed.length; i++) {
-            let fileName = "files/" + compressed[i].originalname.split(".")[0] + dt + i;
-            const cloudFile = storage.bucket().file(fileName);
-            console.log("file ref:" + cloudFile);
-            const uploadPromise = cloudFile.save(compressed[i].buffer, { contentType: compressed[i].mimetype })
-                .then(() => {
-                    return cloudFile.getSignedUrl({ action: "read", expires: expires.toISOString() });
-                })
-                .then((downLink) => {
-                    console.log("link retrieved: " + downLink);
-                    return {name: cloudFile.name, link: downLink};
-                })
-                .catch((err) => {
-                    console.log("Error uploading file:", err);
-                    throw new Error("Error uploading file");
-                });
-            photoUploadPromises.push(uploadPromise);
-        }
-
-        // Wait for all file upload promises to resolve
         const photoNames = await Promise.all(photoUploadPromises);
         return photoNames;
     } catch (err) {
-        console.log("Error uploading photos:", err);
-        throw new Error("Error uploading photos: "+err.message);
+        console.error("Error uploading photos:", err);
+        throw new Error("Error uploading photos: " + err.message);
     }
+}
+
+export default async function compressAndUpload(photos) {
+    console.log(`Compressing ${photos.length} photos.`);
+    const compressed = await compressAll(photos);
+    console.log(`Uploading ${compressed.length} compressed photos.`);
+    const photoNames = await uploadPhotos(compressed);
+    console.log("Successfully uploaded:", photoNames);
+    return photoNames;
 }

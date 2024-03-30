@@ -1,4 +1,4 @@
-import compressImages from '../middleware/compressImages.js';
+import compressAndUpload from '../middleware/compressImages.js';
 import {db, storage, fieldValue} from './firebaseConnect.js'
 const qCol = db.collection("quizzes");
 
@@ -135,14 +135,14 @@ export async function handleFileUploads(req) {
 
   export async function addResponse(req, code) {
     const { user, timestamp, responses } = req.body;
-    const photos = req.photos;
+    const photos = req.files;
     const filesToAssociate = [];
     if (photos) {
-      const photoNames = await compressImages(photos)
-      for (const res of responses) {
-        if (res == "#photoUpload#") {
+      const photoNames = await compressAndUpload(photos)
+      for (let i=0; i<responses.length; i++) {
+        if (responses[i] == "#photoUpload#") {
           const pic = photoNames.shift();
-          res = pic.link;
+          responses[i] = pic.link;
           filesToAssociate.push(pic.name)
         }
       }
