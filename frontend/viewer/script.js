@@ -151,16 +151,22 @@ function showResponses(quiz) {
       const answer = res.responses[i];
       const quest = quiz.questions[i];
       resBox.innerHTML += `<p>Question ${i+1}: ${quest.title}</p>`
-      if (quest.type == "multipleChoice") {
-        resBox.innerHTML += `
-        <p>\tAnswered: ${quest.options[answer]}
-          <i class="fa-solid ${answer == quest.correct ? "fa-circle-check" : "fa-circle-xmark"}"></i>
-        </p>`
-      } else if (quest.type == "shortAnswer") {
-        resBox.innerHTML += `
-        <p>\tAnswered: ${answer}
-          <i class="fa-solid ${answer.toLowerCase().trim() == quest.correct.toLowerCase().trim() ? "fa-circle-check" : "fa-circle-xmark"}"></i>
-        </p>`
+      switch (quest.type) {
+        case "multipleChoice":
+          resBox.innerHTML += `
+            <p>\tAnswered: ${quest.options[answer]}
+              <i class="fa-solid ${answer == quest.correct ? "fa-circle-check" : "fa-circle-xmark"}"></i>
+            </p>`;
+          break;
+        case "shortAnswer":
+          resBox.innerHTML += `
+            <p>\tAnswered: ${answer}
+              <i class="fa-solid ${answer.toLowerCase().trim() == quest.correct.toLowerCase().trim() ? "fa-circle-check" : "fa-circle-xmark"}"></i>
+            </p>`;
+          break;
+        default:
+          resBox.innerHTML += `
+          <img src=${answer} alt="${res.user} uploaded photo" width="100%">`
       }
         
     }
