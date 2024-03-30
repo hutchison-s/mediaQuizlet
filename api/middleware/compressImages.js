@@ -32,7 +32,7 @@ async function uploadOne(photo, index) {
 
     console.log("uploading: ",photo.originalname)
     try {
-    const fileName = `files/${photo.originalname.split(".")[0]}_${dt}_${index}`;
+    const fileName = `files/images/${photo.originalname.split(".")[0]}_${dt}_${index}`;
     const cloudFile = storage.bucket().file(fileName);
 
     return cloudFile.save(photo.buffer, { contentType: photo.mimetype })

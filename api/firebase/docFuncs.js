@@ -13,7 +13,7 @@ export async function handleFileUploads(req) {
 
     try {
         for (let i = 0; i < files.length; i++) {
-            let fileName = "files/" + files[i].originalname.split(".")[0] + dt + i;
+            let fileName = "files/audio/" + files[i].originalname.split(".")[0] + dt + i;
             const cloudFile = storage.bucket().file(fileName);
             console.log("file ref:" + cloudFile);
             const uploadPromise = cloudFile.save(files[i].buffer, { contentType: files[i].mimetype })
