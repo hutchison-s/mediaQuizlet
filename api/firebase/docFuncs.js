@@ -137,24 +137,39 @@ export async function handleFileUploads(req) {
     const { user, timestamp, responses } = req.body;
     const photos = req.files;
     const filesToAssociate = [];
+
+    const resArray = Array.isArray(responses) ? responses : [responses]; // Check if responses is an array-like object
+
     if (photos) {
-      const photoNames = await compressAndUpload(photos)
-      for (let i=0; i<responses.length; i++) {
-        if (responses[i] == "#photoUpload#") {
-          const pic = photoNames.shift();
-          responses[i] = pic.link;
-          filesToAssociate.push(pic.name)
+        const photoNames = await compressAndUpload(photos);
+        
+        for (let i = 0; i < resArray.length; i++) {
+            if (resArray[i] === "#photoUpload#") {
+                const pic = photoNames.shift();
+                resArray[i] = pic.link;
+                filesToAssociate.push(pic.name);
+            }
         }
-      }
     }
+
     const updateData = {
         user: user,
         timestamp: timestamp,
-        responses: responses,
-      }
-      const docUpdate = await qCol.doc(code).update('responses', fieldValue.arrayUnion(updateData), 'associatedFiles', fieldValue.arrayUnion(filesToAssociate));
+        responses: resArray,
+    };
+
+    try {
+      const docUpdate = await qCol.doc(code).update({
+        responses: fieldValue.arrayUnion(updateData), 
+        associatedFiles: fieldValue.arrayUnion(...filesToAssociate)
+      });
       return docUpdate;
-  }
+    } catch (err) {
+        console.error("Error updating document:", err);
+        throw new Error("Error updating document");
+    }
+}
+
 
   export async function updateQuiz(body, code) {
     if (body.status) {

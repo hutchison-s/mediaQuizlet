@@ -1,10 +1,12 @@
 import sharp from "sharp";
+import {storage} from "../firebase/firebaseConnect.js"
 
 async function compressOne(photo) {
     try {
-        const comp = await sharp(photo).jpeg({ quality: 50 }).toBuffer();
+        console.log(`compressing ${photo.originalname}`)
+        const comp = await sharp(photo.buffer).jpeg({ quality: 50 }).toBuffer();
         return {
-            originalname: photo.originalName,
+            originalname: photo.originalname,
             buffer: comp,
             mimetype: 'image/jpeg'
         };
@@ -23,26 +25,31 @@ async function compressAll(photos) {
     }
 }
 
-async function uploadPhotos(compressed) {
+async function uploadOne(photo, index) {
     const dt = Date.now();
     const expires = new Date();
     expires.setFullYear(expires.getFullYear() + 1);
 
-    const photoUploadPromises = compressed.map((photo, index) => {
-        const fileName = `files/${photo.originalname.split(".")[0]}_${dt}_${index}`;
-        const cloudFile = storage.bucket().file(fileName);
-
-        return cloudFile.save(photo.buffer, { contentType: photo.mimetype })
-            .then(() => cloudFile.getSignedUrl({ action: "read", expires: expires.toISOString() }))
-            .then((downLink) => ({ name: cloudFile.name, link: downLink }))
-            .catch((err) => {
-                console.error("Error uploading file:", err);
-                throw new Error("Error uploading file: " + err.message);
-            });
-    });
-
+    console.log("uploading: ",photo.originalname)
     try {
-        const photoNames = await Promise.all(photoUploadPromises);
+    const fileName = `files/${photo.originalname.split(".")[0]}_${dt}_${index}`;
+    const cloudFile = storage.bucket().file(fileName);
+
+    return cloudFile.save(photo.buffer, { contentType: photo.mimetype })
+        .then(() => cloudFile.getSignedUrl({ action: "read", expires: expires.toISOString() }))
+        .then((downLink) => ({ name: cloudFile.name, link: downLink[0] }))
+        .catch((err) => {
+            console.error("Error uploading file:", err);
+            throw new Error("Error uploading file: " + err.message);
+        });
+    } catch (err) {
+        throw new Error(`Error uploading photo "${photo.originalName}": ${err.message}`);
+    }
+}
+
+async function uploadAll(compressed) {
+    try {
+        const photoNames = await Promise.all(compressed.map((photo, index) => uploadOne(photo, index)));
         return photoNames;
     } catch (err) {
         console.error("Error uploading photos:", err);
@@ -54,7 +61,7 @@ export default async function compressAndUpload(photos) {
     console.log(`Compressing ${photos.length} photos.`);
     const compressed = await compressAll(photos);
     console.log(`Uploading ${compressed.length} compressed photos.`);
-    const photoNames = await uploadPhotos(compressed);
-    console.log("Successfully uploaded:", photoNames);
+    const photoNames = await uploadAll(compressed);
+    console.log(`Successfully uploaded ${photoNames.length} photos.`);
     return photoNames;
 }
