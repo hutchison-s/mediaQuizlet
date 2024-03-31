@@ -69,3 +69,21 @@ p:has(.fa-circle-xmark) * {
   gap: 1rem;
 }
 
+.updateGrade {
+  background: var(--secondary);
+  color: var(--background);
+  box-shadow: var(--shadow);
+  border: 3px solid lime;
+  border-radius: 0.25rem;
+  margin-left: 1rem;
+  transform: translateY(-0.25rem);
+  padding: 0.25rem 1rem;
+  cursor: pointer;
+  display: none;
+  animation: bounce 0.5s infinite alternate;
+}
+
+@keyframes bounce {
+  from {translate: none}
+  to {translate: 0 -5px}
+}

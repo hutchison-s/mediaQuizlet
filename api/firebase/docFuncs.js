@@ -152,11 +152,11 @@ export async function handleFileUploads(req) {
             }
         }
     }
-
+    const {questions} = (await qCol.doc(code).get()).data();
     const updateData = {
         user: user,
         timestamp: timestamp,
-        responses: resArray,
+        responses: gradeResponse(questions, resArray),
     };
 
     try {
@@ -179,6 +179,22 @@ export async function handleFileUploads(req) {
       await myDoc.update({status: status})
       const updated = await myDoc.get();
       return updated.data();
+    } else if (body.scores) {
+      console.log("updating scores", body.scores)
+      const {scores} = body;
+      const myDoc = qCol.doc(code);
+      const {responses} = (await myDoc.get()).data();
+      const currentResponses = responses[body.resIndex].responses
+      const newResponses = [];
+      console.log("responses to update:", responses[body.resIndex])
+      for (let i=0; i<scores.length; i++) {
+        newResponses.push({answer: currentResponses[i].answer, score: scores[i]})
+        console.log("updated score to "+newResponses[i].score)
+      }
+      responses[body.resIndex].responses = newResponses
+      await myDoc.update({responses: responses});
+      const updated = await myDoc.get();
+      return updated.data();
     } else {
       throw new Error("No status present in request body")
     }
@@ -191,7 +207,7 @@ export async function handleFileUploads(req) {
       console.log("processing "+res.user)
       for (let i=0; i<res.responses.length; i++) {
         if (questions[i].type == "photoUpload") {
-          let path = res.responses[i].replace("https://storage.googleapis.com/audioquizlet.appspot.com/", "").split("?Google")[0]
+          let path = res.responses[i].answer.replace("https://storage.googleapis.com/audioquizlet.appspot.com/", "").split("?Google")[0]
           try {
             await storage.bucket().file(path).delete();
             console.log("Deleted "+path)
@@ -210,4 +226,27 @@ export async function handleFileUploads(req) {
     const updated = await ref.get();
 
     return updated.data();
+  }
+
+  function gradeResponse(questions, responses) {
+    return responses.map((a, i) => {
+      const q = questions[i];
+      switch (q.type) {
+        case "multipleChoice":
+          return {
+            answer: questions[i].options[a],
+            score: a == q.correct ? q.pointValue : 0
+          }
+        case "shortAnswer":
+          return {
+            answer: a,
+            score: answer.toLowerCase().trim() == quest.correct.toLowerCase().trim() ? quest.pointValue : 0
+          }
+        default:
+          return {
+            answer: a,
+            score: 0
+          }
+      }
+    })
   }
