@@ -250,7 +250,7 @@ function beginQuiz() {
   user = name;
   userDisplay.textContent = user;
   introDialog.close();
-  // requestFullScreen();
+  requestFullScreen();
   window.sessionStorage.setItem("quizUser", user)
   quizTimer && quizTimer.startTimer();
 }
