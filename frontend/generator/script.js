@@ -96,7 +96,10 @@ const generatePicForm = (quest) => {
       <audio controls src="${URL.createObjectURL(quest.file)}"></audio>
       <p class="fileName">${quest.file.name}</p>
       <input type="text" list="qPrompts" placeholder="Instructions..." name="title" class="title" required>
-      <label for="limit">Listen Limit: <input required type="number" min="1" max="100" value="3" name="limit"></label>
+      <div class="numberOptions">
+        <label for="limit">Listen Limit: <input required type="number" min="1" max="100" value="3" name="limit"></label>
+        <label for="pointValue">Points: <input required type="number" min="0" max="100" value="1" name="pointValue"></label>
+      </div>
       <button type="submit" class="softCorner">Submit</button>`;
   const select = qTypeSelect(quest.file);
   select.value = 'pic'
@@ -115,7 +118,10 @@ const generateSAForm = (quest) => {
       <p class="fileName">${quest.file.name}</p>
       <input type="text" list="qPrompts" placeholder="Title or Question..." name="title" class="title" required>
       <input required type="text" placeholder="Correct Answer..." name="correct" class="title">
-      <label for="limit">Listen Limit: <input required type="number" min="1" max="100" value="3" name="limit"></label>
+      <div class="numberOptions">
+        <label for="limit">Listen Limit: <input required type="number" min="1" max="100" value="3" name="limit"></label>
+        <label for="pointValue">Points: <input required type="number" min="0" max="100" value="1" name="pointValue"></label>
+      </div>
       <button type="submit" class="softCorner">Submit</button>`;
   const select = qTypeSelect(quest.file);
   select.value = 'sa'
@@ -139,7 +145,10 @@ const generateMCForm = (quest) => {
       <input required type="text" list="optHistory" placeholder="Option B..." name="optB" class="option"><input value=1 type="radio" name="correct">
       <input required type="text" list="optHistory" placeholder="Option C..." name="optC" class="option"><input value=2 type="radio" name="correct">
       <input required type="text" list="optHistory" placeholder="Option D..." name="optD" class="option"><input value=3 type="radio" name="correct">
-      <label for="limit">Listen Limit: <input required type="number" min="1" max="100" value="3" name="limit"></label>
+      <div class="numberOptions">
+        <label for="limit">Listen Limit: <input required type="number" min="1" max="100" value="3" name="limit"></label>
+        <label for="pointValue">Points: <input required type="number" min="0" max="100" value="1" name="pointValue"></label>
+      </div>
       <button type="submit" class="softCorner">Submit</button>`;
   const select = qTypeSelect(quest.file);
   select.value = 'mc'
@@ -181,6 +190,7 @@ const editActive = () => {
       form = generateMCForm(quest);
       form.title.value = quest.title;
       form.limit.value = quest.limit;
+      form.pointValue.value = quest.pointValue;
       form.optA.value = quest.options[0];
       form.optB.value = quest.options[1];
       form.optC.value = quest.options[2];
@@ -191,12 +201,14 @@ const editActive = () => {
       form = generateSAForm(quest);
       form.title.value = quest.title;
       form.limit.value = quest.limit;
+      form.pointValue.value = quest.pointValue;
       form.correct.value = quest.correct;
       break;
     default:
       form = generatePicForm(quest);
       form.title.value = quest.title;
       form.limit.value = quest.limit;
+      form.pointValue.value = quest.pointValue;
   }
   box.innerHTML = "";
   box.appendChild(form);
