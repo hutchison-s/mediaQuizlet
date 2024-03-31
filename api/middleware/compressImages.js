@@ -1,10 +1,24 @@
 import sharp from "sharp";
 import {storage} from "../firebase/firebaseConnect.js"
+import toJpeg from 'heic-convert'
 
 async function compressOne(photo) {
     try {
         console.log(`compressing ${photo.originalname}`)
-        const comp = await sharp(photo.buffer).resize(800, 800, {fit: sharp.fit.inside, withoutEnlargement: true}).jpeg({ quality: 50 }).toBuffer();
+        let comp;
+
+        if (/\.heic$/gi.test(photo.originalname)) {
+            try {
+            const jpgBuffer = await toJpeg({buffer: photo.buffer, format: "JPEG"})
+            comp = await sharp(jpgBuffer).resize(800, 800, {fit: sharp.fit.inside, withoutEnlargement: true}).jpeg({ quality: 70 }).toBuffer();
+            } catch (error) {
+            console.error('Error converting HEIC to JPEG:', error);
+            }
+
+        } else {
+        comp = await sharp(photo.buffer).resize(800, 800, {fit: sharp.fit.inside, withoutEnlargement: true}).jpeg({ quality: 70 }).toBuffer();
+        
+        }
         return {
             originalname: photo.originalname,
             buffer: comp,

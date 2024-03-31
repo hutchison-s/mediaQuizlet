@@ -7,7 +7,7 @@ import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage() });
 
 import authenticate from "./middleware/auth.js";
-import { handleFileUploads, createDocument, getQuizzerInfo, addResponse, updateQuiz, resetQuiz, deleteExpired } from "./firebase/docFuncs.js";
+import { handleFileUploads, createDocument, getQuizzerInfo, addResponse, updateQuiz, resetQuiz, deleteDoc, deleteExpired } from "./firebase/docFuncs.js";
 
 const port = process.env.PORT || 8000;
 
@@ -95,6 +95,19 @@ app.patch("/quiz/:code/admin", authenticate, async (req, res) => {
 app.patch("/quiz/:code/admin/reset", authenticate, async (req, res) => {
   try {
       const updated = await resetQuiz(req.params.code);
+      res.send(updated)
+  } catch(err) {
+    console.log(err)
+    res
+      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
+  }
+})
+
+// Delete quiz and associated files
+
+app.delete("/quiz/:code/admin", authenticate, async (req, res) => {
+  try {
+      const updated = await deleteDoc(req.params.code);
       res.send(updated)
   } catch(err) {
     console.log(err)

@@ -83,6 +83,13 @@ p:has(.fa-circle-xmark) * {
   animation: bounce 0.5s infinite alternate;
 }
 
+#deleteQuiz {
+  padding: 1rem 2rem;
+  font-size: large;
+  box-shadow: var(--shadow);
+  margin-top: 2rem;
+}
+
 @keyframes bounce {
   from {translate: none}
   to {translate: 0 -5px}

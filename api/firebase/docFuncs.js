@@ -80,30 +80,52 @@ export async function handleFileUploads(req) {
 
         for (const doc of snapshots.docs) {
             const quiz = doc.data();
-            
             if (quiz.associatedFiles) {
-                for (const fileName of quiz.associatedFiles) {
-                    try {
-                        await storage.bucket().file(fileName).delete();
-                        console.log("File deleted: " + fileName);
-                    } catch (err) {
-                        console.log("Couldn't delete file: " + fileName);
-                    }
-                }
-            }
+              for (const fileName of quiz.associatedFiles) {
+                  try {
+                      await storage.bucket().file(fileName).delete();
+                      console.log("File deleted: " + fileName);
+                  } catch (err) {
+                      console.log("Couldn't delete file: " + fileName);
+                  }
+              }
+          }
 
-            try {
-                await doc.ref.delete();
-                console.log("Document deleted: " + doc.id);
-            } catch (err) {
-                console.log("Error deleting document: " + doc.id);
-            }
+          try {
+              await doc.ref.delete();
+              console.log("Document deleted: " + doc.id);
+          } catch (err) {
+              console.log("Error deleting document: " + doc.id);
+          }
+            
         }
     } catch (err) {
         console.error(err);
         throw new Error("Error occurred during deletion.");
     }
 }
+
+  export async function deleteDoc(code) {
+    const doc = qCol.doc(code)
+    const quiz = (await doc.get()).data()
+    if (quiz.associatedFiles) {
+      for (const fileName of quiz.associatedFiles) {
+          try {
+              await storage.bucket().file(fileName).delete();
+              console.log("File deleted: " + fileName);
+          } catch (err) {
+              console.log("Couldn't delete file: " + fileName);
+          }
+      }
+    }
+    try {
+      await doc.delete();
+      console.log("Document deleted: " + doc.id);
+      return {status: "complete"}
+    } catch (err) {
+      console.log("Error deleting document: " + doc.id);
+    }
+  }
 
   export async function getQuizzerInfo(code) {
     const docReq = await qCol.doc(code).get()
@@ -138,6 +160,7 @@ export async function handleFileUploads(req) {
     const { user, timestamp, responses } = req.body;
     const photos = req.files;
     const filesToAssociate = [];
+    console.log("reponse received, processing...")
 
     const resArray = Array.isArray(responses) ? responses : [responses]; // Check if responses is an array-like object
 
@@ -158,7 +181,7 @@ export async function handleFileUploads(req) {
         timestamp: timestamp,
         responses: gradeResponse(questions, resArray),
     };
-
+    console.log("adding response", updateData)
     try {
       const docUpdate = await qCol.doc(code).update({
         responses: fieldValue.arrayUnion(updateData), 
@@ -229,24 +252,31 @@ export async function handleFileUploads(req) {
   }
 
   function gradeResponse(questions, responses) {
-    return responses.map((a, i) => {
-      const q = questions[i];
-      switch (q.type) {
-        case "multipleChoice":
-          return {
-            answer: questions[i].options[a],
-            score: a == q.correct ? q.pointValue : 0
-          }
-        case "shortAnswer":
-          return {
-            answer: a,
-            score: answer.toLowerCase().trim() == quest.correct.toLowerCase().trim() ? quest.pointValue : 0
-          }
-        default:
-          return {
-            answer: a,
-            score: 0
-          }
-      }
-    })
+    console.log("grading responses...",  questions, responses)
+    try {
+      const mapped = responses.map((a, i) => {
+        const q = questions[i];
+        switch (q.type) {
+          case "multipleChoice":
+            return {
+              answer: questions[i].options[a],
+              score: a == q.correct ? q.pointValue : 0
+            }
+          case "shortAnswer":
+            return {
+              answer: a,
+              score: a.toLowerCase().trim() == q.correct.toLowerCase().trim() ? q.pointValue : 0
+            }
+          default:
+            return {
+              answer: a,
+              score: 0
+            }
+        }
+      })
+      return mapped;
+    } catch (err) {
+      console.log(err)
+    }
+    
   }

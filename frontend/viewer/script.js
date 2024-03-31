@@ -33,9 +33,10 @@ function apiCall(quizId) {
       
     })
     .then((quizObject) => {
-      const [change, reset] = adminOptions(quizObject, quizId)
+      const [change, reset, del] = adminOptions(quizObject, quizId)
       optBox.append(change);
       optBox.append(reset);
+      optBox.append(del)
       showResponses(quizObject)
       auth = passwordInput.value;
     })
@@ -73,9 +74,10 @@ function changeStatus(quizId, newStatus) {
       const id = urlParams.get("id")
       console.log(id+" status set to "+quiz.status);
       optBox.innerHTML = "";
-      const [change, reset] = adminOptions(quiz, id)
+      const [change, reset, del] = adminOptions(quiz, id)
       optBox.append(change);
       optBox.append(reset);
+      optBox.append(del);
     })
     .catch(err => {
       console.log(err)
@@ -102,9 +104,10 @@ function eraseResponses(quizId) {
       console.log(id+" responses reset");
       elid("resBox").remove()
       optBox.innerHTML = "";
-      const [change, reset] = adminOptions(quiz, id)
+      const [change, reset, del] = adminOptions(quiz, id)
       optBox.append(change);
       optBox.append(reset);
+      optBox.append(del);
       showResponses(quiz)
     })
     .catch(err => {
@@ -127,7 +130,29 @@ function adminOptions(quiz, id) {
   resetBtn.addEventListener("click", ()=>{
     eraseResponses(id);
   })
-  return [changeBtn, resetBtn];
+  const deleteBtn = newEl("button", "deleteQuiz", "warningButton");
+  deleteBtn.classList.add("softCorner");
+  deleteBtn.textContent = "Delete Quiz";
+  deleteBtn.addEventListener("click", ()=>{
+    deleteQuiz(id);
+  })
+  return [changeBtn, resetBtn, deleteBtn];
+}
+
+function deleteQuiz(code) {
+  const encoding = btoa(`${encodeURIComponent(code)}:${encodeURIComponent(auth)}`);
+  fetch(apiURL+`/quiz/${code}/admin`, {
+    method: "DELETE",
+    headers: {
+        "Authorization": 'Basic ' + encoding
+    }
+  }).then(res => {
+    if (res.ok) {
+      window.location.href = "https://audioquizlet.netlify.app"
+    }
+  }).catch(err => {
+    console.log(err)
+  })
 }
 
 function showResponses(quiz) {

@@ -62,9 +62,10 @@ body {
   color: #ffffffcc;
   cursor: pointer;
   outline: 1px solid #ffffff33;
+  transition: transform 0.2s;
 }
 .warningButton:hover {
-  scale: 1.02;
+  scale: 1.1;
   outline: 2px solid #ffffffcc;
   box-shadow: var(--shadow);
 }
