@@ -1,5 +1,7 @@
+import compressAndUpload from '../middleware/compressImages.js';
 import {db, storage, fieldValue} from './firebaseConnect.js'
 const qCol = db.collection("quizzes");
+
 
 export async function handleFileUploads(req) {
     const { files } = req;
@@ -11,7 +13,7 @@ export async function handleFileUploads(req) {
 
     try {
         for (let i = 0; i < files.length; i++) {
-            let fileName = "files/" + files[i].originalname.split(".")[0] + dt + i;
+            let fileName = `files/audio/${files[i].originalname.split(".")[0].replace(/[\W]/g, "_").replace(/_{2,}/g, "_")}_${dt}_${i}.${files[i].originalname.split(".")[1]}`;
             const cloudFile = storage.bucket().file(fileName);
             console.log("file ref:" + cloudFile);
             const uploadPromise = cloudFile.save(files[i].buffer, { contentType: files[i].mimetype })
@@ -115,38 +117,59 @@ export async function handleFileUploads(req) {
       status: data.status
     }
     for (const q of data.questions) {
-      if (q.type == "multipleChoice") {
-        sendData.questions.push({
-          title: q.title,
-          options: q.options,
-          limit: q.limit,
-          file: q.file,
-          type: q.type
-        })
-      } else if (q.type = "shortAnswer") {
-        sendData.questions.push({
-          title: q.title,
-          correct: q.correct,
-          limit: q.limit,
-          file: q.file,
-          type: q.type
-        })
+      const qData = {
+        title: q.title,
+        file: q.file,
+        limit: q.limit,
+        type: q.type,
       }
-      
+      if (q.type == "multipleChoice") {
+        qData.options = q.options
+      } else if (q.type == "shortAnswer") {
+        qData.correct = q.correct
+      }
+      sendData.questions.push(qData)
     }
     return sendData;
   }
 
-  export async function addResponse(body, code) {
-    const { user, timestamp, responses } = body;
+  export async function addResponse(req, code) {
+    const { user, timestamp, responses } = req.body;
+    const photos = req.files;
+    const filesToAssociate = [];
+
+    const resArray = Array.isArray(responses) ? responses : [responses]; // Check if responses is an array-like object
+
+    if (photos) {
+        const photoNames = await compressAndUpload(photos);
+        
+        for (let i = 0; i < resArray.length; i++) {
+            if (resArray[i] === "#photoUpload#") {
+                const pic = photoNames.shift();
+                resArray[i] = pic.link;
+                filesToAssociate.push(pic.name);
+            }
+        }
+    }
+
     const updateData = {
         user: user,
         timestamp: timestamp,
-        responses: responses,
-      }
-      const docUpdate = await qCol.doc(code).update('responses', fieldValue.arrayUnion(updateData));
+        responses: resArray,
+    };
+
+    try {
+      const docUpdate = await qCol.doc(code).update({
+        responses: fieldValue.arrayUnion(updateData), 
+        associatedFiles: fieldValue.arrayUnion(...filesToAssociate)
+      });
       return docUpdate;
-  }
+    } catch (err) {
+        console.error("Error updating document:", err);
+        throw new Error("Error updating document");
+    }
+}
+
 
   export async function updateQuiz(body, code) {
     if (body.status) {
@@ -161,8 +184,29 @@ export async function handleFileUploads(req) {
   }
 
   export async function resetQuiz(code) {
-    const myDoc = qCol.doc(code)
-    await myDoc.update({responses: new Array()})
-    const updated = await myDoc.get();
+    const ref = qCol.doc(code)
+    const {questions, responses, associatedFiles} = (await ref.get()).data();
+    for (const res of responses) {
+      console.log("processing "+res.user)
+      for (let i=0; i<res.responses.length; i++) {
+        if (questions[i].type == "photoUpload") {
+          let path = res.responses[i].replace("https://storage.googleapis.com/audioquizlet.appspot.com/", "").split("?Google")[0]
+          try {
+            await storage.bucket().file(path).delete();
+            console.log("Deleted "+path)
+            let idx = associatedFiles.indexOf(path);
+            associatedFiles.splice(idx,1);
+          } catch (err) {
+            console.log("Couldn't delete "+path);
+            console.error(err)
+          }
+        }
+      }
+    }
+    console.log(associatedFiles)
+    
+    await ref.update({responses: new Array(), associatedFiles: associatedFiles})
+    const updated = await ref.get();
+
     return updated.data();
   }

@@ -54,10 +54,10 @@ app.get("/quiz/:code", async (req, res) => {
 
 // Add response to quiz
 
-app.post("/quiz/:code/response", async (req, res) => {
+app.post("/quiz/:code/response", upload.array("photos"), async (req, res) => {
   try {
     const id = req.params.code;
-    const update = await addResponse(req.body, id);
+    const update = await addResponse(req, id);
     res.send(update);
     console.log("New Response to quiz " + id + " received."); 
   } catch(err) {

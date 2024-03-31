@@ -63,17 +63,25 @@ function restoreState(state) {
 
 function submitAll() {
   const qForms = elall(".questionForm");
-  const responses = Array.from(qForms).map(form => form.answer.value)
-  const data = {
-    user,
-    timestamp: new Date().toTimeString(),
-    responses: responses
-  };
+
+  const formData = new FormData();
+  for (const qForm of Array.from(qForms)) {
+    if (qForm.answer.type == "file") {
+      console.log(qForm.answer.files[0])
+      formData.append("photos", qForm.answer.files[0])
+      formData.append('responses', "#photoUpload#")
+    } else {
+      formData.append('responses', qForm.answer.value)
+    }
+  }
+  formData.append("user", user);
+  formData.append("timestamp", new Date().toTimeString())
+
   quizTimer && clearInterval(quizTimer?.interval);
+
   fetch(apiURL+`/quiz/${thisQuizId}/response`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(data),
+    body: formData,
   })
     .then((res) => {
       window.localStorage.removeItem("quizState" + thisQuizId);
@@ -104,15 +112,21 @@ function createQuestion(q) {
   const player = createPlayer(q.file, q.limit);
 
   form.innerHTML += `<h2 class="qTitle">${q.title}</h2>`;
-  if (q.type == "multipleChoice") {
-    form.classList.add("mc")
-    for (const [value, opt] of q.options.entries()) {
-      form.innerHTML += `<label>${opt}<input required type="radio" value="${value}" name="answer"
-      }"></label>`;
-    }
-  } else if (q.type = "shortAnswer") {
-    form.classList.add("sa")
-    form.innerHTML += `<label><input required type="text" placeholder="Your answer..." name="answer"></label>`
+  switch (q.type) {
+    case "multipleChoice":
+      form.classList.add("mc")
+      for (const [value, opt] of q.options.entries()) {
+        form.innerHTML += `<label>${opt}<input required type="radio" value="${value}" name="answer"
+        }"></label>`;
+      }
+      break;
+    case "shortAnswer":
+      form.classList.add("sa")
+      form.innerHTML += `<label><input required type="text" placeholder="Your answer..." name="answer"></label>`;
+      break;
+    default:
+      form.classList.add("pic")
+      form.innerHTML += `<label><input required type="file" accept="image/*" name="answer">Upload your photo:</label>`
   }
   
   form.addEventListener("submit", (e) => {
@@ -236,7 +250,7 @@ function beginQuiz() {
   user = name;
   userDisplay.textContent = user;
   introDialog.close();
-  requestFullScreen();
+  // requestFullScreen();
   window.sessionStorage.setItem("quizUser", user)
   quizTimer && quizTimer.startTimer();
 }
@@ -257,16 +271,16 @@ window.addEventListener("beforeunload", (e)=>{
     updateStorage();
   }
 });
-window.addEventListener("blur", (e)=>{
-  if (user) {
-    if (!hasBeenWarned) {
-      alert("This is your only warning. Navigating away from this page will result in your quiz being submitted as-is.")
-      hasBeenWarned = true;
-    } else {
-      submitAll();
-    }
-  }
-})
+// window.addEventListener("blur", (e)=>{
+//   if (user) {
+//     if (!hasBeenWarned) {
+//       alert("This is your only warning. Navigating away from this page will result in your quiz being submitted as-is.")
+//       hasBeenWarned = true;
+//     } else {
+//       submitAll();
+//     }
+//   }
+// })
 lightDark.addEventListener("click", changeMode);
  
 function requestFullScreen() {
