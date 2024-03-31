@@ -122,6 +122,7 @@ export async function handleFileUploads(req) {
         file: q.file,
         limit: q.limit,
         type: q.type,
+        pointValue: q.pointValue
       }
       if (q.type == "multipleChoice") {
         qData.options = q.options
