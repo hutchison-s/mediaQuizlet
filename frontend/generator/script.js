@@ -229,7 +229,7 @@ const handleFiles = (files) => {
       return;
   }
   for (const f of files) {
-    if (f.size / 1048576 > 4) {
+    if (f.size / 1048576 > 6) {
       upload.value = "";
       alert("One or more files are too large. Max size allowed is 4 MB")
       resetPage();
