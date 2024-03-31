@@ -19,6 +19,7 @@ class PicQuestion {
         this.limit = null;
         this.photo = null;
         this.type = "photoUpload"
+        this.pointValue = 1;
     }
 
     getData() {
@@ -33,6 +34,7 @@ class PicQuestion {
         this.title = data.get("title");
         this.limit = data.get("limit")
         this.isComplete = true;
+        this.pointValue = data.get("pointValue")
         this.addToDataLists();
     }
 

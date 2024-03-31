@@ -17,7 +17,8 @@ class ShortAnswerQuestion {
         this.isComplete = null;
         this.qDataList = qDataList;
         this.limit = null;
-        this.type = "shortAnswer"
+        this.type = "shortAnswer";
+        this.pointValue = 1;
     }
 
     getData() {
@@ -33,6 +34,7 @@ class ShortAnswerQuestion {
         this.correct = data.get("correct");
         this.limit = data.get("limit")
         this.isComplete = true;
+        this.pointValue = data.get("pointValue")
         this.addToDataLists();
     }
 
