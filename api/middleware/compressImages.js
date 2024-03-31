@@ -4,7 +4,7 @@ import {storage} from "../firebase/firebaseConnect.js"
 async function compressOne(photo) {
     try {
         console.log(`compressing ${photo.originalname}`)
-        const comp = await sharp(photo.buffer).jpeg({ quality: 50 }).toBuffer();
+        const comp = await sharp(photo.buffer).resize(800, 800, {fit: sharp.fit.inside, withoutEnlargement: true}).jpeg({ quality: 50 }).toBuffer();
         return {
             originalname: photo.originalname,
             buffer: comp,
@@ -32,7 +32,7 @@ async function uploadOne(photo, index) {
 
     console.log("uploading: ",photo.originalname)
     try {
-    const fileName = `files/images/${photo.originalname.split(".")[0]}_${dt}_${index}`;
+    const fileName = `files/images/${photo.originalname.split(".")[0].replace(/[\W]/g, "_").replace(/_{2,}/g, "_")}_${dt}_${index}.jpg`;
     const cloudFile = storage.bucket().file(fileName);
 
     return cloudFile.save(photo.buffer, { contentType: photo.mimetype })

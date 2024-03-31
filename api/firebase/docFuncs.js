@@ -13,7 +13,7 @@ export async function handleFileUploads(req) {
 
     try {
         for (let i = 0; i < files.length; i++) {
-            let fileName = "files/audio/" + files[i].originalname.split(".")[0] + dt + i;
+            let fileName = `files/audio/${files[i].originalname.split(".")[0].replace(/[\W]/g, "_").replace(/_{2,}/g, "_")}_${dt}_${i}.${files[i].originalname.split(".")[1]}`;
             const cloudFile = storage.bucket().file(fileName);
             console.log("file ref:" + cloudFile);
             const uploadPromise = cloudFile.save(files[i].buffer, { contentType: files[i].mimetype })
@@ -184,8 +184,29 @@ export async function handleFileUploads(req) {
   }
 
   export async function resetQuiz(code) {
-    const myDoc = qCol.doc(code)
-    await myDoc.update({responses: new Array()})
-    const updated = await myDoc.get();
+    const ref = qCol.doc(code)
+    const {questions, responses, associatedFiles} = (await ref.get()).data();
+    for (const res of responses) {
+      console.log("processing "+res.user)
+      for (let i=0; i<res.responses.length; i++) {
+        if (questions[i].type == "photoUpload") {
+          let path = res.responses[i].replace("https://storage.googleapis.com/audioquizlet.appspot.com/", "").split("?Google")[0]
+          try {
+            await storage.bucket().file(path).delete();
+            console.log("Deleted "+path)
+            let idx = associatedFiles.indexOf(path);
+            associatedFiles.splice(idx,1);
+          } catch (err) {
+            console.log("Couldn't delete "+path);
+            console.error(err)
+          }
+        }
+      }
+    }
+    console.log(associatedFiles)
+    
+    await ref.update({responses: new Array(), associatedFiles: associatedFiles})
+    const updated = await ref.get();
+
     return updated.data();
   }
