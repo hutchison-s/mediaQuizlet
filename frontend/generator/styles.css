@@ -228,8 +228,15 @@ body {
 }
 .qForm input[type="number"] {
   font-size: 16px;
-  padding: 0.2rem;
-  width: 30%;
+  padding: 0.25rem 1rem;
+  border-radius: 0.25rem;
+  text-align: center;
+}
+.qForm .numberOptions {
+  grid-column: span 2;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
 }
 .qForm button {
   grid-column: span 2;

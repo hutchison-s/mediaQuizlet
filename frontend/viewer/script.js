@@ -139,42 +139,82 @@ function showResponses(quiz) {
     introDialog.close()
     return;
   }
-  for (const res of quiz.responses) {
+  let totalPoints = quiz.questions.reduce((acc, q)=>acc+parseInt(q.pointValue), 0)
+  for (const [idx, res] of quiz.responses.entries()) {
     const resBox = newEl("div", null, "response")
     resBox.innerHTML += `
       <div>
-        <h2>${res.user} <span class="score">(<span class="numCorrect"></span>/${quiz.questions.length})</span></h2>
+        <h2>${res.user} <span class="score">(<span class="numCorrect"></span>/${totalPoints})</span><button class="updateGrade">Update</button></h2>
         <p><small>${res.timestamp}</small></p>
       </div>
     `
     for (let i=0; i<res.responses.length; i++) {
-      const answer = res.responses[i];
+      const answer = res.responses[i].answer;
+      const score = res.responses[i].score;
       const quest = quiz.questions[i];
       resBox.innerHTML += `<p>Question ${i+1}: ${quest.title}</p>`
       switch (quest.type) {
         case "multipleChoice":
           resBox.innerHTML += `
-            <p>\tAnswered: ${quest.options[answer]}
-              <i class="fa-solid ${answer == quest.correct ? "fa-circle-check" : "fa-circle-xmark"}"></i>
+          <label><input type="number" min="0" max="${quest.pointValue}" value=${score}> out of ${quest.pointValue} points earned</label>
+            <p>\tAnswered: ${answer}
+              <i class="fa-solid ${score == quest.pointValue ? "fa-circle-check" : "fa-circle-xmark"}"></i>
             </p>`;
           break;
         case "shortAnswer":
           resBox.innerHTML += `
+          <label><input type="number" min="0" max="${quest.pointValue}" value=${score}> out of ${quest.pointValue} points earned</label>
             <p>\tAnswered: ${answer}
-              <i class="fa-solid ${answer.toLowerCase().trim() == quest.correct.toLowerCase().trim() ? "fa-circle-check" : "fa-circle-xmark"}"></i>
-            </p>`;
+              <i class="fa-solid ${score == quest.pointValue ? "fa-circle-check" : "fa-circle-xmark"}"></i>
+            </p>
+            `;
           break;
         default:
           resBox.innerHTML += `
+          <label><input type="number" min="0" max="${quest.pointValue}" value=${score}> out of ${quest.pointValue} points earned</label>
           <img src=${answer} alt="${res.user} uploaded photo" width="100%">`
       }
         
     }
-    resBox.querySelector(".numCorrect").textContent = resBox.querySelectorAll(".fa-circle-check").length
-    box.appendChild(resBox)
+    resBox.querySelector(".updateGrade").addEventListener("click", ()=>{
+      const queryString = window.location.search;
+        const urlParams = new URLSearchParams(queryString);
+        let code = urlParams.get("id");
+        const encoding = btoa(`${encodeURIComponent(code)}:${encodeURIComponent(auth)}`);
+        fetch(apiURL+`/quiz/${code}/admin`, {
+          method: "PATCH",
+          headers: {
+              "Authorization": 'Basic ' + encoding,
+              "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            resIndex: idx,
+            scores: Array.from(resBox.querySelectorAll("input[type='number']")).map(n => n.value)
+          })
+        }).then(res => {
+          console.log(res)
+          calculateGrade(resBox)
+          resBox.querySelector(".updateGrade").style.display = "none"
+        }).catch(err => {
+          console.log(err)
+        })
+    })
+    for (const input of resBox.querySelectorAll("input[type='number']")) {
+      input.addEventListener("input", ()=>{
+        calculateGrade(resBox);
+        resBox.querySelector(".updateGrade").style.display = "inline-block"
+      })
+      box.appendChild(resBox)
+      calculateGrade(resBox);
+    }
+    root.appendChild(box);
+    introDialog.close()
   }
-  root.appendChild(box);
-  introDialog.close()
+}
+
+function calculateGrade(resBox) {
+  const pointsEarned = Array.from(resBox.querySelectorAll("input[type='number']")).reduce((acc, num) => acc + parseInt(num.value), 0)
+  resBox.querySelector(".numCorrect").textContent = pointsEarned;
 }
 
 function handleSendPassword() {

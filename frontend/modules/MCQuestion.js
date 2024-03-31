@@ -20,6 +20,7 @@ class MCQuestion {
       this.qDataList = qDataList;
       this.optDataList = optDataList;
       this.type = "multipleChoice";
+      this.pointValue = 1;
     }
     // Method to get question data as FormData object
     getData() {
@@ -44,6 +45,7 @@ class MCQuestion {
       this.correct = parseInt(data.get("correct"));
       this.isComplete = true;
       this.limit = data.get("limit");
+      this.pointValue = data.get("pointValue")
       this.addToDataLists();
     }
     addToDataLists() {

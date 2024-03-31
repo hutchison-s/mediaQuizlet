@@ -112,6 +112,7 @@ function createQuestion(q) {
   const player = createPlayer(q.file, q.limit);
 
   form.innerHTML += `<h2 class="qTitle">${q.title}</h2>`;
+  form.innerHTML += `<p><small>${q.pointValue} points</small></p>`
   switch (q.type) {
     case "multipleChoice":
       form.classList.add("mc")
