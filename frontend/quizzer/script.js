@@ -61,14 +61,14 @@ function restoreState(state) {
 
 // Retrieve all indexes of checked radio buttons and submit with username and timestamp to API
 
-function submitAll() {
+async function submitAll() {
   const qForms = elall(".questionForm");
 
   const formData = new FormData();
   for (const qForm of Array.from(qForms)) {
     if (qForm.answer.type == "file") {
-      console.log(qForm.answer.files[0])
-      formData.append("photos", qForm.answer.files[0])
+        console.log(qForm.answer.files[0])
+        formData.append("photos", qForm.answer.files[0])
       formData.append('responses', "#photoUpload#")
     } else {
       formData.append('responses', qForm.answer.value)
@@ -127,7 +127,7 @@ function createQuestion(q) {
       break;
     default:
       form.classList.add("pic")
-      form.innerHTML += `<label><input required type="file" accept="image/*" name="answer">Upload your photo:</label>`
+      form.innerHTML += `<label><input required type="file" accept="image/*, image/HEIC, image/heic" name="answer">Upload your photo:</label>`
   }
   
   form.addEventListener("submit", (e) => {
