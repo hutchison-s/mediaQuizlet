@@ -21,9 +21,12 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
 - **Features**:
   - Upload audio files.
   - Create questions based on the uploaded files.
-    - Multiple choice
-    - Short Answer
-    - Photo Upload
+    - Set a limit on number of times quiz-taker can play the audio
+    - Set custom point value for the question
+    - Response types:
+      - Multiple choice
+      - Short Answer
+      - Photo Upload
   - Set a password to access quiz responses.
   - Optionally set a time limit for the quiz.
   - Receive an access link to share with others.
@@ -42,10 +45,9 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
 - **Description**: Page for taking a quiz.
 - **Features**:
   - Enter your name.
-  - Take the quiz by answering multiple-choice questions.
+  - Take the quiz by answering questions / uploading files.
   - Time remaining and listen limits for questions are locked until you submit or time expires, even on refresh.
   - Submit your answers.
-  - View responses after submission.
 
 ### 5. Viewer Page
 
@@ -55,6 +57,7 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
   - Enter the password chosen during quiz generation to view responses.
   - Close or Re-Open Quiz to new responses.
   - Reset quiz and erase all responses.
+  - Edit grades and update scores.
 
 ## Technologies Used
 
