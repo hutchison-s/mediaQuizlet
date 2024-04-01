@@ -294,17 +294,14 @@ const onSubmitQuiz = async (e) => {
   for (const q of questions) {
     const fData = new FormData();
     fData.append("files", q.file)
-    await fetch(apiURL+"/audio/upload", {
+    const res = await fetch(apiURL+"/audio/upload", {
       method: 'POST',
       body: fData
     })
-      .then(res => res.json())
-      .then(fInfo => {
-        console.log(fInfo)
-        q.file = fInfo.link
-        data.append("associatedFiles", fInfo.name)
-      })
-      .catch(err => console.log(err))
+    const fInfo = await res.json()
+    console.log(fInfo)
+    q.file = fInfo.link
+    data.append("associatedFiles", fInfo.name)
   }
   data.append("questions", JSON.stringify(questions));
   data.append("password", passwordInput.value);
