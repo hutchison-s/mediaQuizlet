@@ -4,10 +4,11 @@ import cors from "cors";
 import dotenv from "dotenv";
 dotenv.config();
 import multer from "multer";
-const upload = multer({ storage: multer.memoryStorage() });
+const upload = multer({ storage: multer.memoryStorage(), limits: {} });
 
 import authenticate from "./middleware/auth.js";
-import { handleFileUploads, createDocument, getQuizzerInfo, addResponse, updateQuiz, resetQuiz, deleteDoc, deleteExpired } from "./firebase/docFuncs.js";
+import { createDocument, getQuizzerInfo, addResponse, updateQuiz, resetQuiz, deleteDoc, deleteExpired } from "./firebase/docFuncs.js";
+import { handleAudioUpload } from "./firebase/fileFuncs.js";
 
 const port = process.env.PORT || 8000;
 
@@ -23,13 +24,19 @@ app.get("/", (req, res) => {
 });
 
 // Create New Quiz & Upload files
+app.post("/audio/upload", upload.single("files"), async(req, res) => {
+  console.log("audio upload initiated");
+  const file = req.file
+  const uploaded = await handleAudioUpload(file);
+  console.log("uploaded "+uploaded.path)
+  res.send(uploaded);
+})
 
-app.post("/upload", upload.array("files", 12), async (req, res) => {
-  console.log("called upload")
+app.post("/createQuiz", upload.single("files"), async (req, res) => {
+  console.log("quiz creation initiated")
   try {
-    const {timeLimit, password, expires, status} = req.body;
-    const [qList, fileIds] = await handleFileUploads(req);
-    const message = await createDocument(qList, timeLimit, password, expires, status, fileIds);
+    const {questions, timeLimit, password, expires, status, associatedFiles} = req.body;
+    const message = await createDocument(questions, timeLimit, password, expires, status, associatedFiles);
     console.log("received\n"+message)
     res.send(message);
   } catch (err) {

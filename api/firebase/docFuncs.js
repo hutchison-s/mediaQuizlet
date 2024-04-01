@@ -1,46 +1,6 @@
 import compressAndUpload from '../middleware/compressImages.js';
 import {db, storage, fieldValue} from './firebaseConnect.js'
 const qCol = db.collection("quizzes");
-
-
-export async function handleFileUploads(req) {
-    const { files } = req;
-    const dt = Date.now();
-    const expires = new Date();
-    expires.setFullYear(expires.getFullYear() + 1);
-    const qList = JSON.parse(req.body.questions);
-    const fileUploadPromises = [];
-
-    try {
-        for (let i = 0; i < files.length; i++) {
-            let fileName = `files/audio/${files[i].originalname.split(".")[0].replace(/[\W]/g, "_").replace(/_{2,}/g, "_")}_${dt}_${i}.${files[i].originalname.split(".")[1]}`;
-            const cloudFile = storage.bucket().file(fileName);
-            console.log("file ref:" + cloudFile);
-            const uploadPromise = cloudFile.save(files[i].buffer, { contentType: files[i].mimetype })
-                .then(() => {
-                    return cloudFile.getSignedUrl({ action: "read", expires: expires.toISOString() });
-                })
-                .then((downLink) => {
-                    console.log("link retrieved: " + downLink);
-                    qList[i].file = downLink;
-                    return cloudFile.name;
-                })
-                .catch((err) => {
-                    console.log("Error uploading file:", err);
-                    throw new Error("Error uploading file");
-                });
-            fileUploadPromises.push(uploadPromise);
-        }
-
-        // Wait for all file upload promises to resolve
-        const fileIds = await Promise.all(fileUploadPromises);
-        return [qList, fileIds];
-    } catch (err) {
-        console.log("Error uploading files:", err);
-        throw new Error("Error uploading files");
-    }
-    
-  }
   
   export async function createDocument(qList, timeLimit, password, expires, status, associatedFiles) {
     try {
