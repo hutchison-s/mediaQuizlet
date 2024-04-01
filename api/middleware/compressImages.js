@@ -7,18 +7,18 @@ async function compressOne(photo) {
         console.log(`compressing ${photo.originalname}`)
         let comp;
 
-        if (/\.heic$/gi.test(photo.originalname)) {
-            try {
-            const jpgBuffer = await toJpeg({buffer: photo.buffer, format: "JPEG"})
-            comp = await sharp(jpgBuffer).resize(800, 800, {fit: sharp.fit.inside, withoutEnlargement: true}).jpeg({ quality: 70 }).toBuffer();
-            } catch (error) {
-            console.error('Error converting HEIC to JPEG:', error);
-            }
+        // if (/\.heic$/gi.test(photo.originalname)) {
+        //     try {
+        //     const jpgBuffer = await toJpeg({buffer: photo.buffer, format: "JPEG"})
+        //     comp = await sharp(jpgBuffer).resize(800, 800, {fit: sharp.fit.inside, withoutEnlargement: true}).jpeg({ quality: 70 }).toBuffer();
+        //     } catch (error) {
+        //     console.error('Error converting HEIC to JPEG:', error);
+        //     }
 
-        } else {
+        // } else {
         comp = await sharp(photo.buffer).resize(800, 800, {fit: sharp.fit.inside, withoutEnlargement: true}).jpeg({ quality: 70 }).toBuffer();
         
-        }
+        // }
         return {
             originalname: photo.originalname,
             buffer: comp,

@@ -5,6 +5,7 @@ import {changeMode, setInitialStyle} from "../modules/darkmode.js";
 import LimitedPlayer from '../modules/LimitedPlayer.js';
 import Timer from '../modules/Timer.js';
 import {apiURL} from '../urls.js';
+import toJpeg from 'heic-convert';
 
 setInitialStyle();
 
@@ -67,8 +68,15 @@ async function submitAll() {
   const formData = new FormData();
   for (const qForm of Array.from(qForms)) {
     if (qForm.answer.type == "file") {
-        console.log(qForm.answer.files[0])
-        formData.append("photos", qForm.answer.files[0])
+      const photo = qForm.answer.files[0]
+        console.log(photo)
+        if (/\.heic$/gi.test(photo.originalname)) {
+          const jpgBuffer = await toJpeg({buffer: photo.buffer, format: "JPEG"})
+          formData.append("photos", jpgBuffer)
+        } else {
+          formData.append("photos", photo)
+        }
+        
       formData.append('responses', "#photoUpload#")
     } else {
       formData.append('responses', qForm.answer.value)
