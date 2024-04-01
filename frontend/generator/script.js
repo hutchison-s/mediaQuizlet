@@ -284,7 +284,7 @@ const markIncomplete = (idx) => {
   item.querySelector(".checkComplete").style.background = "var(--primary)";
 };
 
-const onSubmitQuiz = (e) => {
+const onSubmitQuiz = async (e) => {
   e.preventDefault();
   const nextYear = new Date();
   nextYear.setFullYear(nextYear.getFullYear()+1);
@@ -292,7 +292,19 @@ const onSubmitQuiz = (e) => {
   submissionTool.close();
   const data = new FormData();
   for (const q of questions) {
-    data.append("files", q.file);
+    const fData = new FormData();
+    fData.append("files", q.file)
+    await fetch(apiURL+"/audio/upload", {
+      method: 'POST',
+      body: fData
+    })
+      .then(res => res.json())
+      .then(fInfo => {
+        console.log(fInfo)
+        q.file = fInfo.link
+        data.append("associatedFiles", fInfo.name)
+      })
+      .catch(err => console.log(err))
   }
   data.append("questions", JSON.stringify(questions));
   data.append("password", passwordInput.value);
@@ -300,8 +312,8 @@ const onSubmitQuiz = (e) => {
   data.append("timeLimit", tlimit);
   data.append("expires", nextYear.toISOString())
   data.append("status", "open");
-
-  fetch(apiURL+"/upload", {
+  console.log(data.get("questions"))
+  fetch(apiURL+"/createQuiz", {
     method: "POST",
     body: data,
   })
