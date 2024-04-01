@@ -299,9 +299,8 @@ const onSubmitQuiz = async (e) => {
       body: fData
     })
     const fInfo = await res.json()
-    console.log(fInfo)
     q.file = fInfo.link
-    data.append("associatedFiles", fInfo.name)
+    data.append("associatedFiles", fInfo.path)
   }
   data.append("questions", JSON.stringify(questions));
   data.append("password", passwordInput.value);
