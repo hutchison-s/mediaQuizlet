@@ -73,9 +73,9 @@ async function uploadAll(compressed) {
 
 export default async function compressAndUpload(photos) {
     console.log(`Compressing ${photos.length} photos.`);
-    const compressed = await compressAll(photos);
-    console.log(`Uploading ${compressed.length} compressed photos.`);
-    const photoNames = await uploadAll(compressed);
+    // const compressed = await compressAll(photos);
+    // console.log(`Uploading ${compressed.length} compressed photos.`);
+    const photoNames = await uploadAll(photos);
     console.log(`Successfully uploaded ${photoNames.length} photos.`);
     return photoNames;
 }

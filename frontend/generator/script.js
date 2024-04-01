@@ -5,6 +5,7 @@ import MCQuestion from "../modules/MCQuestion.js";
 import ShortAnswerQuestion from "../modules/SAQuestion.js";
 import PicQuestion from "../modules/PicQuestion.js";
 import {apiURL} from '../urls.js';
+import { processQuestions } from "../modules/Uploader.js";
 
 setInitialStyle();
 
@@ -290,19 +291,11 @@ const onSubmitQuiz = async (e) => {
   nextYear.setFullYear(nextYear.getFullYear()+1);
   spinner.classList.remove("hidden")
   submissionTool.close();
+
   const data = new FormData();
-  for (const q of questions) {
-    const fData = new FormData();
-    fData.append("files", q.file)
-    const res = await fetch(apiURL+"/audio/upload", {
-      method: 'POST',
-      body: fData
-    })
-    const fInfo = await res.json()
-    q.file = fInfo.link
-    data.append("associatedFiles", fInfo.path)
-  }
-  data.append("questions", JSON.stringify(questions));
+  const [processedQuestions, associatedFiles] = await processQuestions(questions);
+  data.append("associatedFiles", JSON.stringify(associatedFiles))
+  data.append("questions", JSON.stringify(processedQuestions));
   data.append("password", passwordInput.value);
   let tlimit = timeLimit.value == "" ? null : timeLimit.value;
   data.append("timeLimit", tlimit);

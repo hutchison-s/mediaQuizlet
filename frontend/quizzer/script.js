@@ -5,7 +5,7 @@ import {changeMode, setInitialStyle} from "../modules/darkmode.js";
 import LimitedPlayer from '../modules/LimitedPlayer.js';
 import Timer from '../modules/Timer.js';
 import {apiURL} from '../urls.js';
-import toJpeg from 'heic-convert';
+import { resizeAndCompress } from "../modules/Uploader.js";
 
 setInitialStyle();
 
@@ -69,14 +69,9 @@ async function submitAll() {
   for (const qForm of Array.from(qForms)) {
     if (qForm.answer.type == "file") {
       const photo = qForm.answer.files[0]
-        console.log(photo)
-        if (/\.heic$/gi.test(photo.originalname)) {
-          const jpgBuffer = await toJpeg({buffer: photo.buffer, format: "JPEG"})
-          formData.append("photos", jpgBuffer)
-        } else {
-          formData.append("photos", photo)
-        }
-        
+      console.log(photo)
+      const compPhoto = await resizeAndCompress(photo);
+      formData.append("photos", compPhoto, photo.originalname)
       formData.append('responses', "#photoUpload#")
     } else {
       formData.append('responses', qForm.answer.value)
@@ -135,7 +130,7 @@ function createQuestion(q) {
       break;
     default:
       form.classList.add("pic")
-      form.innerHTML += `<label><input required type="file" accept="image/*, image/HEIC, image/heic" name="answer">Upload your photo:</label>`
+      form.innerHTML += `<label><input required type="file" accept="image/*" name="answer">Upload your photo:</label>`
   }
   
   form.addEventListener("submit", (e) => {
