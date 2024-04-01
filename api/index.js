@@ -36,7 +36,7 @@ app.post("/createQuiz", upload.single("files"), async (req, res) => {
   console.log("quiz creation initiated")
   try {
     const {questions, timeLimit, password, expires, status, associatedFiles} = req.body;
-    const message = await createDocument(questions, timeLimit, password, expires, status, associatedFiles);
+    const message = await createDocument(JSON.parse(questions), timeLimit, password, expires, status, associatedFiles);
     console.log("received\n"+message)
     res.send(message);
   } catch (err) {
