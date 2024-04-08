@@ -18,6 +18,7 @@ class LimitedPlayer {
       this.button = newEl("button", null, "playBtn");
       this.remaining = limit;
       this.remDisplay = newEl("p", null, "remaining");
+      this.isPlaying = false;
       this.init();
     }
     init() {
@@ -32,13 +33,22 @@ class LimitedPlayer {
       };
       this.audio.onplay = () => {
         this.remDisplay.textContent = `${--this.remaining} remaining plays`;
+      };
+      this.audio.onpause = () => {
+        this.audio.currentTime = 0;
+        this.button.innerHTML = '<i class="fa-solid fa-play"></i>';
+        this.isPlaying = false;
         if (this.remaining === 0) {
           this.button.setAttribute("disabled", true);
         }
-      };
+      }
       this.audio.onended = () => {
         this.progressBar.style.backgroundImage = `conic-gradient(var(--light-secondary) 0%, var(--primary) 0% 100%)`;
-        
+        this.button.innerHTML = '<i class="fa-solid fa-play"></i>';
+        this.isPlaying = false;
+        if (this.remaining === 0) {
+          this.button.setAttribute("disabled", true);
+        }
       };
   
       // play button
@@ -49,12 +59,19 @@ class LimitedPlayer {
         e.preventDefault();
         console.log("clicked");
         document.querySelectorAll("audio").forEach(a => {
-          if (a.currentTime != 0) {
+          if (a.currentTime != 0 && a != this.audio) {
             a.pause();
-            a.currentTime = 0;
           }
         })
-        this.audio.play();
+        this.isPlaying = !this.isPlaying;
+        if (this.isPlaying) {
+          this.audio.play();
+          this.button.innerHTML = '<i class="fa-solid fa-stop"></i>';
+        } else {
+          this.audio.pause();
+          this.audio.currentTime = 0;
+          this.button.innerHTML = '<i class="fa-solid fa-play"></i>';
+        }
       });
       this.progressBar.appendChild(this.button);
       this.player.appendChild(this.progressBar);
