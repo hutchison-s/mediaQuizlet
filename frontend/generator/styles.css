@@ -482,6 +482,22 @@ body {
   }
 }
 
+@media screen and (max-width: 450px) {
+  #sidebar {
+    flex: 1.2;
+  }
+  #uploadLabel {
+    font-size: medium;
+    width: 60vw;
+    padding: 0.5rem 1rem;
+  }
+  #restart {
+    left: unset;
+    right: 1rem;
+    translate: none;
+  }
+}
+
 @media screen and (max-height: 700px) {
   #sideBar {
     flex: 1 0 30%;
