@@ -64,7 +64,7 @@ function restoreState(state) {
 
 async function submitAll() {
   const qForms = elall(".questionForm");
-
+  elid("spinner").classList.toggle("hidden")
   const formData = new FormData();
   for (const qForm of Array.from(qForms)) {
     if (qForm.answer.type == "file") {
@@ -92,6 +92,7 @@ async function submitAll() {
       root.innerHTML = `<h2 class='status'>Submitted Successfully</h2>`;
       user = null;
       quizTimer = null;
+      elid("spinner").classList.toggle("hidden")
       exitFullScreen();
     })
     .catch((err) => {
@@ -170,13 +171,16 @@ function createQuiz(quiz) {
   const subBtn = newEl("button", "submitAll", "softCorner");
   subBtn.textContent = "Submit Quiz";
   subBtn.addEventListener("click", submitAll);
+  subBtn.addEventListener("click", e=>{
+    subBtn.textContent = "Submitting..."
+  });
   container.appendChild(subBtn);
   const oldState = window.localStorage.getItem("quizState"+thisQuizId);
   if (oldState) {
-    if (!window.sessionStorage.getItem("quizUser")) {
-      root.innerHTML = "<h2 class='status'>Quiz already in session elsewhere.</h2>";
-      return;
-    }
+    // if (!window.sessionStorage.getItem("quizUser")) {
+    //   root.innerHTML = "<h2 class='status'>Quiz already in session elsewhere.</h2>";
+    //   return;
+    // }
       restoreState(JSON.parse(oldState));
   } else {
     gatherInfo(quiz.timeLimit, quiz.questions.length);

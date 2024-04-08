@@ -18,6 +18,7 @@ let auth = null;
 
 
 function apiCall(quizId) {
+  elid("spinner").classList.toggle("hidden")
   const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(passwordInput.value)}`);
   fetch(apiURL+`/quiz/${quizId}/admin`, {
     headers: {
@@ -39,8 +40,10 @@ function apiCall(quizId) {
       optBox.append(del)
       showResponses(quizObject)
       auth = passwordInput.value;
+      elid("spinner").classList.toggle("hidden")
     })
     .catch((err) => {
+      elid("spinner").classList.add("hidden")
       console.log(err);
       if (err.message == "Not authorized") {
           passwordInput.style.outline = "4px solid var(--warning)"
