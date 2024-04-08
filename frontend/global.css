@@ -143,3 +143,42 @@ body {
   transform: none;
   cursor: not-allowed;
 }
+
+/* Loading Graphic */
+
+#spinner {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  width: 100vw;
+  height: 100dvh;
+  box-sizing: border-box;
+  background: 
+    linear-gradient(var(--background), var(--light-secondary), var(--background), var(--secondary), var(--background), var(--background), var(--light-secondary), var(--background));
+  background-size: 400vw 400vh;
+  background-repeat: no-repeat;
+  animation: l19 1s infinite linear;
+  z-index: 1000;
+  opacity: 0.5;
+}
+
+#spinner::after {
+  content: "Loading...";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: -50% -50%;
+  z-index: 1;
+  mix-blend-mode: difference;
+  color: var(--secondary);
+}
+
+#spinner.hidden {
+  display: none;
+}
+
+@keyframes l19 {
+  0%   {background-position: top}
+  100%  {background-position:bottom}
+}
