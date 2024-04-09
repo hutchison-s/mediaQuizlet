@@ -1,133 +1,75 @@
-import express from "express";
-const app = express();
-import cors from "cors";
+import express from 'express';
+import cors from 'cors';
 import dotenv from "dotenv";
 dotenv.config();
 import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage(), limits: {} });
+import authenticate, { admin } from "./middleware/auth.js";
+import { deleteQuiz, getAllQuizzes, getFullQuiz, getQuiz, newQuiz, updateQuiz } from "./database/quizFunctions.js";
 
-import authenticate from "./middleware/auth.js";
-import { createDocument, getQuizzerInfo, addResponse, updateQuiz, resetQuiz, deleteDoc, deleteExpired } from "./firebase/docFuncs.js";
-import { handleAudioUpload } from "./firebase/fileFuncs.js";
+const app = express();
+const PORT = process.env.PORT || 8000;
 
-const port = process.env.PORT || 8000;
-
-// Middleware to parse JSON requests
+// Middleware
 app.use(express.json());
 app.use(cors());
+// app.use(express.urlencoded({ extended: true }));
 
-// Middleware to handle form data
-app.use(express.urlencoded({ extended: true }));
 
-app.get("/", (req, res) => {
-  res.send("Hello, Express!");
+// Retrieve all quizzes
+app.get('/api/quizzes', admin, getAllQuizzes);
+
+// Create a new quiz
+app.post('/api/quizzes', upload.single("file"), newQuiz);
+
+// Retrieve quiz details (without responses or answers)
+app.get('/api/quizzes/:quizId', getQuiz);
+
+// Retrieve full quiz details (admin)
+app.get('/api/quizzes/:quizId/admin', authenticate, getFullQuiz);
+
+// Update an existing quiz
+app.patch('/api/quizzes/:quizId/admin', authenticate, updateQuiz);
+
+// Delete a quiz
+app.delete('/api/quizzes/:quizId/admin', authenticate, deleteQuiz);
+
+// Retrieve all responses for a quiz
+app.get('/api/quizzes/:quizId/responses', authenticate, (req, res) => {
+    // Implement logic to retrieve all responses for a quiz by quizId
 });
 
-// Create New Quiz & Upload files
-app.post("/audio/upload", upload.single("files"), async(req, res) => {
-  console.log("audio upload initiated");
-  const file = req.file
-  const uploaded = await handleAudioUpload(file);
-  console.log("uploaded "+uploaded.path)
-  res.send(uploaded);
-})
-
-app.post("/createQuiz", upload.single("files"), async (req, res) => {
-  console.log("quiz creation initiated")
-  try {
-    const {questions, timeLimit, password, expires, status, associatedFiles} = req.body;
-    const message = await createDocument(JSON.parse(questions), timeLimit, password, expires, status, JSON.parse(associatedFiles));
-    console.log("received\n"+message)
-    res.send(message);
-  } catch (err) {
-    console.log(err)
-    res.status(500).send(err)
-  }
+// Submit a response to a quiz
+app.post('/api/quizzes/:quizId/responses', (req, res) => {
+    // Implement logic to submit a response to a quiz by quizId
 });
 
-// Retrieve Quiz Questions and Info
-
-app.get("/quiz/:code", async (req, res) => {
-  try {
-    console.log(req.params.code + " requested");
-    const data = await getQuizzerInfo(req.params.code)
-    res.send(data);
-  } catch(err) {
-    res
-      .status(400)
-      .send({ message: "Error retrieving quiz document", error: err });
-  }
+// Retrieve specific response
+app.get('/api/quizzes/:quizId/responses/:responseId', authenticate, (req, res) => {
+    // Implement logic to retrieve a specific response by responseId
 });
 
-// Add response to quiz
-
-app.post("/quiz/:code/response", upload.array("photos"), async (req, res) => {
-  try {
-    const id = req.params.code;
-    const update = await addResponse(req, id);
-    res.send(update);
-    console.log("New Response to quiz " + id + " received."); 
-  } catch(err) {
-    res.status(400).send({message: "Error in sending response", error: err})
-  }
+// Edit specific response
+app.patch('/api/quizzes/:quizId/responses/:responseId', authenticate, (req, res) => {
+    // Implement logic to edit a specific response by responseId
 });
 
-// Get admin-level quiz info
-
-app.get("/quiz/:code/admin", authenticate, async (req, res) => {
-  try {
-    console.log(req.params.code + " requested");
-    res.send(req.quizData); // Send the authenticated data from the request object
-  } catch(err) {
-    console.log(err);
-    res.status(500).send({ message: "Error retrieving quiz document", error: err.message });
-  }
+// Delete specific response
+app.delete('/api/quizzes/:quizId/responses/:responseId', authenticate, (req, res) => {
+    // Implement logic to delete a specific response by responseId
 });
 
-// Update quiz data
+// Compress and upload audio file
+app.post('/api/uploads/audio', (req, res) => {
+    // Implement logic to compress and upload audio file
+});
 
-app.patch("/quiz/:code/admin", authenticate, async (req, res) => {
-  try {
-    const updated = await updateQuiz(req.body, req.params.code);
-    res.send(updated);
-  } catch (err) {
-    console.log(err)
-    res
-      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
-  }
-})
-
-// Reset quiz and remove responses
-
-app.patch("/quiz/:code/admin/reset", authenticate, async (req, res) => {
-  try {
-      const updated = await resetQuiz(req.params.code);
-      res.send(updated)
-  } catch(err) {
-    console.log(err)
-    res
-      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
-  }
-})
-
-// Delete quiz and associated files
-
-app.delete("/quiz/:code/admin", authenticate, async (req, res) => {
-  try {
-      const updated = await deleteDoc(req.params.code);
-      res.send(updated)
-  } catch(err) {
-    console.log(err)
-    res
-      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
-  }
-})
-
-// Cron Function
-
-app.use("/api/cron", deleteExpired)
+// Compress and upload image file
+app.post('/api/uploads/image', (req, res) => {
+    // Implement logic to compress and upload image file
+});
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running at port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
