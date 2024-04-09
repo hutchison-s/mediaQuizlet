@@ -6,6 +6,7 @@ import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage(), limits: {} });
 import authenticate, { admin } from "./middleware/auth.js";
 import { deleteQuiz, getAllQuizzes, getFullQuiz, getQuiz, newQuiz, updateQuiz } from "./database/quizFunctions.js";
+import { newResponse } from './database/responseFunctions.js';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -22,13 +23,13 @@ app.get('/api/quizzes', admin, getAllQuizzes);
 // Create a new quiz
 app.post('/api/quizzes', upload.single("file"), newQuiz);
 
-// Retrieve quiz details (without responses or answers)
+// Retrieve quiz details (only info necessary for quiz-taking)
 app.get('/api/quizzes/:quizId', getQuiz);
 
 // Retrieve full quiz details (admin)
 app.get('/api/quizzes/:quizId/admin', authenticate, getFullQuiz);
 
-// Update an existing quiz
+// Update status or time limit for an existing quiz, or reset responses
 app.patch('/api/quizzes/:quizId/admin', authenticate, updateQuiz);
 
 // Delete a quiz
@@ -40,9 +41,7 @@ app.get('/api/quizzes/:quizId/responses', authenticate, (req, res) => {
 });
 
 // Submit a response to a quiz
-app.post('/api/quizzes/:quizId/responses', (req, res) => {
-    // Implement logic to submit a response to a quiz by quizId
-});
+app.post('/api/quizzes/:quizId/responses', newResponse);
 
 // Retrieve specific response
 app.get('/api/quizzes/:quizId/responses/:responseId', authenticate, (req, res) => {

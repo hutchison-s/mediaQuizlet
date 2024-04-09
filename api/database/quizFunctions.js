@@ -11,12 +11,13 @@ export async function getAllQuizzes(req, res) {
 }
 
 export async function newQuiz(req, res) {
-    const {password, expires, questions, status, associatedFiles, timeLimit} = req.body;
-    if (!password || !expires || !questions || !status || !associatedFiles || !timeLimit) {
+    const {admin, password, expires, questions, status, associatedFiles, timeLimit} = req.body;
+    if (!admin, !password || !expires || !questions || !status || !associatedFiles || !timeLimit) {
         console.log(password)
         res.status(400).send("Not a valid request body. Missing required fields.")
     } else {
         const nQ = {
+            admin,
             password,
             expires,
             questions,
@@ -27,7 +28,8 @@ export async function newQuiz(req, res) {
         }
         try {
            const newDoc = await qCol.add(nQ);
-            console.log(newDoc.id) 
+            console.log(newDoc.id)
+            await qCol.doc(newDoc.id).update({quizId: newDoc.id}) 
         } catch (err) {
             res.status(500).send({error: err, message: "Could not create document."})
         }
