@@ -1,6 +1,6 @@
 import { db } from "../database/firebaseConnect.js";
 
-export default async function authenticate(req, res, next) {
+export async function authenticate(req, res, next) {
     try {
       const authheader = req.headers['authorization'];
       if (!authheader) {

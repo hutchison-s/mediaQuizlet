@@ -2,19 +2,24 @@ import { deleteFile } from "./fileFunctions.js";
 import { qCol } from "./firebaseConnect.js";
 
 export async function getAllQuizzes(req, res) {
-    const snapshots = await qCol.get();
-    const docs = [];
-    snapshots.forEach(doc => {
-        docs.push(doc.data())
-    })
-    console.log(docs)
+    try {
+        const snapshots = await qCol.get();
+        const docs = [];
+        snapshots.forEach(doc => {
+            docs.push(doc.data())
+        })
+        res.send(docs);
+    } catch (err) {
+        console.log(err)
+        res.status(500).send({error: err, message: "Error occurred while attempting to retrieve quizzes."})
+    }
 }
 
 export async function newQuiz(req, res) {
     const {admin, password, expires, questions, status, associatedFiles, timeLimit} = req.body;
     if (!admin, !password || !expires || !questions || !status || !associatedFiles || !timeLimit) {
         console.log(password)
-        res.status(400).send("Not a valid request body. Missing required fields.")
+        res.status(400).send({message: "Not a valid request body. Missing required fields."})
     } else {
         const nQ = {
             admin,
@@ -29,8 +34,11 @@ export async function newQuiz(req, res) {
         try {
            const newDoc = await qCol.add(nQ);
             console.log(newDoc.id)
-            await qCol.doc(newDoc.id).update({quizId: newDoc.id}) 
+            await qCol.doc(newDoc.id).update({quizId: newDoc.id})
+            const data = (await qCol.doc(newDoc.id).get()).data()
+            res.send(data)
         } catch (err) {
+            console.log(err)
             res.status(500).send({error: err, message: "Could not create document."})
         }
         
@@ -40,7 +48,7 @@ export async function newQuiz(req, res) {
 export async function getQuiz(req, res) {
     const {quizId} = req.params;
     if (!quizId) {
-        res.status(400).send("Invalid quiz id");
+        res.status(400).send({message: "Invalid quiz id"});
     } else {
         try {
             const doc = qCol.doc(quizId);
@@ -55,7 +63,7 @@ export async function getQuiz(req, res) {
             res.send(quiz);
         } catch (err) {
             console.log(err);
-            res.status(500).send("Error retrieving quiz.")
+            res.status(500).send({error: err, message: "Error retrieving quiz."})
         }
     }
 }
@@ -63,7 +71,7 @@ export async function getQuiz(req, res) {
 export async function getFullQuiz(req, res) {
     const {quizId} = req.params;
     if (!quizId) {
-        res.status(400).send("Invalid quiz id");
+        res.status(400).send({message: "Invalid quiz id"});
     } else {
         try {
             const doc = qCol.doc(quizId);
@@ -71,7 +79,7 @@ export async function getFullQuiz(req, res) {
             res.send(quiz);
         } catch (err) {
             console.log(err);
-            res.status(500).send("Error retrieving quiz.")
+            res.status(500).send({error: err, message: "Error retrieving quiz."})
         }
     }
 }
@@ -79,12 +87,12 @@ export async function getFullQuiz(req, res) {
 export async function updateQuiz(req, res) {
     const {status, timeLimit, reset} = req.body;
     if (!status && !timeLimit && !reset) {
-        res.status(400).send("Invalid request. Missing required fields.");
+        res.status(400).send({message: "Invalid request. Missing required fields."});
         return;
     }
     const {quizId} = req.params;
     if (!quizId) {
-        res.status(400).send("Invalid quiz id");
+        res.status(400).send({message: "Invalid quiz id"});
         return;
     }
     try {
@@ -101,9 +109,10 @@ export async function updateQuiz(req, res) {
             updateData.responses = new Array();
         }
         doc.update(updateData);
+        const data = (await doc.get()).data()
     } catch (err) {
         console.log(err);
-        res.status(500).send("Error updating quiz.")
+        res.status(500).send({error: err, message: "Error updating quiz."})
     }
 
 }
