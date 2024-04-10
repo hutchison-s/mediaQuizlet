@@ -1,7 +1,7 @@
 import { apiURL } from "../urls.js"
 
 export async function fileToLinkPath(file) {
-    const url = apiURL+`/audio/upload`;
+    const url = apiURL+`uploads/audio`;
     const fData = new FormData();
     fData.append('files', file);
     const response = await fetch(url, {
@@ -21,7 +21,7 @@ export async function processQuestions(questions) {
     const associated = [];
 
     const updatedQuestions = await Promise.all(questions.map(async q=>{
-        const {file, ...otherProps} = q;
+        const {file, qDataList, isComplete, ...otherProps} = q;
         const {link, path} = await fileToLinkPath(file);
         associated.push(path);
         return {file: link, ...otherProps}

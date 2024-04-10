@@ -5,11 +5,13 @@ export async function deleteFile(name) {
 }
 
 export async function uploadAudio(req, res) {
-    return await upload(req, res, "audio")
+    const response = await upload(req, res, "audio");
+    res.send(response)
 }
 
 export async function uploadImage(req, res) {
-    return await upload(req, res, "images")
+    const response =  await upload(req, res, "images");
+    res.send(response)
 }
 
 async function upload(req, res, collection) {
@@ -24,7 +26,7 @@ async function upload(req, res, collection) {
     try {
         const tail = file.originalname.split(".")[1]
         let fileName = `files/${collection}/${dt}_${randomString(8)}.${tail}`;
-        const cloudFile = storage.bucket().file(fileName);
+        const cloudFile = bucket.file(fileName);
 
         return cloudFile.save(file.buffer, { contentType: file.mimetype })
             .then(() => cloudFile.getSignedUrl({ action: "read", expires: expires.toISOString() }))

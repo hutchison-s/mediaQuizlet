@@ -41,7 +41,7 @@ app.get('/api/quizzes/:quizId/responses', authenticate, getAllResponses);
 app.post('/api/quizzes/:quizId/responses', newResponse);
 
 // Retrieve specific response
-app.get('/api/quizzes/:quizId/responses/:responseId', authenticate, getOneResponse);
+app.get('/api/quizzes/:quizId/responses/:responseId', getOneResponse);
 
 // Edit specific response
 app.patch('/api/quizzes/:quizId/responses/:responseId', updateResponse);

@@ -1,5 +1,6 @@
 import { deleteFile } from "./fileFunctions.js";
-import { qCol } from "./firebaseConnect.js";
+import { qCol, rCol } from "./firebaseConnect.js";
+import { deleteOneResponse } from "./responseFunctions.js";
 
 export async function getAllQuizzes(req, res) {
     try {
@@ -34,7 +35,7 @@ export async function newQuiz(req, res) {
         try {
            const newDoc = await qCol.add(nQ);
             console.log(newDoc.id)
-            await qCol.doc(newDoc.id).update({quizId: newDoc.id})
+            await qCol.doc(newDoc.id).update({quizId: newDoc.id, URL: "https://audioquizlet.netlify.app/quizzer?id="+newDoc.id})
             const data = (await qCol.doc(newDoc.id).get()).data()
             res.send(data)
         } catch (err) {
@@ -127,6 +128,13 @@ export async function deleteQuiz(req, res) {
         for (let f of associatedFiles) {
             await deleteFile(f);
             console.log("deleted "+f)
+        }
+        for (let r of quiz.responses) {
+            const response = (await rCol.doc(r).get()).data()
+            for (let f of response.associatedFiles) {
+                await deleteFile(f);
+            }
+            await rCol.doc(r).delete();
         }
         await doc.delete();
         console.log(doc.id+" deleted successfully.");

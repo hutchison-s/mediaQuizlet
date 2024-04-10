@@ -10,13 +10,14 @@ const newEl = (type, id = null, cl = null) => {
   };
 
 class Timer {
-    constructor(limit, quizId, submitCallback) {
-      this.remaining = `${limit - 1}:59`;
+    constructor(startTime, limit, quizId, submitCallback) {
+      this.remaining = limit*60; // in seconds
       this.display = newEl("div", "timer");
       this.timeBox = newEl("p", "timeBox");
       this.interval = null;
       this.quizId = quizId;
       this.callback = submitCallback;
+      this.end = startTime + (limit*60000);
       this.init();
     }
     init() {
@@ -30,25 +31,18 @@ class Timer {
       }, 1000);
     }
     countdown() {
-      let [min, sec] = this.remaining
-        .toString()
-        .split(":")
-        .map((x) => parseInt(x));
-      sec--;
+      this.remaining = Math.floor((this.end - Date.now())/1000) // in seconds;
+      let sec = this.remaining % 60;
+      let min = Math.floor(this.remaining / 60);
       
-      if (min == 0 && sec == 0) {
+      if (min <= 0 && sec <= 0) {
         clearInterval(this.interval);
         this.callback();
-      }
-      if (sec == -1) {
-        min--;
-        sec = 59;
       }
       let minutes = min.toString();
       let seconds =
         sec.toString().length < 2 ? "0" + sec.toString() : sec.toString();
-      this.remaining = `${minutes}:${seconds}`;
-      this.timeBox.textContent = this.remaining;
+      this.timeBox.textContent = `${minutes}:${seconds}`;
     }
   }
 
