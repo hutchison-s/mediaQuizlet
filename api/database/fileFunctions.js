@@ -24,13 +24,16 @@ async function upload(req, res, collection) {
     const expires = new Date();
     expires.setFullYear(expires.getFullYear() + 1);
     try {
-        const tail = file.originalname.split(".")[1]
+        const tail = file.originalname.split(".")[1] || "jpg"
         let fileName = `files/${collection}/${dt}_${randomString(8)}.${tail}`;
         const cloudFile = bucket.file(fileName);
 
         return cloudFile.save(file.buffer, { contentType: file.mimetype })
             .then(() => cloudFile.getSignedUrl({ action: "read", expires: expires.toISOString() }))
-            .then((downLink) => ({link: downLink[0], path: cloudFile.name}))
+            .then((downLink) => {
+                console.log("returning "+cloudFile.name)
+                return {link: downLink[0], path: cloudFile.name}
+            })
             .catch((err) => {
                 console.error("Error uploading file:", err);
                 throw new Error("Error uploading file: " + err.message);

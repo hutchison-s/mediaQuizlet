@@ -323,6 +323,9 @@ body {
   display: grid;
   gap: 1rem;
 }
+#submissionTool label[for="email"] {
+  width: 100%;
+}
 #cancelSubmission {
   position: absolute;
   bottom: 1rem;

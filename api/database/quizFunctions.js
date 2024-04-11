@@ -100,17 +100,26 @@ export async function updateQuiz(req, res) {
         const doc = qCol.doc(quizId);
         const oldQuiz = (await doc.get()).data();
         const updateData = {};
+        
+        if (reset) {
+            for (let r of oldQuiz.responses) {
+                const response = (await rCol.doc(r).get()).data()
+                for (let f of response.associatedFiles) {
+                    await deleteFile(f);
+                }
+                await rCol.doc(r).delete();
+            }
+            updateData.responses = new Array();
+        }
         if (status) {
             updateData.status = oldQuiz.status == "open" ? "closed" : "open";
         }
         if (timeLimit) {
             updateData.timeLimit = timeLimit;
         }
-        if (reset) {
-            updateData.responses = new Array();
-        }
-        doc.update(updateData);
+        await doc.update(updateData);
         const data = (await doc.get()).data()
+        res.send(data)
     } catch (err) {
         console.log(err);
         res.status(500).send({error: err, message: "Error updating quiz."})

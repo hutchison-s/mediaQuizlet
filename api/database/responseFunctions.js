@@ -67,19 +67,48 @@ export async function getOneResponse(req, res) {
 }
 
 export async function updateResponse(req, res) {
-    const {answers, timeSubmitted, associatedFiles} = req.body;
+    const {answers, timeSubmitted, associatedFiles, scores} = req.body;
     const {quizId, responseId} = req.params;
-    if (!responseId || !quizId || !timeSubmitted || !answers) {
+    if (!responseId || !quizId) {
         res.status(400).send({message: "Not a valid request body. Missing required fields."});
         return;
+    }
+    if (!timeSubmitted || !answers) {
+        if (scores) {
+            const ref = rCol.doc(responseId);
+            const {answers} = (await ref.get()).data();
+            for (let i = 0; i<scores.length; i++) {
+                answers[i].score = scores[i];
+            }
+            await ref.update({answers: answers});
+            res.send((await ref.get()).data())
+            return;
+        } else {
+            res.status(400).send({message: "Not a valid request body. Missing required fields."});
+            return;
+        }
     }
     try {
         const ref = rCol.doc(responseId);
         const oldDoc = (await ref.get()).data();
+        const quiz = (await qCol.doc(quizId).get()).data();
+        const {questions} = quiz;
+        const graded = answers.map((a, idx) => {
+            const q = questions[idx];
+            switch(q.type) {
+                case "multipleChoice":
+                    return {answer: q.options[a.answer], score: a.answer == q.correct ? q.pointValue : 0}
+                case "shortAnswer":
+                    let correct = new RegExp(q.correct.trim().replace(/[^\w-]/g, ""), "i")
+                    return {answer: a.answer, score: correct.test(a.answer.trim().replace(/[^\w-]/g, "")) ? q.pointValue : 0}
+                default:
+                    return a;
+            }
+        })
         if (oldDoc && oldDoc.quizId == quizId) {
             const docUpdate = {
                 timeSubmitted: timeSubmitted,
-                answers: answers,
+                answers: graded,
                 associatedFiles: associatedFiles || null
             }
             await ref.update(docUpdate);
@@ -92,6 +121,8 @@ export async function updateResponse(req, res) {
         res.status(500).send({error: err, message: "Could not update response document."})
     }
 }
+
+
 
 export async function deleteOneResponse(req, res) {
     const {quizId, responseId} = req.params;

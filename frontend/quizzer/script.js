@@ -78,18 +78,24 @@ async function submitAll() {
   for (const qForm of Array.from(qForms)) {
     if (qForm.answer.type == "file") {
       const photo = qForm.answer.files[0]
-      console.log(photo)
-      const compPhoto = await resizeAndCompress(photo);
-      const photoForm = new FormData();
-      photoForm.append("photos", compPhoto, photo.originalname)
-      const {link, path} = await fetch(apiURL+"uploads/images", {method: "POST", body: photoForm});
-      associatedFiles.push(path);
-      answers.push(link)
+      if (photo) {
+        console.log(photo)
+        const compPhoto = await resizeAndCompress(photo);
+        const photoForm = new FormData();
+        photoForm.append("photos", compPhoto, "photoUpload")
+        const uploadResponse = await fetch(apiURL+"uploads/image", {method: "POST", body: photoForm}).then(res => res.json());
+        const {link, path} = uploadResponse;
+        console.log(uploadResponse)
+        associatedFiles.push(path);
+        answers.push({answer: link, score: 0})
+      } else {
+        answers.push({answer: "", score: 0})
+      }
     } else {
-      answers.push(qForm.answer.value)
+      answers.push({answer: qForm.answer.value, score: 0})
     }
   }
-
+  console.log(answers)
   const newResponse = {
     answers: answers,
     associatedFiles: associatedFiles,

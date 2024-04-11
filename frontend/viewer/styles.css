@@ -22,7 +22,12 @@ body {
   padding: 1.5rem 0.5rem;
   border-bottom: 1px dashed var(--light-secondary);
 }
-
+.response p {
+  position: relative;
+}
+.response h2 {
+  position: relative;
+}
 .response > p:nth-of-type(even) {
   margin-left: 1rem;
 }
@@ -67,6 +72,22 @@ p:has(.fa-circle-xmark) * {
   display: flex;
   justify-content: center;
   gap: 1rem;
+}
+
+.correctAnswer,
+.deleteResponse {
+  position: absolute;
+  right: 0;
+}
+.deleteResponse {
+  background: var(--warning);
+  border-radius: 0.2rem;
+  border: solid 1px solid var(--secondary);
+  padding: 0.25rem 1rem;
+  cursor: pointer;
+}
+.deleteResponse * {
+  color: #fefefe;
 }
 
 .updateGrade {
