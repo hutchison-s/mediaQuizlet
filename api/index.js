@@ -8,6 +8,7 @@ import { authenticate, admin } from "./middleware/auth.js";
 import { deleteQuiz, getAllQuizzes, getFullQuiz, getQuiz, newQuiz, updateQuiz } from "./database/quizFunctions.js";
 import { deleteOneResponse, getAllResponses, getOneResponse, newResponse, updateResponse } from './database/responseFunctions.js';
 import { uploadAudio, uploadImage } from './database/fileFunctions.js';
+import { createAudioDoc, getAllAudio, getAudioInfo, getChunk, uploadAudioChunk } from './database/audioFunctions.js';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -49,8 +50,20 @@ app.patch('/api/quizzes/:quizId/responses/:responseId', updateResponse);
 // Delete specific response
 app.delete('/api/quizzes/:quizId/responses/:responseId', authenticate, deleteOneResponse);
 
-// Compress and upload audio file
-app.post('/api/uploads/audio', upload.single("files"), uploadAudio);
+// Create new audio document and return id
+app.post('/api/uploads/audio', createAudioDoc); 
+
+// Return list of all audio docs, requires admin authorization
+app.get('/api/uploads/audio', admin, getAllAudio); 
+
+// Upload a file chunk and add reference to audio doc
+app.post('/api/uploads/audio/:id/chunks', upload.single("chunk"), uploadAudioChunk);
+
+// Get totalChunks and mimetype for audio doc
+app.get('/api/uploads/audio/:id/chunks', getAudioInfo); 
+
+// Get specific chunk for specific audio
+app.get('/api/uploads/audio/:id/chunks/:index', getChunk) 
 
 // Compress and upload image file
 app.post('/api/uploads/image', upload.single("photos"), uploadImage);

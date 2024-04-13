@@ -6,5 +6,6 @@ const fbApp = admin.initializeApp({credential: admin.credential.cert(credential)
 export const db = admin.firestore(fbApp);
 export const qCol = db.collection("quizzes");
 export const rCol = db.collection("responses");
+export const aCol = db.collection("audio");
 export const bucket = admin.storage(fbApp).bucket();
 export const fieldValue = admin.firestore.FieldValue;
