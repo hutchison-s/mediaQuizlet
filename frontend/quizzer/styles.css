@@ -157,3 +157,40 @@ body {
     font-size: medium;
   }
 }
+
+#frontLoader {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  height: 120%;
+  width: 120%;
+  translate: -50% -50%;
+  color: var(--background);
+  overflow:visible;
+  background-color: transparent;
+}
+#frontLoader::before {
+  position: fixed;
+  content: "";
+  left: -100vw;
+  top: -100vh;
+  width: 400vw;
+  height: 400vh;
+  background-image: linear-gradient(to bottom, var(--secondary), var(--primary));
+  background-size: 400vw;
+  animation: spinBG 4s infinite linear;
+  z-index: -2;
+}
+#frontLoader .wrapper {
+  height: 100%;
+  display: grid;
+  place-items: center;
+}
+#frontLoader .dialogInstructions * {
+  color: var(--background);
+  font-size: 2rem;
+}
+
+@keyframes spinBG {
+  to {rotate: 360deg}
+}

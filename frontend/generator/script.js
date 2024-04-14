@@ -244,9 +244,9 @@ const handleFiles = (files) => {
       return;
   }
   for (const f of files) {
-    if (f.size / 1048576 > 4) {
+    if (f.size / 1048576 > 20) {
       upload.value = "";
-      alert("One or more files are too large. Max size allowed is 4 MB")
+      alert("One or more files are too large. Max size allowed is 20 MB")
       resetPage();
       return;
     }
@@ -297,8 +297,8 @@ const onSubmitQuiz = async (e) => {
   let tlimit = timeLimit.value == "" ? null : timeLimit.value;
   const [processedQuestions, associatedFiles] = await processQuestions(questions);
   const newQuiz = {
-    associatedFiles: associatedFiles,
     questions: processedQuestions,
+    associatedFiles: associatedFiles,
     password: passwordInput.value,
     admin: emailInput.value,
     timeLimit: tlimit,

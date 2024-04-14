@@ -17,6 +17,7 @@ export async function createAudioDoc(req, res) {
       await audioRef.update({audioId: audioRef.id});
   
       res.send({ id: audioRef.id });
+      console.log("Created new audio doc with id of "+audioRef.id);
     } catch (error) {
       res.status(500).send({ error: 'Failed to create audio document' });
     }
@@ -38,26 +39,31 @@ export async function createAudioDoc(req, res) {
   }
 
   export async function uploadAudioChunk(req, res) {
+
+    console.log("chunk upload initiated");
     try {
       const { id } = req.params;
       const { index } = req.body;
-      const data = req.file;
+      const chunk = req.file;
 
       if (!id) {
         res.status(400).send({message: "Audio ID required"});
+        console.log("no id present in request");
         return;
       }
-      if (!index || !data || !data) {
+      if (!index || !chunk) {
         res.status(400).send({message: "Missing required fields"});
+        console.log("missing info in request");
         return;
       }
   
       // Upload chunk data to Firebase Storage
       const ref = aCol.doc(id);
-      const doc = await ref.get();
-      const {mimeType} = doc.data();
-      const cloudFile = bucket.file(`files/audio/${id}/chunk_${index}.${mimeType.split('/')[1]}`);
-      await cloudFile.save(data);
+      let filePath = `files/audio/${id}/chunk_${index}.dat`;
+      const cloudFile = bucket.file(filePath);
+      console.log("uploading chunk: "+filePath, typeof chunk.buffer, chunk);
+      await cloudFile.save(chunk.buffer);
+      
   
       // Update audio document in Firestore
       await ref.update({
@@ -65,9 +71,10 @@ export async function createAudioDoc(req, res) {
         chunks: fieldValue.arrayUnion(cloudFile.name)
       });
   
-      res.send({ message: 'Chunk uploaded successfully' });
+      res.send({ message: 'Chunk uploaded successfully', path: cloudFile.name });
     } catch (error) {
       res.status(500).send({ error: error, message: 'Failed to upload audio chunk' });
+      console.log(error)
     }
   }
 
@@ -94,12 +101,14 @@ export async function createAudioDoc(req, res) {
   export async function getChunk(req, res) {
     try {
       const { id, index } = req.params;
+      
       const expires = new Date();
       expires.setFullYear(expires.getFullYear() + 1);
   
       // Retrieve audio document from Firestore
       const ref = aCol.doc(id);
       const doc = await ref.get();
+      console.log("Getting chunk "+(index+1)+" of "+doc.data().totalChunks+" from audio doc "+id)
   
       if (!doc.exists) {
         res.status(404).send({ error: 'Audio document not found' });
@@ -111,17 +120,22 @@ export async function createAudioDoc(req, res) {
         res.status(404).send({ error: 'Audio chunk not found' });
         return;
       }
-  
-      const chunkFilePath = `files/audio/${id}/chunk_${index}.${mimeType.split("/")[1]}`
+      let chunkFilePath = `files/audio/${id}/chunk_${index}.dat`;
       const cloudFile = bucket.file(chunkFilePath);
-  
-      // Download chunk data from Firebase Storage
-      const data = await cloudFile.download();
-      res.setHeader('Content-Type', 'audio/wav');
-      res.setHeader('Content-Disposition', `attachment; filename="chunk_${index}.${mimeType.split("/")[1]}"`);
-      res.send(data)
+      cloudFile.createReadStream()
+            .on('error', (err) => {
+                console.error('Error reading audio chunk:', err);
+                res.status(500).send({ error: 'Failed to retrieve audio chunk data' });
+            })
+            .pipe(res); // Pipe the data directly to the response
 
     } catch (error) {
       res.status(500).json({ error: 'Failed to retrieve audio chunk data' });
     }
+  }
+
+  export async function deleteAudioDoc(id) {
+    const ref = aCol.doc(id);
+    await ref.delete();
+    return {message: "deleted audio document"};
   }

@@ -1,3 +1,4 @@
+import { deleteAudioDoc } from "./audioFunctions.js";
 import { deleteFile } from "./fileFunctions.js";
 import { qCol, rCol } from "./firebaseConnect.js";
 import { deleteOneResponse } from "./responseFunctions.js";
@@ -17,8 +18,8 @@ export async function getAllQuizzes(req, res) {
 }
 
 export async function newQuiz(req, res) {
-    const {admin, password, expires, questions, status, associatedFiles, timeLimit} = req.body;
-    if (!admin, !password || !expires || !questions || !status || !associatedFiles || !timeLimit) {
+    const {admin, password, expires, questions, status, timeLimit, associatedFiles} = req.body;
+    if (!admin, !password || !expires || !questions || !status || !associatedFiles) {
         console.log(password)
         res.status(400).send({message: "Not a valid request body. Missing required fields."})
     } else {
@@ -28,7 +29,7 @@ export async function newQuiz(req, res) {
             expires,
             questions,
             status,
-            associatedFiles,
+            associatedFiles: associatedFiles,
             timeLimit,
             responses: new Array()
         }
@@ -137,6 +138,9 @@ export async function deleteQuiz(req, res) {
         for (let f of associatedFiles) {
             await deleteFile(f);
             console.log("deleted "+f)
+        }
+        for (let q of quiz.questions) {
+            await deleteAudioDoc(q.file)
         }
         for (let r of quiz.responses) {
             const response = (await rCol.doc(r).get()).data()

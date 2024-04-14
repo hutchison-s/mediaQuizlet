@@ -11,7 +11,7 @@ const newEl = (type, id = null, cl = null) => {
 
 class LimitedPlayer {
     constructor(file, limit) {
-      this.file = file;
+      this.file = URL.createObjectURL(file);
       this.audio = newEl("audio");
       this.player = newEl("div", null, "playerBox");
       this.progressBar = newEl("div", null, "progressBar");
