@@ -23,7 +23,9 @@ const submissionForm = elid("submissionForm");
 const submissionTool = elid("submissionTool");
 const cancelSubmission = elid("cancelSubmission");
 const passwordInput = elid("password");
+const emailInput = elid("email");
 const restartBtn = elid("restart")
+const submitBtn = elid("submitButton");
 const darkToggle = elid("lightDark")
 const peek = elid("peek");
 const timeLimit = elid("timeLimit");
@@ -242,9 +244,9 @@ const handleFiles = (files) => {
       return;
   }
   for (const f of files) {
-    if (f.size / 1048576 > 4) {
+    if (f.size / 1048576 > 20) {
       upload.value = "";
-      alert("One or more files are too large. Max size allowed is 4 MB")
+      alert("One or more files are too large. Max size allowed is 20 MB")
       resetPage();
       return;
     }
@@ -287,27 +289,31 @@ const markIncomplete = (idx) => {
 
 const onSubmitQuiz = async (e) => {
   e.preventDefault();
+  submitBtn.textContent = "Submitting..."
   const nextYear = new Date();
   nextYear.setFullYear(nextYear.getFullYear()+1);
   spinner.classList.remove("hidden")
   submissionTool.close();
-
-  const data = new FormData();
-  const [processedQuestions, associatedFiles] = await processQuestions(questions);
-  data.append("associatedFiles", JSON.stringify(associatedFiles))
-  data.append("questions", JSON.stringify(processedQuestions));
-  data.append("password", passwordInput.value);
   let tlimit = timeLimit.value == "" ? null : timeLimit.value;
-  data.append("timeLimit", tlimit);
-  data.append("expires", nextYear.toISOString())
-  data.append("status", "open");
-  console.log(data.get("questions"))
-  fetch(apiURL+"/createQuiz", {
+  const [processedQuestions, associatedFiles] = await processQuestions(questions);
+  const newQuiz = {
+    questions: processedQuestions,
+    associatedFiles: associatedFiles,
+    password: passwordInput.value,
+    admin: emailInput.value,
+    timeLimit: tlimit,
+    expires: nextYear.toISOString(),
+    status: "open"
+  }
+  fetch(apiURL+"quizzes", {
     method: "POST",
-    body: data,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(newQuiz),
   })
     .then((response) => response.json())
-    .then((data) => {
+    .then((doc) => {
       spinner.classList.add("hidden")
       launchSubmission.style.display = "none";
       questions.length = 0;
@@ -316,12 +322,12 @@ const onSubmitQuiz = async (e) => {
       activeQ = 0;
       root.innerHTML = ""
       restartBtn.style.display = "none";
-      root.append(success(data.url));
+      root.append(success(doc.URL));
       elid("copyLink").addEventListener("click", (e)=>{
-        navigator.clipboard.writeText(data.url)
+        navigator.clipboard.writeText(doc.URL)
       })
       elid("copyCode").addEventListener("click", (e)=>{
-        navigator.clipboard.writeText(data.url.substring(data.url.length-20))
+        navigator.clipboard.writeText(doc.quizId)
       })
     })
     .catch((error) => {

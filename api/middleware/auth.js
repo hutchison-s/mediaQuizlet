@@ -1,6 +1,6 @@
-import { db } from "../firebase/firebaseConnect.js";
+import { db } from "../database/firebaseConnect.js";
 
-export default async function authenticate(req, res, next) {
+export async function authenticate(req, res, next) {
     try {
       const authheader = req.headers['authorization'];
       if (!authheader) {
@@ -31,5 +31,29 @@ export default async function authenticate(req, res, next) {
     } catch(err) {
       console.log(err);
       res.status(err.status).send({ message: "Authentication Error", error: err.message });
+    }
+  }
+
+  export async function admin(req, res, next) {
+    try {
+      const authheader = req.headers['authorization'];
+      if (!authheader) {
+        let err = new Error('You are not authenticated! No header present');
+        res.setHeader('WWW-Authenticate', 'Basic');
+        err.status = 401;
+        throw err;
+      }
+      const decodedCreds = Buffer.from(authheader.split(' ')[1],'base64').toString();
+      const [user, pass] = decodedCreds.split(':');
+      if (user == process.env.ADMIN_USER && pass == process.env.ADMIN_PASS) {
+        next()
+      } else {
+        console.log(user, pass)
+        let err = new Error('Invalid Credentials');
+        err.status = 401;
+        throw err;
+      }
+    } catch (err) {
+      console.log(err)
     }
   }

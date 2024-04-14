@@ -1,7 +1,7 @@
 import { apiURL } from "../urls.js"
 
 export async function fileToLinkPath(file) {
-    const url = apiURL+`/audio/upload`;
+    const url = apiURL+`uploads/audio`;
     const fData = new FormData();
     fData.append('files', file);
     const response = await fetch(url, {
@@ -18,16 +18,76 @@ export async function fileToLinkPath(file) {
 }
 
 export async function processQuestions(questions) {
-    const associated = [];
-
+    const associatedFiles = [];
     const updatedQuestions = await Promise.all(questions.map(async q=>{
-        const {file, ...otherProps} = q;
-        const {link, path} = await fileToLinkPath(file);
-        associated.push(path);
-        return {file: link, ...otherProps}
+        const {file, qDataList, isComplete, ...otherProps} = q;
+        const {id, associated} = await chunkAndUpload(file);
+        for (const f of associated) {
+            associatedFiles.push(f)
+        }
+        return {file: id, ...otherProps}
     }))
 
-    return [updatedQuestions, associated]
+    return [updatedQuestions, associatedFiles]
+}
+
+export async function newAudio(mimeType) {
+    const response = await fetch(apiURL+"uploads/audio", {
+        method: 'POST',
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({mimeType})
+    }).then(res => res.json())
+    return response.id;
+}
+
+export async function uploadChunk(id, data, index) {
+    console.log("processing chunk", data)
+    const formData = new FormData();
+    formData.append('index', index);
+    formData.append('chunk', new Blob([data], {type: "application/octet-stream"}));
+    const response = await fetch(apiURL+`uploads/audio/${id}/chunks`, {
+        method: 'POST',
+        body: formData
+    }).then(res => res.json())
+    return response;
+}
+
+async function chunkAndUpload(file) {
+    const id = await newAudio(file.type); // Create a new audio document and get its ID
+    const chunkSize = 4 * 1024 * 1024; // 4 MB chunk size (adjust as needed)
+    const fileReader = new FileReader();
+
+    return new Promise((resolve, reject) => {
+        fileReader.onload = async (event) => {
+            const chunkPaths = [];
+            const buffer = event.target.result;
+            const totalChunks = Math.ceil(buffer.byteLength / chunkSize);
+
+            for (let i = 0; i < totalChunks; i++) {
+                const start = i * chunkSize;
+                const end = Math.min(start + chunkSize, buffer.byteLength);
+                const chunk = buffer.slice(start, end);
+                
+                try {
+                    const {path} = await uploadChunk(id, chunk, i);
+                    chunkPaths.push(path);
+                    console.log(`Uploaded chunk ${i + 1} of ${totalChunks}`);
+                } catch (error) {
+                    reject(error);
+                }
+            }
+
+            resolve({id: id, associated: chunkPaths});
+        };
+
+        fileReader.onerror = (error) => {
+            reject(error);
+        };
+
+        fileReader.readAsArrayBuffer(file);
+    });
 }
 
 export async function resizeAndCompress(file) {

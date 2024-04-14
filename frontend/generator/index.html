@@ -60,6 +60,16 @@
     <dialog id="submissionTool" class="softCorner">
       <h2>Ready to Generate a Quiz Link?</h2>
       <form class="softCorner" id="submissionForm">
+        <label for="email">
+          <span>Enter your email address:</span>
+          <input 
+            required 
+            type="email" 
+            id="email" 
+            class="softCorner" 
+            placeholder="Email Address..."
+          >
+        </label>
         <label for="password">
           <span>Enter a secure password to view responses:</span>
           <div id="passBox">
@@ -88,7 +98,7 @@
             hidden
           />
         </label>
-        <button type="submit" class="softCorner primaryBtn" disabled>Generate Quiz Link</button>
+        <button type="submit" id="submitButton" class="softCorner primaryBtn" disabled>Generate Quiz Link</button>
       </form>
       <button id="cancelSubmission" class="softCorner warningButton">Cancel</button>
     </dialog>

@@ -20,7 +20,7 @@ let auth = null;
 function apiCall(quizId) {
   elid("spinner").classList.toggle("hidden")
   const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(passwordInput.value)}`);
-  fetch(apiURL+`/quiz/${quizId}/admin`, {
+  fetch(apiURL+`quizzes/${quizId}/admin`, {
     headers: {
         Authorization: 'Basic ' + encoding
     }
@@ -38,8 +38,9 @@ function apiCall(quizId) {
       optBox.append(change);
       optBox.append(reset);
       optBox.append(del)
-      showResponses(quizObject)
       auth = passwordInput.value;
+      showResponses(quizObject)
+      
       elid("spinner").classList.toggle("hidden")
     })
     .catch((err) => {
@@ -63,7 +64,7 @@ function apiCall(quizId) {
 
 function changeStatus(quizId, newStatus) {
   const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
-  fetch(apiURL+`/quiz/${quizId}/admin`, {
+  fetch(apiURL+`quizzes/${quizId}/admin`, {
     method: "PATCH",
     headers: {
         "Authorization": 'Basic ' + encoding,
@@ -93,12 +94,13 @@ function eraseResponses(quizId) {
     return;
   }
   const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
-  fetch(apiURL+`/quiz/${quizId}/admin/reset`, {
+  fetch(apiURL+`quizzes/${quizId}/admin`, {
     method: "PATCH",
     headers: {
         "Authorization": 'Basic ' + encoding,
         "Content-Type": "application/json"
-    }
+    },
+    body: JSON.stringify({reset: true})
   }).then(res => res.json())
     .then(quiz => {
       const queryString = window.location.search;
@@ -144,7 +146,7 @@ function adminOptions(quiz, id) {
 
 function deleteQuiz(code) {
   const encoding = btoa(`${encodeURIComponent(code)}:${encodeURIComponent(auth)}`);
-  fetch(apiURL+`/quiz/${code}/admin`, {
+  fetch(apiURL+`quizzes/${code}/admin`, {
     method: "DELETE",
     headers: {
         "Authorization": 'Basic ' + encoding
@@ -158,7 +160,29 @@ function deleteQuiz(code) {
   })
 }
 
-function showResponses(quiz) {
+function deleteResponse(e, quizId, responseId) {
+  const encoding = btoa(`${encodeURIComponent(quizId)}:${encodeURIComponent(auth)}`);
+  fetch(apiURL+`quizzes/${quizId}/responses/${responseId}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": "Basic "+encoding
+    }
+  }).then(res => {
+    if (res.ok) {
+      let target = e.target.parentNode;
+      while (!target.classList.contains("response")) {
+        target = target.parentNode;
+      }
+      target.remove();
+      if (elid("resBox").children.length == 0) {
+        elid("resBox").innerHTML = "<h2 class='status'>No Responses Yet</h2>"
+      }
+    }
+  })
+}
+
+async function showResponses(quiz) {
+  const encoding = btoa(`${encodeURIComponent(quiz.quizId)}:${encodeURIComponent(auth)}`);
   const box = newEl("div", "resBox", "softCorner")
   box.classList.add("shadow")
   if (quiz.responses.length == 0) {
@@ -168,31 +192,40 @@ function showResponses(quiz) {
     return;
   }
   let totalPoints = quiz.questions.reduce((acc, q)=>acc+parseInt(q.pointValue), 0)
-  for (const [idx, res] of quiz.responses.entries()) {
+  const responses = await fetch(apiURL+`quizzes/${quiz.quizId}/responses`, {method: "GET", headers: {"Authorization": "Basic "+encoding}}).then(data => data.json());
+  for (const res of responses) {
     const resBox = newEl("div", null, "response")
+    let timestamp = new Date(res.timeSubmitted);
+    let duration = (res.timeSubmitted - res.timeStarted) / 1000;
     resBox.innerHTML += `
       <div>
-        <h2>${res.user} <span class="score">(<span class="numCorrect"></span>/${totalPoints})</span><button class="updateGrade">Update</button></h2>
-        <p><small>${res.timestamp}</small></p>
+        <h2>
+          ${res.user} 
+          <span class="score">(<span class="numCorrect"></span>/${totalPoints})</span>
+          <button class="updateGrade">Update</button>
+          <button class="deleteResponse"><i class="fa-solid fa-trash"></i></button>
+        </h2>
+        <p><small>${timestamp.toLocaleTimeString()}</small></p>
+        <p><small>Completed in ${Math.floor(duration / 60)} minutes and ${duration % 60} seconds</small></p>
       </div>
     `
-    for (let i=0; i<res.responses.length; i++) {
-      const answer = res.responses[i].answer;
-      const score = res.responses[i].score;
+    for (let i=0; i<res.answers.length; i++) {
+      const answer = res.answers[i].answer;
+      const score = res.answers[i].score;
       const quest = quiz.questions[i];
       resBox.innerHTML += `<p>Question ${i+1}: ${quest.title}</p>`
       switch (quest.type) {
         case "multipleChoice":
           resBox.innerHTML += `
           <label><input type="number" min="0" max="${quest.pointValue}" value=${score}> out of ${quest.pointValue} points earned</label>
-            <p>\tAnswered: ${answer}
+            <p>\tAnswered: ${answer} ${score != quest.pointValue ? "<span class='correctAnswer'>Correct answer is "+quest.options[quest.correct]+"</span>" : ""}
               <i class="fa-solid ${score == quest.pointValue ? "fa-circle-check" : "fa-circle-xmark"}"></i>
             </p>`;
           break;
         case "shortAnswer":
           resBox.innerHTML += `
           <label><input type="number" min="0" max="${quest.pointValue}" value=${score}> out of ${quest.pointValue} points earned</label>
-            <p>\tAnswered: ${answer}
+            <p>\tAnswered: ${answer} ${score != quest.pointValue ? "<span class='correctAnswer'>Correct answer is "+quest.correct+"</span>" : ""}
               <i class="fa-solid ${score == quest.pointValue ? "fa-circle-check" : "fa-circle-xmark"}"></i>
             </p>
             `;
@@ -204,19 +237,19 @@ function showResponses(quiz) {
       }
         
     }
+    
+    resBox.querySelector(".deleteResponse").addEventListener("click", (e)=>{
+        deleteResponse(e, res.quizId, res.responseId)
+    })
     resBox.querySelector(".updateGrade").addEventListener("click", ()=>{
-      const queryString = window.location.search;
-        const urlParams = new URLSearchParams(queryString);
-        let code = urlParams.get("id");
-        const encoding = btoa(`${encodeURIComponent(code)}:${encodeURIComponent(auth)}`);
-        fetch(apiURL+`/quiz/${code}/admin`, {
+        
+        fetch(apiURL+`quizzes/${quiz.quizId}/responses/${res.responseId}`, {
           method: "PATCH",
           headers: {
               "Authorization": 'Basic ' + encoding,
               "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            resIndex: idx,
             scores: Array.from(resBox.querySelectorAll("input[type='number']")).map(n => n.value)
           })
         }).then(res => {

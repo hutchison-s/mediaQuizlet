@@ -23,30 +23,38 @@ const players = [];
 let quizTimer = null;
 let thisQuizId = null;
 let user = null;
-let hasBeenWarned = false;
+let responseId = null;
+let thisTimeLimit = null;
 
 // Store current time remaining, checked responses, and listen limits in localStorage
 
 function updateStorage() {
     const stateUpdate = {
-        user: user,
-        timeRemaining: quizTimer.remaining,
         listenLimits: players.map(p=>p.remaining),
-        responses: qList.map(form=>form.answer.value)
+        responses: qList.map(form=>form.answer.value),
+        responseId: responseId,
+        timeLimit: thisTimeLimit
     }
     localStorage.setItem("quizState"+thisQuizId, JSON.stringify(stateUpdate))
 }
 
 // If quizState exists in localStorage for this quiz id, restore checkmarks, listen limits, and time remaining
 
-function restoreState(state) {
-    // Restore user
-    user = state.user
-    userDisplay.textContent = state.user;
-    // Restore timer settings
-    quizTimer.remaining = state.timeRemaining;
-    quizTimer.countdown();
-    quizTimer.startTimer();
+async function restoreState(state) {
+    // Retrieve response
+    fetch(apiURL+`quizzes/${thisQuizId}/responses/${state.responseId}`).then(res => res.json()).then(data => {
+      user = data.user;
+      responseId = data.responseId
+      thisTimeLimit = state.timeLimit
+      userDisplay.textContent = `Quizzing as ${user}`;
+      if (thisTimeLimit) { // Restore timer settings
+        quizTimer = new Timer(data.timeStarted, thisTimeLimit, thisQuizId, submitAll);
+        root.appendChild(quizTimer.display);
+        quizTimer.countdown();
+        quizTimer.startTimer();
+      }
+    })
+    
     // Restore listen limits & responses
     for (let i = 0; i<players.length; i++) {
         players[i].remaining = state.listenLimits[i]
@@ -65,26 +73,43 @@ function restoreState(state) {
 async function submitAll() {
   const qForms = elall(".questionForm");
   elid("spinner").classList.toggle("hidden")
-  const formData = new FormData();
+  const associatedFiles = [];
+  const answers = [];
   for (const qForm of Array.from(qForms)) {
     if (qForm.answer.type == "file") {
       const photo = qForm.answer.files[0]
-      console.log(photo)
-      const compPhoto = await resizeAndCompress(photo);
-      formData.append("photos", compPhoto, photo.originalname)
-      formData.append('responses', "#photoUpload#")
+      if (photo) {
+        console.log(photo)
+        const compPhoto = await resizeAndCompress(photo);
+        const photoForm = new FormData();
+        photoForm.append("photos", compPhoto, "photoUpload")
+        const uploadResponse = await fetch(apiURL+"uploads/image", {method: "POST", body: photoForm}).then(res => res.json());
+        const {link, path} = uploadResponse;
+        console.log(uploadResponse)
+        associatedFiles.push(path);
+        answers.push({answer: link, score: 0})
+      } else {
+        answers.push({answer: "", score: 0})
+      }
     } else {
-      formData.append('responses', qForm.answer.value)
+      answers.push({answer: qForm.answer.value, score: 0})
     }
   }
-  formData.append("user", user);
-  formData.append("timestamp", new Date().toTimeString())
-
+  console.log(answers)
+  const newResponse = {
+    answers: answers,
+    associatedFiles: associatedFiles,
+    timeSubmitted: Date.now()
+  }
+  
   quizTimer && clearInterval(quizTimer?.interval);
 
-  fetch(apiURL+`/quiz/${thisQuizId}/response`, {
-    method: "POST",
-    body: formData,
+  fetch(apiURL+`quizzes/${thisQuizId}/responses/${responseId}`, {
+    method: "PATCH",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(newResponse)
   })
     .then((res) => {
       window.localStorage.removeItem("quizState" + thisQuizId);
@@ -92,6 +117,8 @@ async function submitAll() {
       root.innerHTML = `<h2 class='status'>Submitted Successfully</h2>`;
       user = null;
       quizTimer = null;
+      thisTimeLimit = null;
+      responseId = null;
       elid("spinner").classList.toggle("hidden")
       exitFullScreen();
     })
@@ -111,9 +138,11 @@ function createPlayer(file, limit) {
 
 // Create player and quiz form for each question object passed in and return LimitedPlayer instance and quiz form element
 
-function createQuestion(q) {
+async function createQuestion(q) {
   const form = newEl("form", null, "questionForm");
-  const player = createPlayer(q.file, q.limit);
+  const audioId = q.file;
+  const file = await getAudioFile(audioId);
+  const player = createPlayer(file, q.limit);
 
   form.innerHTML += `<h2 class="qTitle">${q.title}</h2>`;
   form.innerHTML += `<p><small>${q.pointValue} points</small></p>`
@@ -142,32 +171,49 @@ function createQuestion(q) {
   return [player, form]
 }
 
+// Get audio chunks from firebase storage and assemble into audio file
+
+async function getAudioFile(id) {
+  const {totalChunks, mimeType} = await fetch(apiURL+`uploads/audio/${id}/chunks`).then(res=>res.json());
+  const promises = [];
+  for (let i=0; i<totalChunks; i++) {
+    promises.push(fetch(apiURL+`uploads/audio/${id}/chunks/${i}`).then(res => res.blob()));
+  }
+  const chunks = (await Promise.all(promises))
+  const blob = new Blob(chunks, {type: mimeType});
+  return blob;
+}
+
 // Iterate through questions and append their required elements to the provided box element
 
-function populateQuestions(box, qList) {
+async function populateQuestions(box, qList) {
+  const promises = [];
   for (const q of qList) {
-    const [player, form] = createQuestion(q);
+    promises.push(createQuestion(q))
+  }
+  const questions = await Promise.all(promises);
+  questions.forEach(q => {
+    const [player, form] = q;
     root.append(player.audio);
     box.appendChild(player.player);
     box.appendChild(form)
-  }
+  })
 }
 
 // Create timer and quiz container elements and add to DOM.
 
-function createQuiz(quiz) {
+async function createQuiz(quiz) {
   if (quiz.status == "closed") {
     displayClosed();
     introDialog.showModal();
     return;
   }
   const container = newEl("article", "quizBox", "softCorner");
-  if (quiz.timeLimit != "null") {
-    quizTimer = new Timer(quiz.timeLimit, thisQuizId, submitAll);
-    root.appendChild(quizTimer.display);
-  }
   root.appendChild(container);
-  populateQuestions(container, quiz.questions);
+  const frontLoader = elid("frontLoader")
+  frontLoader.showModal()
+  await populateQuestions(container, quiz.questions);
+  frontLoader.close()
   const subBtn = newEl("button", "submitAll", "softCorner");
   subBtn.textContent = "Submit Quiz";
   subBtn.addEventListener("click", submitAll);
@@ -177,28 +223,30 @@ function createQuiz(quiz) {
   container.appendChild(subBtn);
   const oldState = window.localStorage.getItem("quizState"+thisQuizId);
   if (oldState) {
-    // if (!window.sessionStorage.getItem("quizUser")) {
-    //   root.innerHTML = "<h2 class='status'>Quiz already in session elsewhere.</h2>";
-    //   return;
-    // }
       restoreState(JSON.parse(oldState));
   } else {
-    gatherInfo(quiz.timeLimit, quiz.questions.length);
+    gatherInfo(quiz.questions.length);
   }
 }
 
 function apiCall(quizId) {
-  fetch(apiURL+"/quiz/" + quizId)
+  fetch(apiURL+"quizzes/" + quizId)
     .then((data) => {
       return data.json();
     })
     .then((quizObject) => {
       thisQuizId = quizId;
+      if (quizObject.timeLimit != "null") {
+        thisTimeLimit = quizObject.timeLimit;
+      }
       if (window.localStorage.getItem("quizState"+quizId)) {
         console.log("exists")
       }
+      console.log("time limit: "+quizObject.timeLimit)
       console.log("status: "+quizObject.status)
-      createQuiz(quizObject, quizId);
+      createQuiz(quizObject);
+    })
+    .then(()=>{
       elid("viewResponses").addEventListener("click", ()=>{
         window.location.href = "https://audioquizlet.netlify.app/viewer?id="+quizId
       });
@@ -225,11 +273,11 @@ function displayClosed() {
       </div>`
 }
 
-function gatherInfo(time, questions) {
-  if (time == "null") {
+function gatherInfo(questions) {
+  if (!thisTimeLimit) {
     totalTime.textContent = "unlimited time";
   } else {
-    totalTime.textContent = time == 1 ? "1 minute" : time + " minutes";
+    totalTime.textContent = thisTimeLimit == 1 ? "1 minute" : thisTimeLimit + " minutes";
   }
   numQuestions.textContent =
     questions == 1 ? "1 question" : questions + " questions";
@@ -256,11 +304,30 @@ function beginQuiz() {
     return;
   }
   user = name;
-  userDisplay.textContent = user;
-  introDialog.close();
-  requestFullScreen();
-  window.sessionStorage.setItem("quizUser", user)
-  quizTimer && quizTimer.startTimer();
+  userDisplay.textContent = `Quizzing as ${user}`;
+  fetch(apiURL+`quizzes/${thisQuizId}/responses`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+      user: user,
+      timeStarted: Date.now()
+    })
+  }).then(res => res.json())
+    .then(data => {
+      console.log("received", data)
+      responseId = data.responseId
+      if (thisTimeLimit) {
+        quizTimer = new Timer(data.timeStarted, thisTimeLimit, thisQuizId, submitAll);
+        root.appendChild(quizTimer.display);
+      }
+      introDialog.close();
+      requestFullScreen();
+      window.sessionStorage.setItem("quizUser", user)
+      quizTimer && quizTimer.startTimer();
+    })
+  
 }
 
 window.addEventListener("load", () => {
@@ -279,16 +346,7 @@ window.addEventListener("beforeunload", (e)=>{
     updateStorage();
   }
 });
-// window.addEventListener("blur", (e)=>{
-//   if (user) {
-//     if (!hasBeenWarned) {
-//       alert("This is your only warning. Navigating away from this page will result in your quiz being submitted as-is.")
-//       hasBeenWarned = true;
-//     } else {
-//       submitAll();
-//     }
-//   }
-// })
+
 lightDark.addEventListener("click", changeMode);
  
 function requestFullScreen() {

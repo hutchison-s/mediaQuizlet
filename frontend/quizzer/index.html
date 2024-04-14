@@ -23,7 +23,7 @@
     <i id="lightDark" class="fa-solid fa-circle-half-stroke"></i>
     <div>
       <h1><a href="../"><i class="fa-solid fa-circle-play"></i>Audio&nbsp;Quizlet</a></h1>
-      <p><small>Quizzing as <span id="currentUser"></span></small></p>
+      <p><small id="currentUser"></small></p>
     </div>
     <div id="root"></div>
     <dialog id="introDialog" class="softCorner dialog">
@@ -44,6 +44,16 @@
           <button id="beginQuiz" class="softCorner primaryBtn" disabled>Begin</button>
           <p>or</p>
           <button id="viewResponses" class="softCorner secondaryBtn">View Responses</button>
+        </div>
+      </div>
+    </dialog>
+    <dialog id="frontLoader">
+      <div class="wrapper">
+        <div class="dialogLogo">
+          <h2><i class="fa-solid fa-circle-play"></i>Audio&nbsp;Quizlet</h2>
+        </div>
+        <div class="dialogInstructions">
+          <p>Retrieving Quiz</p>
         </div>
       </div>
     </dialog>

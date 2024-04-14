@@ -1,133 +1,74 @@
-import express from "express";
-const app = express();
-import cors from "cors";
+import express from 'express';
+import cors from 'cors';
 import dotenv from "dotenv";
 dotenv.config();
 import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage(), limits: {} });
+import { authenticate, admin } from "./middleware/auth.js";
+import { deleteQuiz, getAllQuizzes, getFullQuiz, getQuiz, newQuiz, updateQuiz } from "./database/quizFunctions.js";
+import { deleteOneResponse, getAllResponses, getOneResponse, newResponse, updateResponse } from './database/responseFunctions.js';
+import { uploadAudio, uploadImage } from './database/fileFunctions.js';
+import { createAudioDoc, getAllAudio, getAudioInfo, getChunk, uploadAudioChunk } from './database/audioFunctions.js';
 
-import authenticate from "./middleware/auth.js";
-import { createDocument, getQuizzerInfo, addResponse, updateQuiz, resetQuiz, deleteDoc, deleteExpired } from "./firebase/docFuncs.js";
-import { handleAudioUpload } from "./firebase/fileFuncs.js";
+const app = express();
+const PORT = process.env.PORT || 8000;
 
-const port = process.env.PORT || 8000;
-
-// Middleware to parse JSON requests
+// Middleware
 app.use(express.json());
 app.use(cors());
 
-// Middleware to handle form data
-app.use(express.urlencoded({ extended: true }));
+// Retrieve all quizzes
+app.get('/api/quizzes', admin, getAllQuizzes);
 
-app.get("/", (req, res) => {
-  res.send("Hello, Express!");
-});
+// Create a new quiz
+app.post('/api/quizzes', newQuiz);
 
-// Create New Quiz & Upload files
-app.post("/audio/upload", upload.single("files"), async(req, res) => {
-  console.log("audio upload initiated");
-  const file = req.file
-  const uploaded = await handleAudioUpload(file);
-  console.log("uploaded "+uploaded.path)
-  res.send(uploaded);
-})
+// Retrieve quiz details (only info necessary for quiz-taking)
+app.get('/api/quizzes/:quizId', getQuiz);
 
-app.post("/createQuiz", upload.single("files"), async (req, res) => {
-  console.log("quiz creation initiated")
-  try {
-    const {questions, timeLimit, password, expires, status, associatedFiles} = req.body;
-    const message = await createDocument(JSON.parse(questions), timeLimit, password, expires, status, JSON.parse(associatedFiles));
-    console.log("received\n"+message)
-    res.send(message);
-  } catch (err) {
-    console.log(err)
-    res.status(500).send(err)
-  }
-});
+// Retrieve full quiz details (admin)
+app.get('/api/quizzes/:quizId/admin', authenticate, getFullQuiz);
 
-// Retrieve Quiz Questions and Info
+// Update status or time limit for an existing quiz, or reset responses
+app.patch('/api/quizzes/:quizId/admin', authenticate, updateQuiz);
 
-app.get("/quiz/:code", async (req, res) => {
-  try {
-    console.log(req.params.code + " requested");
-    const data = await getQuizzerInfo(req.params.code)
-    res.send(data);
-  } catch(err) {
-    res
-      .status(400)
-      .send({ message: "Error retrieving quiz document", error: err });
-  }
-});
+// Delete a quiz
+app.delete('/api/quizzes/:quizId/admin', authenticate, deleteQuiz);
 
-// Add response to quiz
+// Retrieve all responses for a quiz
+app.get('/api/quizzes/:quizId/responses', authenticate, getAllResponses);
 
-app.post("/quiz/:code/response", upload.array("photos"), async (req, res) => {
-  try {
-    const id = req.params.code;
-    const update = await addResponse(req, id);
-    res.send(update);
-    console.log("New Response to quiz " + id + " received."); 
-  } catch(err) {
-    res.status(400).send({message: "Error in sending response", error: err})
-  }
-});
+// Create new response document
+app.post('/api/quizzes/:quizId/responses', newResponse);
 
-// Get admin-level quiz info
+// Retrieve specific response
+app.get('/api/quizzes/:quizId/responses/:responseId', getOneResponse);
 
-app.get("/quiz/:code/admin", authenticate, async (req, res) => {
-  try {
-    console.log(req.params.code + " requested");
-    res.send(req.quizData); // Send the authenticated data from the request object
-  } catch(err) {
-    console.log(err);
-    res.status(500).send({ message: "Error retrieving quiz document", error: err.message });
-  }
-});
+// Edit specific response
+app.patch('/api/quizzes/:quizId/responses/:responseId', updateResponse);
 
-// Update quiz data
+// Delete specific response
+app.delete('/api/quizzes/:quizId/responses/:responseId', authenticate, deleteOneResponse);
 
-app.patch("/quiz/:code/admin", authenticate, async (req, res) => {
-  try {
-    const updated = await updateQuiz(req.body, req.params.code);
-    res.send(updated);
-  } catch (err) {
-    console.log(err)
-    res
-      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
-  }
-})
+// Create new audio document and return id
+app.post('/api/uploads/audio', createAudioDoc); 
 
-// Reset quiz and remove responses
+// Return list of all audio docs, requires admin authorization
+app.get('/api/uploads/audio', admin, getAllAudio); 
 
-app.patch("/quiz/:code/admin/reset", authenticate, async (req, res) => {
-  try {
-      const updated = await resetQuiz(req.params.code);
-      res.send(updated)
-  } catch(err) {
-    console.log(err)
-    res
-      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
-  }
-})
+// Upload a file chunk and add reference to audio doc
+app.post('/api/uploads/audio/:id/chunks', upload.single("chunk"), uploadAudioChunk);
 
-// Delete quiz and associated files
+// Get totalChunks and mimetype for audio doc
+app.get('/api/uploads/audio/:id/chunks', getAudioInfo); 
 
-app.delete("/quiz/:code/admin", authenticate, async (req, res) => {
-  try {
-      const updated = await deleteDoc(req.params.code);
-      res.send(updated)
-  } catch(err) {
-    console.log(err)
-    res
-      .status(err.status).send({ message: "Error retrieving quiz document", error: err.message });
-  }
-})
+// Get specific chunk for specific audio
+app.get('/api/uploads/audio/:id/chunks/:index', getChunk) 
 
-// Cron Function
-
-app.use("/api/cron", deleteExpired)
+// Compress and upload image file
+app.post('/api/uploads/image', upload.single("photos"), uploadImage);
 
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running at port ${port}`);
+app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
 });
