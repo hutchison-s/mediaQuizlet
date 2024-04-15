@@ -53,8 +53,13 @@ export async function getQuiz(req, res) {
         res.status(400).send({message: "Invalid quiz id"});
     } else {
         try {
-            const doc = qCol.doc(quizId);
-            const quiz = (await doc.get()).data();
+            const ref = qCol.doc(quizId);     
+            const doc = await ref.get();
+            if (!doc.exists) {
+                res.status(404).send({message: "No quiz with this ID was found."});
+                return;
+            }
+            const quiz = doc.data();
             delete quiz.responses;
             delete quiz.password;
             delete quiz.expires;
