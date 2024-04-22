@@ -1,5 +1,17 @@
+import SideBar from '../Components/Sidebar';
+import './Generator.css';
+
 export default function Generator() {
     return (
-        <h1>Hello Generators!</h1>
+        <>
+            <main id="generatorBody">
+                <SideBar />
+                <section id="genWindow">
+                    <h1>Hello Generators!</h1>
+                </section>
+            </main>
+            
+        </>
+        
     )
 }

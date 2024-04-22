@@ -1,0 +1,12 @@
+#generatorBody {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+}
+#sideBar {
+    flex: 1;
+    background-image: var(--sidebar);
+}
+#genWindow {
+    flex: 4;
+}

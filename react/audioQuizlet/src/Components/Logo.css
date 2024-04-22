@@ -10,6 +10,9 @@
     font-size: clamp(24px, 8vw, 60px);
     text-align: center;
   }
+  #sideBar .logoHeading {
+    font-size: 36px;
+  }
   .logoTag {
       color: var(--primary-half);
       font-size: large;

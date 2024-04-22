@@ -55,6 +55,16 @@ ul {
   justify-content: space-evenly;
 }
 
+.flexFull {
+  flex: 100%;
+}
+.marginCenter {
+  margin: auto;
+}
+.block {
+  display: block;
+}
+
 .textInputWrapper {
   position: relative;
   width: clamp(250px, 80%, 400px);
@@ -250,6 +260,13 @@ ul {
 .dialog .buttonWrap {
   display: grid;
   gap: 0.5rem;
+}
+
+#welcomeMenu {
+  width: 90vw;
+  max-width: 800px;
+  margin: 10dvh auto;
+  gap: 2rem;
 }
 
 /* Loading Graphic */

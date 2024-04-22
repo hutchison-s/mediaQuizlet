@@ -1,0 +1,197 @@
+p:has(#currentUser) {
+    text-align: center;
+    opacity: 0.5;
+  }
+  /* body {
+    display: grid;
+    place-content: center;
+    gap: 4rem;
+  } */
+  #root {
+    position: relative;
+    display: grid;
+    justify-content: center;
+    align-items: baseline;
+    min-width: 300px;
+    width: 100%;
+    height: calc(100dvh - 3rem);
+  }
+  #quizBox {
+    background: var(--background);
+    box-shadow: var(--shadow);
+    padding: 2rem;
+    width: clamp(340px, 70vw, 700px);
+    max-height: 75vh;
+    overflow: auto;
+  }
+  #quizBox h2 {
+    width: 100%;
+    padding: 0.25rem;
+  }
+  #timer {
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
+    display: grid;
+    place-items: center;
+    padding: 0.5rem;
+    box-shadow: var(--shadow);
+    background: var(--background);
+    border: 2px solid var(--secondary);
+  }
+  #timeBox {
+    color: var(--primary);
+    text-align: center;
+    font-size: 2rem;
+  }
+  
+  .playBtn {
+    border-radius: 50%;
+    width: 100px;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    background: var(--secondary);
+    cursor: pointer;
+    border: none;
+  }
+  .playBtn:active {
+    box-shadow: 0 0 4px black;
+  }
+  .playBtn:disabled {
+    filter: blur(4px) grayscale();
+    cursor: not-allowed;
+  }
+  .playBtn * {
+    color: var(--background);
+    font-size: x-large;
+  }
+  .progressBar {
+    width: 120px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    margin: auto;
+  }
+  .questionForm {
+    display: grid;
+    gap: 0.5rem;
+    padding: 2rem 0;
+    border-bottom: 2px dashed var(--light-secondary);
+  }
+  .questionForm label {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .questionForm input[type="text"] {
+    padding: 0.5rem;
+    font-size: 16px;
+    border-radius: 0.25rem;
+    background: var(--background);
+    color: var(--primary);
+    border: 1px solid var(--secondary);
+    width: 100%;
+  }
+  .playerBox {
+    padding: 2rem 0 0;
+  }
+  /* #submitAll {
+    padding: 1rem 2rem;
+    border: none;
+    background: var(--light-secondary);
+    color: var(--secondary);
+    margin: 1rem auto;
+    display: block;
+    cursor: pointer;
+    box-shadow: var(--shadow);
+  }
+  #submitAll:hover {
+    background: var(--secondary);
+    color: var(--background);
+  } */
+  
+  #nameInput {
+    font-size: clamp(16px, 5vw, 28px);
+    width: clamp(250px, 10vw, 300px);
+    display: block;
+    margin: 1rem auto;
+    border: 1px solid var(--light-secondary);
+    background: var(--background);
+    padding: 0.5rem;
+    color: var(--primary);
+    text-align: center;
+  }
+  
+  .status {
+    font-size: 3rem;
+    text-align: center;
+    
+  }
+  #root:has(.status) {
+    background: transparent;
+  }
+  .remaining {
+    text-align: center;
+    padding: 0.5rem;
+  }
+  
+  @media screen and (max-width: 450px) {
+    h1 {
+      margin: 3rem 0 0;
+    }
+    body{
+      gap: 1rem;
+    }
+    #quizBox {
+      width: 95%;
+      margin: 1rem auto;
+    }
+    #quizBox h2 {
+      font-size: medium;
+    }
+    #timeBox {
+      font-size: medium;
+    }
+  }
+  
+  #frontLoader {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    height: 120%;
+    width: 120%;
+    translate: -50% -50%;
+    color: var(--background);
+    overflow:visible;
+    background-color: transparent;
+  }
+  #frontLoader::before {
+    position: fixed;
+    content: "";
+    left: -100vw;
+    top: -100vh;
+    width: 400vw;
+    height: 400vh;
+    background-image: linear-gradient(to bottom, var(--secondary), var(--primary));
+    background-size: 400vw;
+    animation: spinBG 4s infinite linear;
+    z-index: -2;
+  }
+  #frontLoader .wrapper {
+    height: 100%;
+    display: grid;
+    place-items: center;
+  }
+  #frontLoader .dialogInstructions * {
+    color: var(--background);
+    font-size: 2rem;
+  }
+  
+  @keyframes spinBG {
+    to {rotate: 360deg}
+  }
