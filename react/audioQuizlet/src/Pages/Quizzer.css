@@ -2,12 +2,7 @@ p:has(#currentUser) {
     text-align: center;
     opacity: 0.5;
   }
-  /* body {
-    display: grid;
-    place-content: center;
-    gap: 4rem;
-  } */
-  #root {
+  #root:has(#quizBox) {
     position: relative;
     display: grid;
     justify-content: center;

@@ -73,6 +73,7 @@ export async function updateResponse(req, res) {
         res.status(400).send({message: "Not a valid request body. Missing required fields."});
         return;
     }
+    console.log(answers)
     if (!timeSubmitted || !answers) {
         if (scores) {
             const ref = rCol.doc(responseId);
@@ -93,7 +94,8 @@ export async function updateResponse(req, res) {
         const oldDoc = (await ref.get()).data();
         const quiz = (await qCol.doc(quizId).get()).data();
         const {questions} = quiz;
-        const graded = answers.map((a, idx) => {
+        console.log(answers)
+        const graded = Object.values(answers).map((a, idx) => {
             const q = questions[idx];
             switch(q.type) {
                 case "multipleChoice":

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { IndexArray, questionObject } from "../../types";
+import { AnswerObject, IndexArray, questionObject } from "../../types";
 import LimitedPlayer from "../LimitedPlayer";
 import MCQ from "./MCQ";
 import SAQ from "./SAQ"
@@ -8,7 +8,7 @@ import IMGQ from "./IMGQ";
 interface QuestionProps {
     question: questionObject,
     index: number,
-    updater: (a: (x: IndexArray<string>) => IndexArray<string>) => void
+    updater: (a: (x: IndexArray<AnswerObject>) => IndexArray<AnswerObject>) => void
 }
 
 export default function Question({question, index, updater} : QuestionProps) {
@@ -16,12 +16,15 @@ export default function Question({question, index, updater} : QuestionProps) {
     const [answer, setAnswer] = useState<string>("");
 
     useEffect(()=>{
-        updater((prev: IndexArray<string>) => {
-            const temp = {...prev};
-            temp[index] = answer;
-            return temp;
-        })
-    }, [answer])
+        if (answer) {
+            updater((prev: IndexArray<AnswerObject>) => {
+                const temp = {...prev};
+                temp[index] = {answer: answer, score: 0}
+                return temp;
+            })
+        }
+        
+    }, [answer, index, updater])
 
     function createQuestion(qType: string) {
         switch(qType) {

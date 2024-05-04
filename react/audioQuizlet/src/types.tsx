@@ -16,16 +16,14 @@ export type quizObject = {
     password: string,
     quizId: string,
     status: "open" | "closed",
-    timeLimit: string | number,
+    timeLimit: string,
     responses: string[],
     questions: questionObject[]
 }
-
+export type AnswerObject = {
+    answer: string,
+    score: number
+}
 export type IndexArray<T> = {
     [key: number]: T
 }
-
-// export type Answer = {
-//     qIndex: number,
-//     answer: string
-// }
