@@ -1,14 +1,25 @@
 import SideBar from '../Components/Sidebar';
 import './Generator.css';
+import {ItemsProvider} from '../Context/ItemsProvider';
+import ItemCarousel from '../Components/GeneratorComponents/ItemCarousel';
+import LightModeControl from '../Components/lightDark';
+
+
 
 export default function Generator() {
+
+    
+
     return (
         <>
             <main id="generatorBody">
-                <SideBar />
-                <section id="genWindow">
-                    <h1>Hello Generators!</h1>
-                </section>
+                <LightModeControl />
+                <ItemsProvider>
+                    <SideBar />
+                    <section id="genWindow">
+                        <ItemCarousel />
+                    </section>
+                </ItemsProvider>
             </main>
             
         </>

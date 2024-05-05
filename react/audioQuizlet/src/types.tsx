@@ -27,3 +27,27 @@ export type AnswerObject = {
 export type IndexArray<T> = {
     [key: number]: T
 }
+
+export interface Prompt {
+    file: File | null,
+    instructions: string
+}
+export interface AudioPrompt extends Prompt {
+    isPausable: boolean,
+    playLimit: number | null
+}
+
+export interface ImagePrompt extends Prompt {
+    timeLimit: number | null
+}
+
+export interface Response {
+    correct?: string,
+    type: "MC" | "SA" | "IMG" | "AUD",
+}
+
+export type generatorQuestion = {
+    prompts: Prompt[],
+    response: Response
+}
+export type qType = "MC" | "SA" | "IMG" | "AUD";

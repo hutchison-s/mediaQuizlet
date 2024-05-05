@@ -54,7 +54,7 @@ export default function Lookup() {
     }
 
     return (
-        <section className="softCorner shadow flex vertical bgBackground fontPrimary pad2">
+        <section id="welcomeMenu" className="softCorner shadow flex vertical bgBackground fontPrimary pad2">
             <h2>Enter Quizlet Code:</h2>
             <div className="textInputWrapper">
                 <input
