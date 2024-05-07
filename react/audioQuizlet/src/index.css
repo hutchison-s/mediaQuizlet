@@ -48,6 +48,9 @@ ul {
   display: flex;
   align-items: center;
 }
+.flex.wrap {
+  flex-wrap: wrap;
+}
 .flex.vertical {
   flex-direction: column;
 }
@@ -144,6 +147,10 @@ ul {
 }
 .pad2 {
   padding: 2rem;
+}
+
+.notAllowed {
+  cursor: no-drop;
 }
 
 /* BUTTON CLASSES */

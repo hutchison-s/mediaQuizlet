@@ -39,6 +39,7 @@ export default function Question({question, index, updater} : QuestionProps) {
         }
     }
 
+
     return (
         <>
             <LimitedPlayer 

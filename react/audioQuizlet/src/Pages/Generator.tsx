@@ -1,4 +1,4 @@
-import SideBar from '../Components/Sidebar';
+import SideBar from '../Components/GeneratorComponents/Sidebar';
 import './Generator.css';
 import {ItemsProvider} from '../Context/ItemsProvider';
 import ItemCarousel from '../Components/GeneratorComponents/ItemCarousel';

@@ -9,22 +9,45 @@ export function ItemsProvider({children}: PropsWithChildren) {
     const [active, setActive] = useState(0)
 
     const addItem = (t: qType) => {
-        const newItem: generatorQuestion = {
-            prompts: [{file: null, instructions: ""}],
+        setItems(prevItems => {
+            const newItem: generatorQuestion = {
+            prompts: [],
             response: {type: t}
         }
-        setItems([...items, newItem]);
+        const updatedItems = [...prevItems, newItem];
+        setActive(updatedItems.length-1)
+        return updatedItems;
+        })
+        
+    }
+
+    const deleteItem = (index: number) => {
+        if (index < 0 || index >= items.length) {
+            return;
+        }
+        setItems(prevItems=>{
+            const oldItems = [...prevItems];
+            oldItems.splice(index, 1);
+            const updatedItems = oldItems.length > 0 ? oldItems : [];
+            setActive(Math.min(index, updatedItems.length - 1));
+            return updatedItems;
+        })
     }
 
     const updateItems = (index: number, item: generatorQuestion) => {
-        const oldItems = [...items];
-        oldItems[index] = item;
-        setItems(oldItems);
+        if (index < 0 || index >= items.length) {
+            console.error("Invalid index for updateItems");
+            return;
+        }
+        setItems(prevItems => {
+            const oldItems = [...prevItems];
+            oldItems.splice(index, 1, item);
+            return oldItems;
+        });
     }
 
-
     return (
-        <ItemsContext.Provider value={{items, addItem, updateItems, active, setActive}}>
+        <ItemsContext.Provider value={{items, addItem, deleteItem, updateItems, active, setActive}}>
             {children}
         </ItemsContext.Provider>
     )

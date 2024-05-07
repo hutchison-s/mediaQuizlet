@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 
 export default function NavMenu() {
     return (
-        <ul className="flex even">
+        <ul className="flex even wrap">
             <Link to="/">
                 <li>Home</li>
             </Link>

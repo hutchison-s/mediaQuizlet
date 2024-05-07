@@ -9,12 +9,13 @@ export default function NewQuestionButton({onClick}: NewQuestionButtonProps) {
 
     const buttonRef = useRef<HTMLButtonElement>(null)
 
-    useEffect(()=>{
-        const handleClickWhenOpen = (e:PointerEvent)=>{
-            if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
-                setIsOpen(false)
-            }
+    const handleClickWhenOpen = (e:PointerEvent)=>{
+        if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
+            setIsOpen(false)
         }
+    }
+
+    useEffect(()=>{
         if (isOpen) {
             window.addEventListener("pointerdown", handleClickWhenOpen)
         }
@@ -27,11 +28,11 @@ export default function NewQuestionButton({onClick}: NewQuestionButtonProps) {
     return (
         <button ref={buttonRef} id="newQuestion" className="shadow" onClick={()=>{setIsOpen(prev=>!prev)}}>
             <i className="fa-solid fa-plus"></i>
-            {isOpen && <div>
-                <button onClick={()=>{onClick("MC")}}>Multiple Choice</button>
-                <button onClick={()=>{onClick("SA")}}>Short Answer</button>
-                <button onClick={()=>{onClick("IMG")}}>Image Response</button>
-                <button onClick={()=>{onClick("AUD")}}>Audio Response</button>
+            {isOpen && <div id="newQuestionType">
+                <span onClick={()=>{onClick("MC")}}>Multiple Choice</span>
+                <span onClick={()=>{onClick("SA")}}>Short Answer</span>
+                <span onClick={()=>{onClick("IMG")}}>Image Response</span>
+                <span onClick={()=>{onClick("AUD")}}>Audio Response</span>
             </div>}
         </button>
     )
