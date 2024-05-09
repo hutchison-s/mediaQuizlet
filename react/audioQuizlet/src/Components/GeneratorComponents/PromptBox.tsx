@@ -13,6 +13,8 @@ type PromptBoxProps = {
     promptIndex: number
 }
 
+const qTypeList: string[] = ["Text", "Audio", "Image"]
+
 const list: JSX.Element[] = [<i className="fa-solid fa-font"></i>, <i className="fa-solid fa-circle-play"></i>, <i className="fa-solid fa-image"></i>];
 
 export default function PromptBox({ item, itemIndex, promptIndex }: PromptBoxProps) {
@@ -82,7 +84,7 @@ export default function PromptBox({ item, itemIndex, promptIndex }: PromptBoxPro
 
     return (
         <div className="promptBox">
-            <SelectPopUp list={list} sendIndex={receiveIndex} />
+            <SelectPopUp value={qTypeList.indexOf(item.prompts[promptIndex].type)} list={list} sendIndex={receiveIndex} />
             {element}
             <div className="deletePrompt" onClick={removePrompt}>
                 <i className="fa-solid fa-trash-can"></i>

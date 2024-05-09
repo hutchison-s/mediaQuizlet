@@ -1,14 +1,19 @@
-import { Key, useState } from "react"
+import { Key, useEffect, useState } from "react"
 import './SelectPopUp.css';
 
 type SelectProps = {
+    value: number,
     list: string[] | JSX.Element[],
     sendIndex: (i: number) => void
 }
-export default function SelectPopUp({list, sendIndex}: SelectProps) {
+export default function SelectPopUp({value, list, sendIndex}: SelectProps) {
 
     const [isOpen, setIsOpen] = useState(false);
     const [current, setCurrent] = useState(0);
+
+    useEffect(()=>{
+        setCurrent(value)
+    }, [value])
 
     return (
         <>

@@ -18,7 +18,29 @@ export function ItemsProvider({children}: PropsWithChildren) {
         setActive(updatedItems.length-1)
         return updatedItems;
         })
-        
+    }
+
+    const bulkAdd = (questions: generatorQuestion[]) => {
+        setItems(prevItems => {
+            const newItems = [...prevItems, ...questions];
+            setActive(newItems.length - 1)
+            return newItems
+        })
+    }
+
+    const swapPositions = (xIndex: number, yIndex: number) => {
+        if (xIndex < 0 || yIndex < 0 || xIndex >= items.length || yIndex >= items.length) {
+            console.log("Error: Invalid indeces passed: ", xIndex, yIndex);
+            return;
+        }
+        setItems(prevItems => {
+            const newItems = [...prevItems];
+            const x = newItems[xIndex];
+            newItems[xIndex] = newItems[yIndex];
+            newItems[yIndex] = x;
+            return newItems;
+        })
+        setActive(yIndex);
     }
 
     const deleteItem = (index: number) => {
@@ -34,6 +56,11 @@ export function ItemsProvider({children}: PropsWithChildren) {
         })
     }
 
+    const clearItems = ()=>{
+        setItems([]);
+        setActive(0);
+    }
+
     const updateItems = (index: number, item: generatorQuestion) => {
         if (index < 0 || index >= items.length) {
             console.error("Invalid index for updateItems");
@@ -47,7 +74,7 @@ export function ItemsProvider({children}: PropsWithChildren) {
     }
 
     return (
-        <ItemsContext.Provider value={{items, addItem, deleteItem, updateItems, active, setActive}}>
+        <ItemsContext.Provider value={{items, addItem, bulkAdd, swapPositions, deleteItem, clearItems, updateItems, active, setActive}}>
             {children}
         </ItemsContext.Provider>
     )

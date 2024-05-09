@@ -4,11 +4,24 @@ import { generatorQuestion, qType } from "../types";
 interface ItemsContextType {
     items: generatorQuestion[],
     addItem: (t: qType)=>void,
+    bulkAdd: (questions: generatorQuestion[]) => void,
+    swapPositions: (xIndex: number, yIndex: number) => void,
     deleteItem: (index: number)=>void,
+    clearItems: ()=>void,
     updateItems: (index: number, item: generatorQuestion)=>void,
     active: number,
     setActive: (x: number)=>void
 }
 
-export const ItemsContext = createContext<ItemsContextType>({items: [], addItem: ()=>{}, deleteItem: (x)=>{console.log(x)}, updateItems:(x,y)=>{console.log(x,y)}, active: 0, setActive:(x)=>{console.log(x)}});
+export const ItemsContext = createContext<ItemsContextType>({
+    items: [], 
+    addItem: ()=>{}, 
+    bulkAdd: (questions)=>{console.log(questions)},
+    swapPositions: (x, y)=>{console.log(x, y)}, 
+    deleteItem: (x)=>{console.log(x)}, 
+    clearItems: ()=>{console.log("cleared")},
+    updateItems:(x,y)=>{console.log(x,y)}, 
+    active: 0, 
+    setActive:(x)=>{console.log(x)}});
+    
 export const useItems = ()=>useContext(ItemsContext);

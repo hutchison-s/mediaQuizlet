@@ -61,7 +61,7 @@ export default function ItemCarousel() {
                     </div>
                 </>
             :   <div id="introText">
-                    <p>Drag and drop files to the toolbar on the left or get started by clicking the "+" button to add a new question!</p>
+                    <p>Drag and drop files to the sidebar or get started by clicking the "+" button to add a new question!</p>
                 </div>}
         </>
     )

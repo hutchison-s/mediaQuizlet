@@ -44,7 +44,10 @@ export default function AudioPromptBox({p, update}: AudioPromptProps) {
     return (
         p.file
             ?   <div className="audioPrompt">
-                    <audio src={url} controls />
+                    <div>
+                        <audio src={url} controls />
+                        <p style={{textAlign: "center"}}><small>{p.file.name}</small></p>
+                    </div>
                     <div className="audioOptions">
                         <i onClick={()=>{update(null, false, 0)}} className="fa-solid fa-rotate-left"></i>
                         <div className="checkLabel"><input type="checkbox" checked={p.isPausable} onChange={handlePauseToggle}/>Allow Pause </div>
