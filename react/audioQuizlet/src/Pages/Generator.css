@@ -49,6 +49,7 @@
   gap: 0.5rem;
 }
 .sideItem {
+  position: relative;
   display: flex;
   justify-content: space-between;
   padding: 0.5rem;
@@ -58,6 +59,7 @@
   background: var(--background);
   filter: brightness(97%);
   cursor: pointer;
+  overflow: hidden;
 }
 .sideItem:hover {
   filter: none;
@@ -66,6 +68,37 @@
   background: var(--secondary);
   color: var(--background);
   filter: none;
+}
+.sideItem.dragItem {
+  position: fixed;
+  top: 120%;
+  left: 120%;
+}
+.sideItem:has(.dragOver)::before {
+  content: "Drop Here";
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  align-items: center;
+  border: 1px solid var(--primary);
+  background: var(--primary-half);
+}
+.sideItem img {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+}
+.deleteAllItems {
+  padding: 0.5rem;
+  border: 1px solid var(--primary);
+  border-radius: 0.5rem;
+  background-color: var(--warning);
+  color: white;
+  cursor: pointer;
+  margin-top: 1.5rem;
 }
 #genWindow {
     flex: 3;
@@ -276,10 +309,54 @@
   font-size: 2rem;
   display: grid;
   place-items: center;
+  cursor: pointer;
 }
 .audioUploadButton > i,
 .imageUploadButton > i {
   color: var(--background);
+}
+.newAudio {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  
+}
+.recordAudioButton {
+  display: grid;
+  place-items: center;
+}
+.recBtn {
+  position: relative;
+  margin: auto;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 4px solid red;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  background-image: var(--sidebar);
+  font-weight: 800;
+  color: var(--primary);
+  z-index: 2;
+}
+.recBtn.recordStop {
+  background-image: none;
+  background-color: red;
+  color: white;
+}
+.recBtn.recordStop::before,
+.recBtn.recordStop::after {
+  position: absolute;
+  content: "";
+  right: 120%;
+  top: 5%;
+  height: 90%;
+  width: 200%;
+  background: red;
+  filter: blur(16px);
+  opacity: 0.3;
+}
+.recBtn.recordStop::after {
+  right: -220%;
 }
 .audioPrompt,
 .textPrompt,
@@ -348,6 +425,8 @@
 }
 .imagePrompt img {
   width: 100%;
+  max-width: 400px;
+  margin: auto;
 }
 .imagePrompt > .imageOptions {
   width: 100%;
@@ -424,6 +503,7 @@
   display: grid;
   grid-template-columns: 2fr 1fr 2fr;
   padding-top: 1rem;
+  text-align: center;
 }
 .itemFooter > button {
   background: none;
@@ -441,9 +521,14 @@
   color: var(--secondary);
   background-color: transparent;
 }
+
+.hiddenWhenDesktop {
+  display: none;
+}
+
 @keyframes pulse {
   from {scale: 1}
-  to {scale: 1.3}
+  to {scale: 1.15}
 }
 
 @media screen and (max-width: 900px) {
@@ -452,6 +537,15 @@
   }
   #genWindow {
     flex: 6;
+  }
+  #uploaderTarget {
+    display: none;
+  }
+  .hiddenWhenMobile {
+    display: none;
+  }
+  .hiddenWhenDesktop {
+    display: block;
   }
   .itemFrame {
     overflow-y: auto;
@@ -478,10 +572,12 @@
   .promptBox {
     grid-template-columns: 60px 1fr;
   }
+  .newAudio {
+    grid-column: span 2;
+  }
   .audioPrompt:has(audio),
   .imagePrompt:has(img),
   .textPrompt,
-  .audioUploadButton,
   .imageUploadButton {
     border-radius: 0;
     grid-column: span 2;

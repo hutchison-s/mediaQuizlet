@@ -28,6 +28,20 @@ export function ItemsProvider({children}: PropsWithChildren) {
         })
     }
 
+    const shiftItems = (xIndex: number, yIndex: number) => {
+        if (xIndex < 0 || yIndex < 0 || xIndex >= items.length || yIndex >= items.length) {
+            console.log("Error: Invalid indeces passed: ", xIndex, yIndex);
+            return;
+        }
+        setItems(prevItems => {
+        const newItems = [...prevItems];
+        const x = newItems.splice(xIndex, 1)[0];
+        newItems.splice(yIndex, 0, x);
+        setActive(yIndex);
+        return newItems;
+        })
+    }
+
     const swapPositions = (xIndex: number, yIndex: number) => {
         if (xIndex < 0 || yIndex < 0 || xIndex >= items.length || yIndex >= items.length) {
             console.log("Error: Invalid indeces passed: ", xIndex, yIndex);
@@ -74,7 +88,7 @@ export function ItemsProvider({children}: PropsWithChildren) {
     }
 
     return (
-        <ItemsContext.Provider value={{items, addItem, bulkAdd, swapPositions, deleteItem, clearItems, updateItems, active, setActive}}>
+        <ItemsContext.Provider value={{items, addItem, bulkAdd, shiftItems, swapPositions, deleteItem, clearItems, updateItems, active, setActive}}>
             {children}
         </ItemsContext.Provider>
     )

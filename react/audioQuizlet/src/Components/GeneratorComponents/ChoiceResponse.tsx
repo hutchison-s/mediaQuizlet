@@ -36,7 +36,7 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
                     type="text" 
                     name={"option"+index+"-1"} 
                     id={"option"+index+"-1"} 
-                    placeholder="Option 1" 
+                    placeholder="Option 1..." 
                     onChange={(e)=>{handleOptionChange(e, 0)}}
                     />
                 <label htmlFor={"radio"+index+"-1"}>
@@ -56,7 +56,7 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
                     type="text" 
                     name={"option"+index+"-2"} 
                     id={"option"+index+"-2"} 
-                    placeholder="Option 1" 
+                    placeholder="Option 2..." 
                     onChange={(e)=>{handleOptionChange(e, 1)}}
                     />
                 <label htmlFor={"radio"+index+"-2"}>
@@ -76,7 +76,7 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
                     type="text" 
                     name={"option"+index+"-3"} 
                     id={"option"+index+"-3"} 
-                    placeholder="Option 1" 
+                    placeholder="Option 3..." 
                     onChange={(e)=>{handleOptionChange(e, 2)}}
                     />
                 <label htmlFor={"radio"+index+"-3"}>
@@ -95,7 +95,7 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
                     type="text" 
                     name={"option"+index+"-4"} 
                     id={"option"+index+"-4"} 
-                    placeholder="Option 1" 
+                    placeholder="Option 4..." 
                     onChange={(e)=>{handleOptionChange(e, 3)}}
                     />
                 <label htmlFor={"radio"+index+"-4"}>

@@ -61,7 +61,8 @@ export default function ItemCarousel() {
                     </div>
                 </>
             :   <div id="introText">
-                    <p>Drag and drop files to the sidebar or get started by clicking the "+" button to add a new question!</p>
+                    <p className="hiddenWhenMobile">Drag and drop files to the sidebar or get started by clicking the "+" button to add a new question!</p>
+                    <p className="hiddenWhenDesktop">Get started by clicking the "+" button to add a new question!</p>
                 </div>}
         </>
     )
