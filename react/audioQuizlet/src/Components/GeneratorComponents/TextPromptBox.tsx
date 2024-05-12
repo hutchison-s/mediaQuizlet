@@ -10,7 +10,8 @@ export default function TextPromptBox({value, update}: TextPromptProps) {
             <textarea
                 placeholder="Instructions or Text Prompt..." 
                 rows={4}
-                value={value} 
+                value={value}
+                required 
                 onChange={(event:ChangeEvent<HTMLTextAreaElement>)=>{update(event.target.value)}}/>
         </div>
     )

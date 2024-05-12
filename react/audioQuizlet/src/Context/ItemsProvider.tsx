@@ -12,7 +12,8 @@ export function ItemsProvider({children}: PropsWithChildren) {
         setItems(prevItems => {
             const newItem: generatorQuestion = {
             prompts: [],
-            response: {type: t}
+            response: {type: t},
+            pointValue: 1
         }
         const updatedItems = [...prevItems, newItem];
         setActive(updatedItems.length-1)

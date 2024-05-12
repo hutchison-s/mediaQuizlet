@@ -1,5 +1,6 @@
-import { ChangeEvent, DragEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useRef, useState } from "react";
 import { AudioPrompt } from "../../types";
+import PromptUploadButton from "./PromptUploadButton";
 
 type AudioPromptProps = {
     p: AudioPrompt,
@@ -7,18 +8,15 @@ type AudioPromptProps = {
 }
 export default function AudioPromptBox({p, update}: AudioPromptProps) {
     const [url, setUrl] = useState<string>("");
-    const [isDragging, setIsDragging] = useState(false);
-    const [hasError, setHasError] = useState(false);
+
     const [isRecording, setIsRecording] = useState(false);
     const [recorder, setRecorder] = useState<MediaRecorder>();
     const chunksRef = useRef<Blob[]>([]);
-    const inputRef = useRef<HTMLInputElement>(null)
+
 
     const handleUpload = (f: File) => {
         if (f.size < (1064 * 1064 * 20) && f.type.includes("audio")) {
             update(f, false, 3);
-        } else {
-            setIsDragging(false)
         }
     }
     const handlePauseToggle = ()=>{
@@ -39,8 +37,6 @@ export default function AudioPromptBox({p, update}: AudioPromptProps) {
         if (p.file) {
             const objectURL = window.URL.createObjectURL(p.file);
             setUrl(objectURL);
-        } else {
-            setIsDragging(false)
         }
     }, [p])
 
@@ -95,36 +91,7 @@ export default function AudioPromptBox({p, update}: AudioPromptProps) {
                     </div>
                 </div>
             :   <div className="newAudio">
-                <div className="audioUploadButton"
-                        onClick={()=>{inputRef.current?.click()}}
-                        onDragOver={(e:DragEvent)=>{
-                            e.preventDefault();
-                            if (e.dataTransfer.items.length == 1 && Array.from(e.dataTransfer.items).some(item => item.type.includes("audio"))) {
-                                setIsDragging(true)
-                            } else {
-                                setIsDragging(true)
-                                setHasError(true)
-                            }
-                        }}
-                        onDragLeave={(e:DragEvent)=>{
-                            e.preventDefault();
-                            setIsDragging(false)
-                            setHasError(false)
-                        }}
-                        onDrop={(e:DragEvent)=>{
-                            e.preventDefault();
-                            const file = e.dataTransfer.files[0];
-                            if (file && inputRef.current) {
-                                handleUpload(file)
-                            }
-                            setIsDragging(false)
-                            setHasError(false)
-                        }}
-                    >
-                        {isDragging && hasError && <p className="notAllowed" style={{color: "var(--background)", fontSize: "1rem"}}>Only one AUDIO file may be uploaded</p>}
-                        {!hasError && <i className={isDragging ? "dragging fa-solid fa-file-arrow-up" : "fa-solid fa-file-arrow-up"}></i>}
-                        <input type="file" accept="audio/*" id="audioUploader" ref={inputRef} onChange={(e:ChangeEvent<HTMLInputElement>)=>{e.target.files && handleUpload(e.target.files[0])}} hidden/>
-                    </div>
+                    <PromptUploadButton onClick={handleUpload} acceptTypes="audio/*" divClass="audioUploadButton" inputID="audioUpload" />
                     <div className="recordAudioButton">
                         {isRecording
                             ? <button className="recBtn recordStop" onClick={stopRecording}>STOP</button>

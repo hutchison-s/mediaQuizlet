@@ -29,6 +29,12 @@ export default function QuestionItem({index, item}: itemProps) {
         updateItems(index, newItem);
     }
 
+    const changePoints = (e:ChangeEvent<HTMLInputElement>) => {
+        const newItem = {...item};
+        newItem.pointValue = e.target.value.includes(".") ? parseFloat(e.target.value) : parseInt(e.target.value);
+        updateItems(index, newItem)
+    }
+
     const moveBack = ()=>{
         swapPositions(index, index-1);
     }
@@ -65,7 +71,6 @@ export default function QuestionItem({index, item}: itemProps) {
 
     return (
         <div className="itemFrame">
-            
             <div className="itemBox softCorner flex vertical pad2 shadow">
                 <div className="itemHeader">
                     <div className="responseSelectFrame">
@@ -75,6 +80,18 @@ export default function QuestionItem({index, item}: itemProps) {
                             <option value="AUD">Audio Response</option>
                             <option value="IMG">Image Response</option>
                         </select>
+                        <label htmlFor="pointValue">
+                            <span>Points: </span>
+                            <input 
+                                type="number" 
+                                name="pointValue"
+                                className="pointValue" 
+                                id={index+"pointValue"} 
+                                min={0} max={100} step={0.5}
+                                value={item.pointValue}
+                                onChange={changePoints}
+                                required/>
+                        </label>
                     </div>
                     <h3>Question {index+1}</h3>
                     <button className="deleteItemButton" onClick={()=>{deleteItem(index)}}>Delete</button>

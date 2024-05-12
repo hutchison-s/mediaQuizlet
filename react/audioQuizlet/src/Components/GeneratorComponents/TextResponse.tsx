@@ -12,7 +12,8 @@ export default function TextResponse({response, update}: TextResponseProps) {
             className="shortAnswer" 
             type="text" 
             placeholder="Correct Answer..." 
-            value={response.correct} 
+            value={response.correct || ""}
+            required 
             onChange={(e)=>{update(e.target.value)}}
         />
     )

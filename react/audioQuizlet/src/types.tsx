@@ -31,7 +31,8 @@ export type IndexArray<T> = {
 export interface Prompt {
     file: File | null,
     instructions: string,
-    type: pType
+    type: pType,
+    filePath?: string
 }
 export interface AudioPrompt extends Prompt {
     isPausable: boolean,
@@ -50,7 +51,8 @@ export interface Response {
 
 export type generatorQuestion = {
     prompts: Prompt[],
-    response: Response
+    response: Response,
+    pointValue: number
 }
 export type qType = "MC" | "SA" | "IMG" | "AUD";
 export type pType = "Audio" | "Image" | "Text";

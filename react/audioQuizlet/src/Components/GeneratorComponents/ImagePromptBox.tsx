@@ -1,5 +1,6 @@
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import { ImagePrompt } from "../../types";
+import PromptUploadButton from "./PromptUploadButton";
 
 type ImagePromptProps = {
     p: ImagePrompt,
@@ -7,17 +8,20 @@ type ImagePromptProps = {
 }
 export default function ImagePromptBox({p, update}: ImagePromptProps) {
     const [url, setUrl] = useState<string>("");
-    const [limiting, setLimiting] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null)
+    const [isLimiting, setIsLimiting] = useState(false);
 
-    const handleUpload = (e:ChangeEvent<HTMLInputElement>) => {
-        if (e.target.files && e.target.files[0] && e.target.files[0].size < (1064 * 1064 * 20)) {
-            update(e.target.files[0], null);
+    const handleUpload = (f: File) => {
+        if (f.size < (1064 * 1064 * 20) && f.type.includes("image")) {
+            update(f, null);
         }
     }
 
     const handleTimeLimitChange = (e: ChangeEvent<HTMLInputElement>) => {
-        update(p.file, parseInt(e.target.value))
+        updateTimeLimit(parseInt(e.target.value))
+    }
+
+    const updateTimeLimit = (newLimit: number | null) => {
+        update(p.file, newLimit);
     }
 
     useEffect(()=>{
@@ -27,19 +31,24 @@ export default function ImagePromptBox({p, update}: ImagePromptProps) {
         }
     }, [p.file])
 
+    useEffect(()=>{
+        if (isLimiting && !p.timeLimit) {
+            updateTimeLimit(30)
+        } else if (!isLimiting) {
+            updateTimeLimit(null)
+        }
+    }, [isLimiting])
+
     return (
         p.file
             ?   <div className="imagePrompt">
                     <img src={url} className="imagePreview"/>
                     <div className="imageOptions">
                         <i onClick={()=>{update(null, null)}} className="fa-solid fa-rotate-left"></i>
-                        <label className="checkLabel" htmlFor={p.file.name+"timeLimit"}><input type="checkbox" name={p.file.name+"timeLimit"} id={p.file.name+"timeLimit"} onChange={()=>{setLimiting(lim=>!lim)}} checked={limiting}/> Limit Time</label>
-                        {limiting && <label className="checkLabel"><input type="number" min={1} max={600} value={String(p.timeLimit)} onChange={handleTimeLimitChange}/> Seconds</label> }
+                        <label className="checkLabel" htmlFor={p.file.name+"timeLimit"}><input type="checkbox" name={p.file.name+"timeLimit"} id={p.file.name+"timeLimit"} onChange={()=>{setIsLimiting(lim=>!lim)}} checked={isLimiting}/> Limit Time</label>
+                        {isLimiting && <label className="checkLabel"><input type="number" min={1} max={600} value={String(p.timeLimit)} onChange={handleTimeLimitChange}/> Seconds</label> }
                     </div>
                 </div>
-            :   <div className="imageUploadButton" onClick={()=>{inputRef.current?.click()}}>
-                    <i className="fa-solid fa-file-arrow-up"></i>
-                    <input type="file" accept="image/*" id="imageUploader" ref={inputRef} onChange={handleUpload} hidden/>
-                </div>
+            :   <PromptUploadButton onClick={handleUpload} acceptTypes="image/*" divClass="imageUploadButton" inputID="imageUploader"/>   
     )
 }
