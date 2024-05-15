@@ -1,22 +1,37 @@
-import { ChangeEvent, useEffect } from "react"
-import { Response } from "../../types"
+import { ChangeEvent, useEffect, useState } from "react"
 
 type ChoiceResponseProps = {
-    response: Response,
     index: number,
     update: (opts: string[], correct: string | undefined)=>void
 }
 
-export default function ChoiceResponse({response, index, update}: ChoiceResponseProps) {
+export default function ChoiceResponse({index, update}: ChoiceResponseProps) {
+
+    const [correct, setCorrect] = useState<number>(0);
+    const [options, setOptions] = useState<string[]>(["", "", "", ""])
+    const [debounce, setDebounce] = useState<number | undefined>()
 
     useEffect(()=>{
-        update(["", "", "", ""], "0")
+        if (debounce) {
+            clearTimeout(debounce)
+        }
+        const delay = setTimeout(()=>{
+            update(options, String(correct));
+            setDebounce(undefined)
+        }, 2000)
+
+        setDebounce(delay)
+
+    }, [correct, options])
+
+    useEffect(()=>{
+        update(options, String(correct))
     }, [])
 
     const handleRadioChange = (e:ChangeEvent<HTMLInputElement>, i: number) => {
         if (e.target.checked) {
             console.log(i+" is checked")
-            update(response.options!, String(i))
+            setCorrect(i)
         } else {
             console.log(i+" is not checked")
         }
@@ -24,9 +39,11 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
     }
 
     const handleOptionChange = (e:ChangeEvent<HTMLInputElement>, index: number) => {
-        const opts = [...response.options!];
-        opts[index] = e.target.value;
-        update(opts, response.correct);
+        setOptions(prevOpts => {
+            const newOpts = [...prevOpts];
+            newOpts[index] = e.target.value;
+            return newOpts;
+        })
     }
 
     return (
@@ -46,7 +63,7 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
                     type="radio" 
                     name={"radio"+index} 
                     id={"radio"+index+"-1"} 
-                    checked={response.correct == "0"}
+                    checked={correct == 0}
                     onChange={(e)=>{handleRadioChange(e, 0)}}
                     hidden
                     />
@@ -67,7 +84,7 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
                         type="radio"
                         name={"radio"+index}
                         id={"radio"+index+"-2"}
-                        checked={response.correct == "1"}
+                        checked={correct == 1}
                         onChange={(e)=>{handleRadioChange(e, 1)}}
                         hidden
                     />
@@ -88,7 +105,7 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
                         type="radio"
                         name={"radio"+index}
                         id={"radio"+index+'-3'}
-                        checked={response.correct == "2"}
+                        checked={correct == 2}
                         onChange={(e)=>{handleRadioChange(e, 2)}}
                         hidden/>
                 </label>
@@ -108,7 +125,7 @@ export default function ChoiceResponse({response, index, update}: ChoiceResponse
                         type="radio" 
                         name={"radio"+index} 
                         id={"radio"+index+"-4"}  
-                        checked={response.correct == "3"}
+                        checked={correct == 3}
                         onChange={(e)=>{handleRadioChange(e, 3)}}
                         hidden
                         />

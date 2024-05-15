@@ -1,12 +1,12 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 
 type SubmissionDialogProps = {
-    getForm: (formData: FormData) => void,
+    submitQuiz: (formData: FormData) => void,
     closeForm: ()=>void
     setRender: (x: boolean)=>void
 }
 
-export default function SubmissionDialog({getForm, closeForm}: SubmissionDialogProps) {
+export default function SubmissionDialog({submitQuiz, closeForm}: SubmissionDialogProps) {
 
     const modal = useRef<HTMLDialogElement>(null)
     const [validPass, setValidPass] = useState(false)
@@ -30,7 +30,7 @@ export default function SubmissionDialog({getForm, closeForm}: SubmissionDialogP
       fData.append("password", passRef.current!.value)
       fData.append("timeLimit", timeRef.current!.value)
 
-        getForm(fData);
+        submitQuiz(fData);
         modal.current?.close();
         formRef.current?.reset();
     }

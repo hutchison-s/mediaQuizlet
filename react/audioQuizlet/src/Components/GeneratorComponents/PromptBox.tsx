@@ -1,10 +1,7 @@
-import { useEffect, useState } from "react";
 import { useItems } from "../../Context/ItemsContext";
 import { AudioPrompt, ImagePrompt, Prompt, generatorQuestion } from "../../types";
-import AudioPromptBox from "./AudioPromptBox";
-import TextPromptBox from "./TextPromptBox";
 import SelectPopUp from "../SelectPopUp";
-import ImagePromptBox from "./ImagePromptBox";
+import PromptContent from "./PromptContent";
 
 
 type PromptBoxProps = {
@@ -19,7 +16,6 @@ const list: JSX.Element[] = [<i className="fa-solid fa-font"></i>, <i className=
 
 export default function PromptBox({ item, itemIndex, promptIndex }: PromptBoxProps) {
     const { updateItems } = useItems();
-    const [element, setElement] = useState<JSX.Element | null>(null);
 
     const updatePrompt = (updatedPrompt: Prompt) => {
         const newItem = { ...item };
@@ -27,44 +23,15 @@ export default function PromptBox({ item, itemIndex, promptIndex }: PromptBoxPro
         updateItems(itemIndex, newItem);
     };
 
-    useEffect(() => {
-        const prompt = item.prompts[promptIndex];
-        let el: JSX.Element | null = null;
-
-        if (prompt.type === "Audio") {
-            el = (
-                <AudioPromptBox
-                    p={prompt as AudioPrompt}
-                    update={(newFile, isPausable, playLimit) => {
-                        const updatedPrompt: AudioPrompt = { ...prompt, file: newFile, isPausable, playLimit };
-                        updatePrompt(updatedPrompt);
-                    }}
-                />
-            );
-        } else if (prompt.type === "Text") {
-            el = (
-                <TextPromptBox
-                    value={prompt.instructions}
-                    update={(newString) => {
-                        const updatedPrompt: Prompt = { ...prompt, instructions: newString };
-                        updatePrompt(updatedPrompt);
-                    }}
-                />
-            );
-        } else if (prompt.type === "Image") {
-            el = (
-                <ImagePromptBox
-                    p={prompt as ImagePrompt}
-                    update={(newFile, timeLimit) => {
-                        const updatedPrompt: ImagePrompt = { ...prompt, file: newFile, timeLimit };
-                        updatePrompt(updatedPrompt);
-                    }}
-                />
-            );
+    const resetPrompt = ()=>{
+        if (item.prompts[promptIndex].type == "Text") {
+            updatePrompt({ file: null, type: "Text", instructions: "" });
+        } else if (item.prompts[promptIndex].type == "Audio") {
+            updatePrompt({ file: null, type: "Audio", instructions: "", isPausable: false, playLimit: 3 } as AudioPrompt);
+        } else {
+            updatePrompt({ file: null, type: "Image", instructions: "", timeLimit: null } as ImagePrompt);
         }
-
-        setElement(el);
-    }, [item, promptIndex]);
+    }
 
     const receiveIndex = (i: number) => {
         if (i === 0) {
@@ -84,10 +51,16 @@ export default function PromptBox({ item, itemIndex, promptIndex }: PromptBoxPro
 
     return (
         <div className="promptBox">
-            <SelectPopUp value={qTypeList.indexOf(item.prompts[promptIndex].type)} list={list} sendIndex={receiveIndex} />
-            {element}
+            <PromptContent p={item.prompts[promptIndex]} update={updatePrompt}/>
+            <div className="promptTools">
             <div className="deletePrompt" onClick={removePrompt}>
-                <i className="fa-solid fa-trash-can"></i>
+                    <i className="fa-solid fa-trash-can"></i>
+                </div>
+                {item.prompts[promptIndex].type !== "Text" && <button className="resetPrompt" onClick={resetPrompt}>
+                    <i className="fa-solid fa-rotate-left"></i>
+                </button>}
+                <SelectPopUp value={qTypeList.indexOf(item.prompts[promptIndex].type)} list={list} sendIndex={receiveIndex} />
+                
             </div>
         </div>
     );

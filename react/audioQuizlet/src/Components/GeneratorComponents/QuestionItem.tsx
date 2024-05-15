@@ -1,9 +1,8 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent } from "react";
 import { useItems } from "../../Context/ItemsContext";
 import { generatorQuestion, qType } from "../../types";
 import PromptBox from "./PromptBox";
-import TextResponse from "./TextResponse";
-import ChoiceResponse from "./ChoiceResponse";
+import ResponseBox from "./ResponseBox";
 
 type itemProps = {
     index: number,
@@ -13,7 +12,6 @@ type itemProps = {
 export default function QuestionItem({index, item}: itemProps) {
 
     const {swapPositions, updateItems, deleteItem, items} = useItems();
-    const [responseElement, setResponseElement] = useState<JSX.Element | undefined>();
 
     const addPrompt = ()=>{
         const newItem = {...item};
@@ -42,38 +40,11 @@ export default function QuestionItem({index, item}: itemProps) {
         swapPositions(index, index+1);
     }
 
-    useEffect(() => {
-        let el;
-        switch(item.response.type) {
-            case "SA":
-                el = <TextResponse response={item.response} update={(newString: string)=>{
-                    const newItem = {...item};
-                    newItem.response.correct = newString;
-                    updateItems(index, newItem);
-                }}/>;
-                break;
-            case "MC":
-                el = <ChoiceResponse response={item.response} index={index} update={(newOptions: string[], correct: string | undefined)=>{
-                    const newItem = {...item};
-                    newItem.response.options = newOptions;
-                    newItem.response.correct = correct;
-                    updateItems(index, newItem);
-                }}/>
-                break;
-            case "IMG":
-                el = <div>Image Upload <i className="fa-solid fa-camera"></i></div>;
-                break;
-            default:
-                el = <div>Audio Upload <i className="fa-solid fa-circle-play"></i></div>;
-        }
-        setResponseElement(el)
-    }, [item])
-
     return (
         <div className="itemFrame">
-            <div className="itemBox softCorner flex vertical pad2 shadow">
+            <div className="itemBox softCorner flex vertical shadow">
+            <h3>Question {index+1}</h3>
                 <div className="itemHeader">
-                    <div className="responseSelectFrame">
                         <select className="responseSelect" value={item.response.type} onChange={changeType}>
                             <option value="SA">Short Answer</option>
                             <option value="MC">Multiple Choice</option>
@@ -91,16 +62,14 @@ export default function QuestionItem({index, item}: itemProps) {
                                 value={item.pointValue}
                                 onChange={changePoints}
                                 required/>
-                        </label>
-                    </div>
-                    <h3>Question {index+1}</h3>
+                        </label>  
                     <button className="deleteItemButton" onClick={()=>{deleteItem(index)}}>Delete</button>
                 </div>
                 <h4 className="itemSectionHeader">Prompts</h4>
                 {item.prompts.map((p, i)=><PromptBox key={"item"+i+item.response.type} item={item} itemIndex={index} promptIndex={i}/>)}
                 <p><span onClick={addPrompt} className="newPromptButton"><i className="fa-solid fa-circle-plus"></i> Add Prompt</span></p>
                 <h4 className="itemSectionHeader">Response</h4>
-                {responseElement}
+                <ResponseBox t={item.response.type} i={index} />
                 <div className="itemFooter">
                     {index > 0 ? <button onClick={moveBack}><i className="fa-solid fa-arrow-left"></i></button> : <span></span>}
                     {items.length > 1 && <span> Move Question </span>}

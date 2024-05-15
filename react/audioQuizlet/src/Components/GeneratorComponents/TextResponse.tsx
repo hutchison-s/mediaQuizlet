@@ -1,20 +1,35 @@
-import { Response } from "../../types"
+import { useEffect, useState } from "react"
 
 type TextResponseProps = {
-    response: Response,
     update: (s: string)=>void
 }
 
-export default function TextResponse({response, update}: TextResponseProps) {
+export default function TextResponse({update}: TextResponseProps) {
+
+    const [answer, setAnswer] = useState("");
+    const [debounce, setDebounce] = useState<number | undefined>()
+
+    useEffect(()=>{
+        if (debounce) {
+            clearTimeout(debounce)
+        }
+        const delay = setTimeout(()=>{
+            update(answer);
+            setDebounce(undefined)
+        }, 2000)
+
+        setDebounce(delay)
+
+    }, [answer])
 
     return (
         <input
             className="shortAnswer" 
             type="text" 
             placeholder="Correct Answer..." 
-            value={response.correct || ""}
+            value={answer}
             required 
-            onChange={(e)=>{update(e.target.value)}}
+            onChange={(e)=>{setAnswer(e.target.value)}}
         />
     )
 }

@@ -41,6 +41,8 @@ export default function SideBar() {
     }
 
     const checkRequiredInputs = (): boolean => {
+
+        // reset formatting
         const inputs: HTMLInputElement[] = Array.from(document.querySelectorAll("input:required"));
         inputs.forEach(i=>{
             if (i.type == 'file') {
@@ -51,25 +53,28 @@ export default function SideBar() {
                 i.placeholder = ""
             }
         })
+
+        // Check each item for missing required fields and focus on them if empty
+        
         const frames: HTMLDivElement[] = Array.from(document.querySelectorAll(".itemFrame"));
         
-      for (let i = 0; i < frames.length; i++) {
-        const reqs: HTMLInputElement[] = Array.from(frames[i].querySelectorAll("input:required"))
-        const empty = reqs.filter((x: HTMLInputElement) => x.value == "");
-        if (empty.length != 0) {
-            setActive(i)
-            empty[0].focus()
-            if (empty[0].type == 'file') {
-                const parent = empty[0].parentNode as HTMLDivElement
-                parent.style.outline = "2px dotted red";
-            } else {
-                empty[0].style.outline = "2px dotted red";
-                empty[0].placeholder = "Required";
+        for (let i = 0; i < frames.length; i++) {
+            const reqs: HTMLInputElement[] = Array.from(frames[i].querySelectorAll("input:required"))
+            const empty = reqs.filter((x: HTMLInputElement) => x.value == "");
+            if (empty.length != 0) {
+                setActive(i)
+                empty[0].focus()
+                if (empty[0].type == 'file') {
+                    const parent = empty[0].parentNode as HTMLDivElement
+                    parent.style.outline = "2px dotted red";
+                } else {
+                    empty[0].style.outline = "2px dotted red";
+                    empty[0].placeholder = "Required";
+                }
+                return false;
             }
-            return false;
         }
-      }
-      return true;
+        return true;
     }
 
     async function processQuestions() {
@@ -97,7 +102,7 @@ export default function SideBar() {
         return [updatedQuestions, associatedFiles]
     }
 
-    const getForm = async (subData: FormData) => {
+    const submitQuiz = async (subData: FormData) => {
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear()+1);
         const pass = subData.get("password");
@@ -134,7 +139,7 @@ export default function SideBar() {
             <ItemSummary />
             {items.length > 0 && <button id="generateLink" className="primaryBtn softCorner shadow" onClick={generate}>Generate Quizlet Link</button>}
             <FileUploader handleFiles={handleFiles} />
-            {isFinished && <SubmissionDialog setRender={setIsFinished} closeForm={()=>{setIsFinished(false)}} getForm={getForm}/>}
+            {isFinished && <SubmissionDialog setRender={setIsFinished} closeForm={()=>{setIsFinished(false)}} submitQuiz={submitQuiz}/>}
         </aside>
     )
 }
