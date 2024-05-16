@@ -1,8 +1,8 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { questionObject } from "../../types";
+import { quizzerQuestion } from "../../types";
 
 interface MCQProps {
-    question: questionObject,
+    question: quizzerQuestion,
     setAnswer: (a: string) => void,
 }
 
@@ -12,7 +12,7 @@ interface OptionType {
 }
 export default function MCQ({question, setAnswer}: MCQProps) {
 
-    const options = question.options!;
+    const options = question.response.options!;
     const [selected, setSelected] = useState(0);
 
     useEffect(()=>{
@@ -33,7 +33,7 @@ export default function MCQ({question, setAnswer}: MCQProps) {
                         type="radio" 
                         value={idx} 
                         onChange={handleChange}
-                        name={question.title}
+                        name={question.response.type+String(idx)}
                         checked={selected === idx}
                     />
                 </label>

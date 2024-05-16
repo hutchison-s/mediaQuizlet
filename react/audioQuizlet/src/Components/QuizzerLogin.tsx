@@ -1,18 +1,17 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react"
 import { useNavigate } from "react-router-dom";
+import { useQuiz } from "../Context/QuizContext";
 
 interface QuizzerLoginProps {
     setUser: (u: string) => void,
-    limit: string | null,
-    qNumber: number,
-    quizId: string
 }
 
-export default function QuizzerLogin({setUser, limit, qNumber, quizId}: QuizzerLoginProps) {
+export default function QuizzerLogin({setUser}: QuizzerLoginProps) {
 
     const [name, setName] = useState("");
     const navigate = useNavigate();
     const modalRef = useRef<HTMLDialogElement>(null)
+    const {timeLimit, questions, quizId} = useQuiz();
 
     useEffect(()=>{
         let modal = null;
@@ -50,8 +49,7 @@ export default function QuizzerLogin({setUser, limit, qNumber, quizId}: QuizzerL
         
           <p>Please enter your name to begin the quiz.</p>
           <p>
-            You will have {limit ? `${limit} minute${parseInt(limit) > 1 ? "s" : ""}` : "unlimited time"} to complete the
-            {qNumber} question{qNumber > 1 ? "s" : ""}.
+            {`You will have ${timeLimit ? `${timeLimit} minute${parseInt(timeLimit) > 1 ? "s" : ""}` : "untimeLimited time"} to complete the ${questions.length+" "} question${questions.length > 1 ? "s" : ""}`}
           </p>
         </div>
         <input type="text" id="nameInput" className="softCorner" placeholder="Your name..." onInput={handleInput}/>

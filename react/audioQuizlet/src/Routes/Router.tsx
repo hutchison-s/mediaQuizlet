@@ -5,6 +5,7 @@ import Generator from "../Pages/Generator";
 import Quizzer from "../Pages/Quizzer";
 import Viewer from "../Pages/Viewer";
 import Lookup from "../Pages/LookUp";
+import Success from "../Pages/Success";
 
 export default function ReactRoutes() {
 
@@ -28,7 +29,8 @@ export default function ReactRoutes() {
                         <Route path=":quizId" element={<Quizzer />}/>
                     </Route>
                     <Route path="viewer" element={<Viewer />}/> 
-                    <Route path="lookup" element={<Lookup />}/> 
+                    <Route path="lookup" element={<Lookup />}/>
+                    <Route path="success" element={<Success />} />
                 </Route>
                 <Route path="/generator" element={<Generator />}/> 
             </Routes>

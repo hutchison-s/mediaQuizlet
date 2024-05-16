@@ -1,40 +1,30 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom"
-import { AnswerObject, IndexArray, quizObject } from "../types";
+import { AnswerObject, IndexArray } from "../types";
 import "./Quizzer.css";
 import { resizeAndCompress } from "../Functions/utility/utilFunctions";
 import Timer from "../Components/Timer";
 import Quiz from "../Components/Quiz";
 import QuizzerLogin from "../Components/QuizzerLogin";
+import { useQuiz } from "../Context/QuizContext";
+import { useNavigate } from "react-router-dom";
+import QuizProvider from "../Context/QuizProvider";
 
 
 
 export default function Quizzer() {
 
-    const { quizId } = useParams();
-    const [quiz, setQuiz] = useState<quizObject | null>(null);
+    const quiz = useQuiz();
     const [user, setUser] = useState<string>("");
     const [responseId, setResponseId] = useState<string>("");
     const [timeStarted, setTimeStarted] = useState<number | null>(null)
-    const [isLoading, setIsLoading] = useState(true);
-    const [isSubmitted, setIsSubmitted] = useState(false);
     const [answers, setAnswers] = useState<IndexArray<AnswerObject>>({})
 
-    
-    useEffect(()=>{
-        axios.get("http://localhost:8000/api/quizzes/"+quizId)
-            .then(res => {
-                if (res.status === 200) {
-                    setQuiz(res.data)
-                    setIsLoading(false);
-                }
-            })
-    }, [quizId])
+    const navigate = useNavigate()
 
     useEffect(()=>{
         if (user) {
-            axios.post(`http://localhost:8000/api/quizzes/${quizId}/responses`,
+            axios.post(`http://localhost:8000/api/quizzes/${quiz.quizId}/responses`,
             {user: user, timeStarted: Date.now()}
         )
             .then(res => {
@@ -45,14 +35,14 @@ export default function Quizzer() {
             })
         }
         
-    }, [user])
+    }, [user, quiz])
 
     async function uploadImages() {
         const associatedFiles: string[] = [];
         const answers: string[] = [];
         if (quiz && quiz.questions) {
             for (const [idx, q] of quiz.questions.entries()) {
-                if (q.type == "photoUpload") {
+                if (q.response.type == "IMG") {
                     const photo = answers[idx]
                     if (photo) {
                         console.log(photo)
@@ -95,28 +85,27 @@ export default function Quizzer() {
                 associatedFiles: associatedFiles,
                 timeSubmitted: Date.now()
             }
-            axios.patch(`http://localhost:8000/api/quizzes/${quizId}/responses/${responseId}`, newResponse)
+            axios.patch(`http://localhost:8000/api/quizzes/${quiz.quizId}/responses/${responseId}`, newResponse)
                 .then(res => {
                     if (res.status === 200) {
-                        setIsSubmitted(true)
-                        setQuiz(null)
+                        navigate("/success")
                     }
                 })
         }
     }
 
     return (
-        <div className="flex vertical even">
-            {isLoading && <h2>Loading Quiz...</h2>}
-            {!isLoading && !user && quiz && <QuizzerLogin setUser={setUser} limit={quiz.timeLimit} qNumber={quiz.questions.length} quizId={quizId!}/>}
-            {user && quiz
-                ?   <>
-                        {quiz.timeLimit && timeStarted && <Timer limit={parseInt(quiz.timeLimit)} timeStarted={timeStarted}/>}
-                        <Quiz quiz={quiz} setAnswers={setAnswers} handleSubmit={submitResponse} />
-                    </>
-                :   isSubmitted
-                        ?   <h2>Submitted</h2>
-                        :   <h2>Quiz Loading Error</h2>}
-        </div>
+        <QuizProvider>
+            <div className="flex vertical even">
+                {user
+                    ?   <>
+                            {timeStarted && <Timer timeStarted={timeStarted}/>}
+                            <Quiz setAnswers={setAnswers} handleSubmit={submitResponse} />
+                        </>
+                    :   <QuizzerLogin setUser={setUser} />
+                }
+
+            </div>
+        </QuizProvider>
     )
 }

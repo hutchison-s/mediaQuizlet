@@ -3,7 +3,7 @@ import { getAudioFile } from '../Functions/apiCalls/audio';
 
 interface playerProps {
     file: string,
-    limit: number,
+    limit: number | null | undefined,
     allowPause: boolean
 }
 
@@ -80,8 +80,8 @@ export default function LimitedPlayer({file, limit, allowPause}: playerProps) {
             }
         </button>
         </div>
-        <p className="remaining">{remaining} remaining plays</p>
-        
+        {remaining ? <p className="remaining">{remaining} remaining plays</p> : <p className='remaining'>Unlimited Plays</p>}
+        <p style={{textAlign: "center", marginBottom: "1rem"}}><small>{`Pausing ${allowPause ? "en" : "dis"}abled`}</small></p>
         <audio 
             ref={audioRef}
             onPlay={() => {
@@ -89,11 +89,16 @@ export default function LimitedPlayer({file, limit, allowPause}: playerProps) {
             }}
             onPause={() => {
                 setIsPlaying(false)
-                !allowPause && setRemaining((prevRemaining) => prevRemaining - 1);
+                if (remaining) {
+                    setRemaining((prevRemaining) => prevRemaining! - 1);
+                }
             }}
             onEnded={()=>{
                 setIsPlaying(false);
-                setRemaining((prevRemaining) => prevRemaining - 1);
+                if (remaining) {
+                    setRemaining((prevRemaining) => prevRemaining! - 1);
+                }
+                
             }}
             onTimeUpdate={()=>{
                 setProgress((audioRef.current.currentTime / audioRef.current.duration * 100))

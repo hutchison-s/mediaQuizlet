@@ -1,10 +1,11 @@
 import { ChangeEvent, useEffect, useState } from "react";
 
-interface IMGQProps {
+interface FileQProps {
+    accept: string,
     setAnswer: (a: string) => void,
 }
 
-export default function IMGQ({setAnswer}: IMGQProps) {
+export default function FileQ({accept, setAnswer}: FileQProps) {
     
     const [response, setResponse] = useState<File | null>(null);
     const [uploadedURL, setUploadedURL] = useState<string>("");
@@ -26,16 +27,21 @@ export default function IMGQ({setAnswer}: IMGQProps) {
     }
 
     return (
-        <label>
-            <span className="flexFull">Upload your photo: </span>
-            <input 
+        <label style={{textAlign: "center"}}>
+            <span className="flexFull">Upload your {accept.split("/")[0]}: </span>
+            <input
                 required 
                 type="file"
-                accept="image/*" 
+                accept={accept} 
                 onInput={handleChange}
             />
             
-            {response && <img src={uploadedURL} width="200px" style={{margin: "0.5rem auto"}}></img>}
+            {response
+                ?   accept == "image/*"
+                        ?   <img src={uploadedURL} width="200px" style={{margin: "0.5rem auto"}}></img>
+                        :   <audio src={uploadedURL} controls />
+                :   null
+            }
         </label>
     )
 }

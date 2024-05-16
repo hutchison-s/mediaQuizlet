@@ -1,16 +1,19 @@
-import { AnswerObject, IndexArray, questionObject, quizObject } from "../types";
+import { useQuiz } from "../Context/QuizContext";
+import { AnswerObject, IndexArray, quizzerQuestion } from "../types";
 import Question from "./Question/QuestionFrame";
 
 interface QuizProps {
-    quiz: quizObject,
     setAnswers: (x: (y: IndexArray<AnswerObject>)=>IndexArray<AnswerObject>) => void,
     handleSubmit: () => void;
 }
 
-export default function Quiz({quiz, setAnswers, handleSubmit}: QuizProps) {
+export default function Quiz({setAnswers, handleSubmit}: QuizProps) {
+
+    const quiz = useQuiz();
+
     return (
         <section id="quizBox" className="flex vertical">
-            {quiz.questions.map((q: questionObject, index: number) => <Question key={q.title+q.file} index={index} question={q} updater={setAnswers}/>)}
+            {quiz.questions.map((q: quizzerQuestion, index: number) => <Question key={q.response.type+index} index={index} question={q} updater={setAnswers}/>)}
             <button 
                 id="submitAll"
                 className="primaryBtn marginCenter softCorner"

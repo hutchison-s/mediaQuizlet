@@ -1,14 +1,16 @@
 import { useEffect, useState } from "react";
+import { useQuiz } from "../Context/QuizContext";
 
 interface TimerProps {
-    limit: number,
     timeStarted: number
 }
-export default function Timer({limit, timeStarted}: TimerProps) {
+export default function Timer({timeStarted}: TimerProps) {
 
-    const [remaining, setRemaining] = useState<number>(limit * 60);
+    const {timeLimit} = useQuiz();
+    const [remaining, setRemaining] = useState<number>(60);
 
     useEffect(() => {
+        const limit = parseInt(timeLimit)
         // Calculate deadline in milliseconds
         const deadline = (limit * 60 * 1000) + timeStarted;
         const timerInterval = setInterval(() => {
@@ -25,7 +27,7 @@ export default function Timer({limit, timeStarted}: TimerProps) {
         // Clean up the interval on component unmount
         return () => clearInterval(timerInterval);
         
-    }, [limit, timeStarted]); 
+    }, [timeLimit, timeStarted]); 
 
     // Format remaining time as minutes and seconds
     const minutes = Math.floor(remaining / 60);

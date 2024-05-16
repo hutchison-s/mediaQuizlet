@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
-import { AnswerObject, IndexArray, questionObject } from "../../types";
-import LimitedPlayer from "../LimitedPlayer";
+import { AnswerObject, IndexArray, qType, quizzerQuestion } from "../../types";
 import MCQ from "./MCQ";
 import SAQ from "./SAQ"
-import IMGQ from "./IMGQ";
+import QuizPrompt from "./QuizPrompt";
+import FileQ from "./FileQ";
 
 interface QuestionProps {
-    question: questionObject,
+    question: quizzerQuestion,
     index: number,
     updater: (a: (x: IndexArray<AnswerObject>) => IndexArray<AnswerObject>) => void
 }
@@ -14,6 +14,7 @@ interface QuestionProps {
 export default function Question({question, index, updater} : QuestionProps) {
 
     const [answer, setAnswer] = useState<string>("");
+
 
     useEffect(()=>{
         if (answer) {
@@ -26,14 +27,16 @@ export default function Question({question, index, updater} : QuestionProps) {
         
     }, [answer, index, updater])
 
-    function createQuestion(qType: string) {
+    function createQuestion(qType: qType) {
         switch(qType) {
-            case "multipleChoice":
+            case "MC":
                 return <MCQ question={question} setAnswer={setAnswer}/>
-            case "shortAnswer":
+            case "SA":
                 return <SAQ setAnswer={setAnswer}/>
-            case "photoUpload":
-                return <IMGQ setAnswer={setAnswer}/>
+            case "IMG":
+                return <FileQ accept="image/*" setAnswer={setAnswer}/>
+            case "AUD":
+                return <FileQ accept="audio/*" setAnswer={setAnswer}/>
             default:
                 return <div>Not a Valid Question Type</div>
         }
@@ -42,14 +45,12 @@ export default function Question({question, index, updater} : QuestionProps) {
 
     return (
         <>
-            <LimitedPlayer 
-                limit={typeof question.limit === "number" ? question.limit : parseInt(question.limit)} 
-                file={question.file}
-                allowPause={false}/>
+            <h3 style={{marginTop: "1rem"}}>Question {index+1}</h3>
+            <p style={{marginBottom: "1rem"}}><small>{question.pointValue} point{question.pointValue > 1 ? "s" : ""}</small></p>
+            {question.prompts.map((prompt, idx) => <QuizPrompt p={prompt} key={prompt.type+prompt.instructions+String(idx)} />)}
             <div className="questionForm">
-                <h2>{question.title}</h2>
-                <p><small>{question.pointsValue}</small></p>
-                {createQuestion(question.type)}
+                
+                {createQuestion(question.response.type)}
             </div>
         </>
     )

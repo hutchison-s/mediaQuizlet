@@ -7,7 +7,6 @@ export type questionObject = {
     pointsValue: string | number,
     options?: string[]
 }
-
 export type quizObject = {
     URL: string,
     admin: string,
@@ -46,7 +45,7 @@ export interface ImagePrompt extends Prompt {
 export interface Response {
     correct?: string,
     options?: string[],
-    type: "MC" | "SA" | "IMG" | "AUD",
+    type: qType,
 }
 
 export type generatorQuestion = {
@@ -56,3 +55,33 @@ export type generatorQuestion = {
 }
 export type qType = "MC" | "SA" | "IMG" | "AUD";
 export type pType = "Audio" | "Image" | "Text";
+
+export type quizzerPrompt = {
+    type: pType, 
+    filePath: string, 
+    instructions: string, 
+    timeLimit?: number | null
+    playLimit?: number | null
+}
+export type quizzerQuestion = {
+    pointValue: number,
+    response: {type: qType, options?: string[]},
+    prompts: quizzerPrompt[],
+}
+export type quizzerObject = {
+    timeLimit: string,
+    questions: quizzerQuestion[],
+    admin: string,
+    status: "open" | "closed",
+    quizId: string,
+    URL: string
+}
+
+export type userResponse = {
+    quizId: string,
+    responseId: string,
+    timeStarted: string,
+    answers?: AnswerObject[],
+    associatedFiles?: string[],
+    timeSubmitted?: string
+}
