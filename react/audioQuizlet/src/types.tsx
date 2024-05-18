@@ -53,7 +53,7 @@ export type generatorQuestion = {
     response: Response,
     pointValue: number
 }
-export type qType = "MC" | "SA" | "IMG" | "AUD";
+export type qType = "MC" | "SA" | "IMG" | "AUD" | "REC";
 export type pType = "Audio" | "Image" | "Text";
 
 export type quizzerPrompt = {

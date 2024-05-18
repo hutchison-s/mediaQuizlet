@@ -67,6 +67,9 @@ ul {
 .block {
   display: block;
 }
+.gapSmall {
+  gap: 0.25rem;
+}
 
 .textInputWrapper {
   position: relative;

@@ -9,6 +9,7 @@ export function ItemsProvider({children}: PropsWithChildren) {
     const [active, setActive] = useState(0)
 
     const addItem = (t: qType) => {
+        console.log("adding...");
         setItems(prevItems => {
             const newItem: generatorQuestion = {
             prompts: [],
@@ -21,7 +22,23 @@ export function ItemsProvider({children}: PropsWithChildren) {
         })
     }
 
+    const duplicateItem = (index: number)=>{
+        console.log("duplicating...");
+        
+        setItems(prevItems => {
+            const newItems = [...prevItems];
+            const toCopy = newItems[index];
+            const copy = deepCopy<generatorQuestion>(toCopy);
+            console.log("copied item",copy)
+            newItems.splice(index+1, 0, copy);
+            console.log("new items list", newItems)
+            setActive(index+1);
+            return newItems;
+        })
+    }
+
     const bulkAdd = (questions: generatorQuestion[]) => {
+        console.log("bulk adding...")
         setItems(prevItems => {
             const newItems = [...prevItems, ...questions];
             setActive(newItems.length - 1)
@@ -34,12 +51,14 @@ export function ItemsProvider({children}: PropsWithChildren) {
             console.log("Error: Invalid indeces passed: ", xIndex, yIndex);
             return;
         }
+        console.log("shifting...");
+        
         setItems(prevItems => {
-        const newItems = [...prevItems];
-        const x = newItems.splice(xIndex, 1)[0];
-        newItems.splice(yIndex, 0, x);
-        setActive(yIndex);
-        return newItems;
+            const newItems = [...prevItems];
+            const x = deepCopy(newItems.splice(xIndex, 1)[0]);
+            newItems.splice(yIndex, 0, x);
+            setActive(yIndex);
+            return newItems;
         })
     }
 
@@ -48,6 +67,8 @@ export function ItemsProvider({children}: PropsWithChildren) {
             console.log("Error: Invalid indeces passed: ", xIndex, yIndex);
             return;
         }
+        console.log("swapping...");
+        
         setItems(prevItems => {
             const newItems = [...prevItems];
             const x = newItems[xIndex];
@@ -62,6 +83,8 @@ export function ItemsProvider({children}: PropsWithChildren) {
         if (index < 0 || index >= items.length) {
             return;
         }
+        console.log("deleting...");
+        
         setItems(prevItems=>{
             const oldItems = [...prevItems];
             oldItems.splice(index, 1);
@@ -72,6 +95,8 @@ export function ItemsProvider({children}: PropsWithChildren) {
     }
 
     const clearItems = ()=>{
+        console.log("clearing...");
+        
         setItems([]);
         setActive(0);
     }
@@ -81,15 +106,65 @@ export function ItemsProvider({children}: PropsWithChildren) {
             console.error("Invalid index for updateItems");
             return;
         }
+        console.log("updating...");
+        console.trace()
+        
         setItems(prevItems => {
-            const oldItems = [...prevItems];
-            oldItems.splice(index, 1, item);
-            return oldItems;
+            const updatedItems = [...prevItems];
+            updatedItems.splice(index, 1, item);
+            return updatedItems;
         });
     }
 
+    function deepCopy<T>(obj: T): T {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+    
+        // Handle Date
+        if (obj instanceof Date) {
+            return new Date(obj.getTime()) as unknown as T;
+        }
+    
+        // Handle Array
+        if (Array.isArray(obj)) {
+            return obj.map((item) => deepCopy(item)) as unknown as T;
+        }
+    
+        // Handle File
+        if (obj instanceof File) {
+            return new File([obj], obj.name, { type: obj.type, lastModified: obj.lastModified }) as unknown as T;
+        }
+    
+        // Handle Object
+        const copiedObj: { [key: string]: unknown } = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                copiedObj[key] = deepCopy((obj as { [key: string]: unknown })[key]);
+            }
+        }
+        return copiedObj as T;
+    }
+    
+    
+      
+
     return (
-        <ItemsContext.Provider value={{items, addItem, bulkAdd, shiftItems, swapPositions, deleteItem, clearItems, updateItems, active, setActive}}>
+        <ItemsContext.Provider 
+            value={{
+                items,
+                addItem,
+                duplicateItem, 
+                bulkAdd, 
+                shiftItems, 
+                swapPositions, 
+                deleteItem, 
+                clearItems, 
+                updateItems, 
+                active, 
+                setActive
+            }}
+        >
             {children}
         </ItemsContext.Provider>
     )

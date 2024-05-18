@@ -89,7 +89,7 @@ export default function LimitedPlayer({file, limit, allowPause}: playerProps) {
             }}
             onPause={() => {
                 setIsPlaying(false)
-                if (remaining) {
+                if (remaining && !allowPause) {
                     setRemaining((prevRemaining) => prevRemaining! - 1);
                 }
             }}

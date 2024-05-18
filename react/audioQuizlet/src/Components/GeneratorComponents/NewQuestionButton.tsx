@@ -31,8 +31,9 @@ export default function NewQuestionButton({onClick}: NewQuestionButtonProps) {
             {isOpen && <div id="newQuestionType">
                 <span onClick={()=>{onClick("MC")}}>Multiple Choice</span>
                 <span onClick={()=>{onClick("SA")}}>Short Answer</span>
-                <span onClick={()=>{onClick("IMG")}}>Image Response</span>
-                <span onClick={()=>{onClick("AUD")}}>Audio Response</span>
+                <span onClick={()=>{onClick("IMG")}}>Image Upload</span>
+                <span onClick={()=>{onClick("AUD")}}>Audio Upload</span>
+                <span onClick={()=>{onClick("REC")}}>Audio Recording</span>
             </div>}
         </button>
     )

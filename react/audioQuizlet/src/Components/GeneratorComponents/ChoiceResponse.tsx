@@ -1,4 +1,5 @@
 import { ChangeEvent, useEffect, useState } from "react"
+import { useItems } from "../../Context/ItemsContext";
 
 type ChoiceResponseProps = {
     index: number,
@@ -7,6 +8,7 @@ type ChoiceResponseProps = {
 
 export default function ChoiceResponse({index, update}: ChoiceResponseProps) {
 
+    const {items} = useItems();
     const [correct, setCorrect] = useState<number>(0);
     const [options, setOptions] = useState<string[]>(["", "", "", ""])
     const [debounce, setDebounce] = useState<number | undefined>()
@@ -25,8 +27,19 @@ export default function ChoiceResponse({index, update}: ChoiceResponseProps) {
     }, [correct, options])
 
     useEffect(()=>{
-        update(options, String(correct))
-    }, [])
+        const initialOptions = items[index].response.options;
+        const initialCorrect = items[index].response.correct;
+        if (initialOptions) {
+            setOptions(prev => {
+                prev.length = 0;
+                const newOpts = [...initialOptions];
+                return newOpts
+            });
+        }
+        if (initialCorrect) {
+            setCorrect(parseInt(initialCorrect));
+        }
+    }, [index])
 
     const handleRadioChange = (e:ChangeEvent<HTMLInputElement>, i: number) => {
         if (e.target.checked) {
@@ -55,6 +68,7 @@ export default function ChoiceResponse({index, update}: ChoiceResponseProps) {
                     id={"option"+index+"-1"} 
                     placeholder="Option 1..."
                     required 
+                    value={options[0]}
                     onChange={(e)=>{handleOptionChange(e, 0)}}
                     />
                 <label htmlFor={"radio"+index+"-1"}>
@@ -76,6 +90,7 @@ export default function ChoiceResponse({index, update}: ChoiceResponseProps) {
                     id={"option"+index+"-2"} 
                     placeholder="Option 2..."
                     required 
+                    value={options[1]}
                     onChange={(e)=>{handleOptionChange(e, 1)}}
                     />
                 <label htmlFor={"radio"+index+"-2"}>
@@ -97,6 +112,7 @@ export default function ChoiceResponse({index, update}: ChoiceResponseProps) {
                     id={"option"+index+"-3"} 
                     placeholder="Option 3..."
                     required 
+                    value={options[2]}
                     onChange={(e)=>{handleOptionChange(e, 2)}}
                     />
                 <label htmlFor={"radio"+index+"-3"}>
@@ -117,6 +133,7 @@ export default function ChoiceResponse({index, update}: ChoiceResponseProps) {
                     id={"option"+index+"-4"} 
                     placeholder="Option 4..."
                     required 
+                    value={options[3]}
                     onChange={(e)=>{handleOptionChange(e, 3)}}
                     />
                 <label htmlFor={"radio"+index+"-4"}>

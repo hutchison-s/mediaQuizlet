@@ -90,6 +90,7 @@
   right: 0;
   top: 0;
   width: 30%;
+  object-position: center;
 }
 .deleteAllItems {
   padding: 0.5rem;

@@ -30,13 +30,13 @@ export default function AudioPromptBox({p, update}: AudioPromptProps) {
     }
 
     useEffect(()=>{
-        
-    })
-
-    useEffect(()=>{
         if (p.file) {
             const objectURL = window.URL.createObjectURL(p.file);
             setUrl(objectURL);
+        } else {
+            setUrl("")
+            chunksRef.current = [];
+            setRecorder(undefined);
         }
     }, [p])
 

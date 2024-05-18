@@ -4,6 +4,7 @@ import MCQ from "./MCQ";
 import SAQ from "./SAQ"
 import QuizPrompt from "./QuizPrompt";
 import FileQ from "./FileQ";
+import RECQ from "./RECQ";
 
 interface QuestionProps {
     question: quizzerQuestion,
@@ -37,6 +38,8 @@ export default function Question({question, index, updater} : QuestionProps) {
                 return <FileQ accept="image/*" setAnswer={setAnswer}/>
             case "AUD":
                 return <FileQ accept="audio/*" setAnswer={setAnswer}/>
+            case "REC":
+                return <RECQ setAnswer={setAnswer} />
             default:
                 return <div>Not a Valid Question Type</div>
         }

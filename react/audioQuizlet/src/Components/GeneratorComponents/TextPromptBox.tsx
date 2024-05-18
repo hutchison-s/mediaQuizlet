@@ -10,9 +10,6 @@ export default function TextPromptBox({p, update}: TextPromptProps) {
     const [debounce, setDebounce] = useState<number | undefined>()
 
     useEffect(()=>{
-        if (p.instructions == content) {
-            return;
-        }
         if (debounce) {
             clearTimeout(debounce)
         }
@@ -23,7 +20,18 @@ export default function TextPromptBox({p, update}: TextPromptProps) {
 
         setDebounce(delay)
 
-    }, [content, p])
+    }, [content])
+
+    useEffect(()=>{
+        if (p.instructions != "") {
+            setContent(p.instructions)
+        }
+    }, [])
+
+    useEffect(()=>{
+        setContent(p.instructions)
+    }, [p])
+
     return (
         <div className="textPrompt">
             <textarea

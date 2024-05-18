@@ -1,14 +1,18 @@
 import { DragEvent, useEffect, useState } from "react";
 import { useItems } from "../../Context/ItemsContext";
+import { generatorQuestion } from "../../types";
 
 type SideItemProps = {
-    index: number
+    item: generatorQuestion
+    index: number,
+    dragIndex: number | null,
+    targetIndex: number | null,
+    setDragIndex: (n: number | null)=>void,
+    setTargetIndex: (n: number | null)=>void
 }
-export default function SideItem({index}: SideItemProps) {
+export default function SideItem({index, item, dragIndex, targetIndex, setDragIndex, setTargetIndex}: SideItemProps) {
 
-    const {items, active, setActive, shiftItems } = useItems();
-    const [dragIndex, setDragIndex] = useState<number | null>(null);
-    const [targetIndex, setTargetIndex] = useState<number | null>(null);
+    const {active, setActive, shiftItems } = useItems();
     const [preview, setPreview] = useState<string | File | null>("")
 
     const onDragStart = (e:DragEvent<HTMLDivElement>, i: number) => {
@@ -36,47 +40,48 @@ export default function SideItem({index}: SideItemProps) {
         if (dragIndex != null && targetIndex != null) {
             console.log("swap")
             shiftItems(dragIndex, targetIndex);
+            setDragIndex(null);
+            setTargetIndex(null);
         }
         
     }
 
     const onDragEnd = ()=>{
+        console.log("reseting indeces");
+        
         setDragIndex(null);
         setTargetIndex(null);
     }
 
     useEffect(()=>{
-        const item = items[index]
+        let tempPrev: string | File | null = ""
+        
         if (item.prompts.length > 0) {
-            if (item.prompts[0].type == "Text") {
-                if (!preview || (typeof preview == 'string' && preview.substring(0, 8) != item.prompts[index].instructions.substring(0, 8))) {
-                    setPreview(item.prompts[0].instructions.substring(0, 8))
-                }
-            } else {
-                if (!preview || preview != item.prompts[0].file) {
-                    setPreview(item.prompts[0].file)
+            for (const p of item.prompts) {
+                if (p.type == "Image" && p.file != null) {
+                    tempPrev = p.file
+                    break;
+                } else if (p.type == "Text" && p.instructions) {
+                    tempPrev = p.instructions?.substring(0, 8);
+                    continue;
+                } else if (p.type == "Audio" && p.file != null) {
+                    tempPrev = p.file?.name?.substring(0, 8);
                 }
             }
+            setPreview(tempPrev);
         }
-    }, [items, preview, index])
+        
+    }, [item, index])
 
     const ItemPreview = () =>{
-        const p = items[index].prompts[0];
-
         if (!preview) {
             return <></>;
         }
         if (typeof preview == 'string') {
             return <span>{preview}{preview.length > 7 && "..."}</span>
-        } 
-        if (!p.file) {
-            return <></>
+        } else {
+            return <span><img src={window.URL.createObjectURL(preview)} /></span>
         }
-        if (p.type == "Image") {
-            return <span><img src={window.URL.createObjectURL(p.file)} /></span>
-        }
-
-        return <span>{p.file?.name.substring(0, 8)}...</span>
     }
 
     return (
@@ -95,7 +100,10 @@ export default function SideItem({index}: SideItemProps) {
                     onDragEnd={onDragEnd}
                     draggable
                 >
-                    Question {index+1}
+                    <div className="flex gapSmall">
+                        <i style={{opacity: "0.2", cursor: "move"}} className="fa-solid fa-grip-vertical"></i>
+                        Question {index+1}
+                    </div>
                 <ItemPreview />
                 </div>
     )

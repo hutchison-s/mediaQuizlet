@@ -43,6 +43,8 @@ export default function ItemCarousel() {
         }
     }, [items, active])
 
+    
+
     return (
         <>
         <NewQuestionButton onClick={addNewQuestion}/>
@@ -56,7 +58,7 @@ export default function ItemCarousel() {
                     </button>
                     <div id="formWheel">
                         <div id="formCar" ref={carRef} style={{width: `${items.length * w}vw`}}>
-                            {items.map((item, idx) => <QuestionItem key={idx} index={idx} item={item}/>)}
+                            {items.map((item, idx) => <QuestionItem key={"Question"+idx} index={idx} item={item} />)}
                         </div>
                     </div>
                 </>

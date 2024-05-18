@@ -11,7 +11,7 @@ type itemProps = {
 
 export default function QuestionItem({index, item}: itemProps) {
 
-    const {swapPositions, updateItems, deleteItem, items} = useItems();
+    const {duplicateItem, swapPositions, updateItems, deleteItem, items} = useItems();
 
     const addPrompt = ()=>{
         const newItem = {...item};
@@ -48,8 +48,9 @@ export default function QuestionItem({index, item}: itemProps) {
                         <select className="responseSelect" value={item.response.type} onChange={changeType}>
                             <option value="SA">Short Answer</option>
                             <option value="MC">Multiple Choice</option>
-                            <option value="AUD">Audio Response</option>
-                            <option value="IMG">Image Response</option>
+                            <option value="IMG">Image Upload</option>
+                            <option value="AUD">Audio Upload</option>
+                            <option value="REC">Audio Recording</option>
                         </select>
                         <label htmlFor="pointValue">
                             <span>Points: </span>
@@ -66,14 +67,15 @@ export default function QuestionItem({index, item}: itemProps) {
                     <button className="deleteItemButton" onClick={()=>{deleteItem(index)}}>Delete</button>
                 </div>
                 <h4 className="itemSectionHeader">Prompts</h4>
-                {item.prompts.map((p, i)=><PromptBox key={"item"+i+item.response.type} item={item} itemIndex={index} promptIndex={i}/>)}
+                {item.prompts.map((p, i)=><PromptBox key={"item"+index+item.response.type+p.type} item={items[index]} itemIndex={index} promptIndex={i}/>)}
                 <p><span onClick={addPrompt} className="newPromptButton"><i className="fa-solid fa-circle-plus"></i> Add Prompt</span></p>
                 <h4 className="itemSectionHeader">Response</h4>
-                <ResponseBox t={item.response.type} i={index} />
+                <ResponseBox t={items[index].response.type} i={index} />
                 <div className="itemFooter">
                     {index > 0 ? <button onClick={moveBack}><i className="fa-solid fa-arrow-left"></i></button> : <span></span>}
                     {items.length > 1 && <span> Move Question </span>}
                     {index < items.length -1 ? <button onClick={moveForward}><i className="fa-solid fa-arrow-right"></i></button> : <span></span>}
+                    <button style={{gridColumn: "span 3", margin: "1rem auto"}} onClick={()=>{duplicateItem(index)}}><i className="fa-solid fa-copy"></i></button>
                 </div>
             </div>
         </div>

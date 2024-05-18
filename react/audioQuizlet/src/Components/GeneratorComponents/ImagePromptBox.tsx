@@ -7,7 +7,7 @@ type ImagePromptProps = {
     update: (newValue: File | null, timeLimit: number | null)=>void;
 }
 export default function ImagePromptBox({p, update}: ImagePromptProps) {
-    const [url, setUrl] = useState<string>("");
+    const [url, setUrl] = useState<string>(p.file ? window.URL.createObjectURL(p.file) : "");
     const [isLimiting, setIsLimiting] = useState(false);
 
     const handleUpload = (f: File) => {

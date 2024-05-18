@@ -4,6 +4,7 @@ import { generatorQuestion, qType } from "../types";
 interface ItemsContextType {
     items: generatorQuestion[],
     addItem: (t: qType)=>void,
+    duplicateItem: (index: number)=>void,
     bulkAdd: (questions: generatorQuestion[]) => void,
     shiftItems: (xIndex: number, yIndex: number) => void,
     swapPositions: (xIndex: number, yIndex: number) => void,
@@ -15,8 +16,9 @@ interface ItemsContextType {
 }
 
 export const ItemsContext = createContext<ItemsContextType>({
-    items: [], 
-    addItem: ()=>{}, 
+    items: [],
+    addItem: ()=>{},
+    duplicateItem: (index: number)=>{console.log(index)}, 
     bulkAdd: (questions)=>{console.log(questions)},
     shiftItems: (x, y)=>{console.log(x, y)}, 
     swapPositions: (x, y)=>{console.log(x, y)}, 

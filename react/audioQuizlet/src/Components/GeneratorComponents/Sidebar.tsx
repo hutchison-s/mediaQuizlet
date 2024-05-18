@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useItems } from "../../Context/ItemsContext";
 import { AudioPrompt, ImagePrompt, generatorQuestion } from "../../types";
 import LogoLink from "../Logo";
-import NavMenu from "../Nav";
+// import NavMenu from "../Nav";
 import ItemSummary from "./ItemSummary";
 import FileUploader from "./Uploader";
 import SubmissionDialog from "./SubmissionDialog";
@@ -135,7 +135,7 @@ export default function SideBar() {
     return (
         <aside id="sideBar">
             <LogoLink tag={false}/>
-            <NavMenu />
+            {/* <NavMenu /> */}
             <ItemSummary />
             {items.length > 0 && <button id="generateLink" className="primaryBtn softCorner shadow" onClick={generate}>Generate Quizlet Link</button>}
             <FileUploader handleFiles={handleFiles} />

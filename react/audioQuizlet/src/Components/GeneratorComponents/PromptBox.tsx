@@ -15,12 +15,14 @@ const qTypeList: string[] = ["Text", "Audio", "Image"]
 const list: JSX.Element[] = [<i className="fa-solid fa-font"></i>, <i className="fa-solid fa-circle-play"></i>, <i className="fa-solid fa-image"></i>];
 
 export default function PromptBox({ item, itemIndex, promptIndex }: PromptBoxProps) {
-    const { updateItems } = useItems();
+    const { items, updateItems } = useItems();
 
     const updatePrompt = (updatedPrompt: Prompt) => {
-        const newItem = { ...item };
+        const newItem = { ...items[itemIndex] };
         newItem.prompts[promptIndex] = updatedPrompt;
         updateItems(itemIndex, newItem);
+        console.log("updating prompt for item "+itemIndex);
+        
     };
 
     const resetPrompt = ()=>{
@@ -51,12 +53,12 @@ export default function PromptBox({ item, itemIndex, promptIndex }: PromptBoxPro
 
     return (
         <div className="promptBox">
-            <PromptContent p={item.prompts[promptIndex]} update={updatePrompt}/>
+            <PromptContent p={items[itemIndex].prompts[promptIndex]} update={updatePrompt}/>
             <div className="promptTools">
             <div className="deletePrompt" onClick={removePrompt}>
                     <i className="fa-solid fa-trash-can"></i>
                 </div>
-                {item.prompts[promptIndex].type !== "Text" && <button className="resetPrompt" onClick={resetPrompt}>
+                {items[itemIndex].prompts[promptIndex].type !== "Text" && <button className="resetPrompt" onClick={resetPrompt}>
                     <i className="fa-solid fa-rotate-left"></i>
                 </button>}
                 <SelectPopUp value={qTypeList.indexOf(item.prompts[promptIndex].type)} list={list} sendIndex={receiveIndex} />

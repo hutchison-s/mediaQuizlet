@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react"
 
 type TextResponseProps = {
+    initial: string | undefined,
     update: (s: string)=>void
 }
 
-export default function TextResponse({update}: TextResponseProps) {
+export default function TextResponse({initial, update}: TextResponseProps) {
 
-    const [answer, setAnswer] = useState("");
+    const [answer, setAnswer] = useState("Loading...");
     const [debounce, setDebounce] = useState<number | undefined>()
 
     useEffect(()=>{
@@ -14,7 +15,7 @@ export default function TextResponse({update}: TextResponseProps) {
             clearTimeout(debounce)
         }
         const delay = setTimeout(()=>{
-            update(answer);
+            if (answer) update(answer);
             setDebounce(undefined)
         }, 2000)
 
@@ -22,11 +23,23 @@ export default function TextResponse({update}: TextResponseProps) {
 
     }, [answer])
 
+    useEffect(()=>{
+        if (initial) {
+            setAnswer(initial)
+        } else {
+            setAnswer("")
+        }
+    }, [])
+
+    useEffect(()=>{
+        setAnswer(initial || "")
+    }, [initial])
+
     return (
         <input
             className="shortAnswer" 
             type="text" 
-            placeholder="Correct Answer..." 
+            placeholder="Correct Answer..."
             value={answer}
             required 
             onChange={(e)=>{setAnswer(e.target.value)}}
