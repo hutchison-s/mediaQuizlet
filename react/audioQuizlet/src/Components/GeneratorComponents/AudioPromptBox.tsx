@@ -1,10 +1,10 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react";
-import { AudioPrompt } from "../../types";
 import PromptUploadButton from "./PromptUploadButton";
+import { GenPrompt } from "../../types-new";
 
 type AudioPromptProps = {
-    p: AudioPrompt,
-    update: (newValue: File | null, isPausable: boolean, playLimit: number | null)=>void;
+    p: GenPrompt,
+    update: (newValue: File | undefined, isPausable: boolean | undefined, playLimit: number | undefined)=>void;
 }
 export default function AudioPromptBox({p, update}: AudioPromptProps) {
     const [url, setUrl] = useState<string>("");

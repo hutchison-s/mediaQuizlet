@@ -1,31 +1,26 @@
-import { useItems } from "../../Context/ItemsContext";
-import { qType } from "../../types";
+import { useGenerator } from "../../genContext";
+import { GenQuestion, GenResponse, GenResponseType } from "../../types-new";
 import ChoiceResponse from "./ChoiceResponse";
 import TextResponse from "./TextResponse";
 
 type ResponseBoxProps = {
-    t: qType,
-    i: number
+    t: GenResponseType,
+    q: GenQuestion
 }
-export default function ResponseBox({t, i}: ResponseBoxProps) {
+export default function ResponseBox({t, q}: ResponseBoxProps) {
 
-    const {items, updateItems} = useItems();
+    const {dispatch} = useGenerator();
+
+    const updateResponse = (newResponse: GenResponse)=>{
+        const newItem = {...q, response: newResponse};
+        dispatch({type: 'UPDATE_QUESTION', payload: newItem})
+    }
 
     switch(t) {
         case "SA":
-                return <TextResponse initial={items[i].response.correct} update={(newString: string)=>{
-
-                    const newItem = {...items[i]};
-                    newItem.response.correct = newString;
-                    updateItems(i, newItem);
-                }}/>;
+                return <TextResponse qResponse={q.response} update={updateResponse}/>;
             case "MC":
-                return <ChoiceResponse index={i} update={(newOptions: string[], correct: string | undefined)=>{
-                            const newItem = {...items[i]};
-                            newItem.response.options = newOptions;
-                            newItem.response.correct = correct;
-                            updateItems(i, newItem)
-                        }}/>
+                return <ChoiceResponse id={q.id} qResponse={q.response} update={updateResponse}/>
             case "IMG":
                 return <div>Image Upload <i className="fa-solid fa-camera"></i></div>;
             case "REC":

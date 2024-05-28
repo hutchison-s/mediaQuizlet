@@ -1,18 +1,18 @@
 import { DragEvent, useEffect, useState } from "react";
-import { useItems } from "../../Context/ItemsContext";
-import { generatorQuestion } from "../../types";
+import { GenQuestion } from "../../types-new";
+import { useGenerator } from "../../genContext";
 
 type SideItemProps = {
-    item: generatorQuestion
+    question: GenQuestion
     index: number,
     dragIndex: number | null,
     targetIndex: number | null,
     setDragIndex: (n: number | null)=>void,
     setTargetIndex: (n: number | null)=>void
 }
-export default function SideItem({index, item, dragIndex, targetIndex, setDragIndex, setTargetIndex}: SideItemProps) {
+export default function SideItem({index, question, dragIndex, targetIndex, setDragIndex, setTargetIndex}: SideItemProps) {
 
-    const {active, setActive, shiftItems } = useItems();
+    const {state, dispatch} = useGenerator();
     const [preview, setPreview] = useState<string | File | null>("")
 
     const onDragStart = (e:DragEvent<HTMLDivElement>, i: number) => {
@@ -39,13 +39,12 @@ export default function SideItem({index, item, dragIndex, targetIndex, setDragIn
         e.preventDefault();
         if (dragIndex != null && targetIndex != null) {
             console.log("swap")
-            shiftItems(dragIndex, targetIndex);
+            dispatch({type: 'INSERT_QUESTION_BEFORE', payload: {questionId: dragIndex, targetId: targetIndex}});
             setDragIndex(null);
             setTargetIndex(null);
         }
         
     }
-
     const onDragEnd = ()=>{
         console.log("reseting indeces");
         
@@ -53,25 +52,29 @@ export default function SideItem({index, item, dragIndex, targetIndex, setDragIn
         setTargetIndex(null);
     }
 
+    const updateActive = (index: number) => {
+        dispatch({type: 'SET_ACTIVE', payload: index})
+    }
+
     useEffect(()=>{
         let tempPrev: string | File | null = ""
         
-        if (item.prompts.length > 0) {
-            for (const p of item.prompts) {
-                if (p.type == "Image" && p.file != null) {
+        if (question.prompts.length > 0) {
+            for (const p of question.prompts) {
+                if (p.type == "image" && p.file != null) {
                     tempPrev = p.file
                     break;
-                } else if (p.type == "Text" && p.instructions) {
-                    tempPrev = p.instructions?.substring(0, 8);
+                } else if (p.type == "text" && p.text) {
+                    tempPrev = p.text?.substring(0, 8);
                     continue;
-                } else if (p.type == "Audio" && p.file != null) {
+                } else if (p.type == "audio" && p.file != null) {
                     tempPrev = p.file?.name?.substring(0, 8);
                 }
             }
             setPreview(tempPrev);
         }
         
-    }, [item, index])
+    }, [question, index])
 
     const ItemPreview = () =>{
         if (!preview) {
@@ -86,13 +89,13 @@ export default function SideItem({index, item, dragIndex, targetIndex, setDragIn
 
     return (
         <div 
-                    className={`sideItem ${active == index ? "active" : ""} ${targetIndex == index ? "dragOver" : ""}`} 
+                    className={`sideItem ${state.active == index ? "active" : ""} ${targetIndex == index ? "dragOver" : ""}`} 
                     key={index}
                     style={{
                         opacity: dragIndex == index ? "0.25" : "1", 
                         outline: targetIndex == index ? "2px solid lime" : "none"
                     }} 
-                    onClick={()=>{setActive(index)}}
+                    onClick={()=>{updateActive(index)}}
                     onDragStart={(e)=>{onDragStart(e, index)}}
                     onDragOver={(e)=>{onDragOver(e, index)}}
                     onDragLeave={onDragLeave}

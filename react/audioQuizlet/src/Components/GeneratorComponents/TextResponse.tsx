@@ -1,48 +1,29 @@
-import { useEffect, useState } from "react"
+import { ChangeEvent } from "react"
+import { GenResponse } from "../../types-new"
 
 type TextResponseProps = {
-    initial: string | undefined,
-    update: (s: string)=>void
+    qResponse: GenResponse,
+    update: (r: GenResponse)=>void
 }
 
-export default function TextResponse({initial, update}: TextResponseProps) {
+export default function TextResponse({qResponse, update}: TextResponseProps) {
 
-    const [answer, setAnswer] = useState("Loading...");
-    const [debounce, setDebounce] = useState<number | undefined>()
-
-    useEffect(()=>{
-        if (debounce) {
-            clearTimeout(debounce)
-        }
-        const delay = setTimeout(()=>{
-            if (answer) update(answer);
-            setDebounce(undefined)
-        }, 2000)
-
-        setDebounce(delay)
-
-    }, [answer])
-
-    useEffect(()=>{
-        if (initial) {
-            setAnswer(initial)
-        } else {
-            setAnswer("")
-        }
-    }, [])
-
-    useEffect(()=>{
-        setAnswer(initial || "")
-    }, [initial])
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        const newResponse = {
+            ...qResponse,
+            correct: e.target.value
+        };
+        update(newResponse)
+    }
 
     return (
         <input
             className="shortAnswer" 
             type="text" 
             placeholder="Correct Answer..."
-            value={answer}
+            value={qResponse.correct}
             required 
-            onChange={(e)=>{setAnswer(e.target.value)}}
+            onChange={handleChange}
         />
     )
 }

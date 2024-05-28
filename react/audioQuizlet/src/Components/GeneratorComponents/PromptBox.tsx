@@ -1,67 +1,65 @@
-import { useItems } from "../../Context/ItemsContext";
-import { AudioPrompt, ImagePrompt, Prompt, generatorQuestion } from "../../types";
+import { useGenerator } from "../../genContext";
+import { GenPrompt, GenQuestion } from "../../types-new";
 import SelectPopUp from "../SelectPopUp";
 import PromptContent from "./PromptContent";
 
 
 type PromptBoxProps = {
-    item: generatorQuestion,
-    itemIndex: number,
+    question: GenQuestion
     promptIndex: number
 }
 
-const qTypeList: string[] = ["Text", "Audio", "Image"]
+const qTypeList: string[] = ["text", "audio", "image"]
 
 const list: JSX.Element[] = [<i className="fa-solid fa-font"></i>, <i className="fa-solid fa-circle-play"></i>, <i className="fa-solid fa-image"></i>];
 
-export default function PromptBox({ item, itemIndex, promptIndex }: PromptBoxProps) {
-    const { items, updateItems } = useItems();
+export default function PromptBox({ question, promptIndex }: PromptBoxProps) {
+    const { dispatch } = useGenerator();
 
-    const updatePrompt = (updatedPrompt: Prompt) => {
-        const newItem = { ...items[itemIndex] };
+    const updatePrompt = (updatedPrompt: GenPrompt) => {
+        const newItem = { ...question };
         newItem.prompts[promptIndex] = updatedPrompt;
-        updateItems(itemIndex, newItem);
-        console.log("updating prompt for item "+itemIndex);
-        
+        dispatch({type: 'UPDATE_QUESTION', payload: newItem})
     };
 
     const resetPrompt = ()=>{
-        if (item.prompts[promptIndex].type == "Text") {
-            updatePrompt({ file: null, type: "Text", instructions: "" });
-        } else if (item.prompts[promptIndex].type == "Audio") {
-            updatePrompt({ file: null, type: "Audio", instructions: "", isPausable: false, playLimit: 3 } as AudioPrompt);
+        if (question.prompts[promptIndex].type === "text") {
+            updatePrompt({ type: "text", text: "" });
+        } else if (question.prompts[promptIndex].type === "audio") {
+            updatePrompt({ type: "audio", isPausable: false, playLimit: 3 });
         } else {
-            updatePrompt({ file: null, type: "Image", instructions: "", timeLimit: null } as ImagePrompt);
+            updatePrompt({ type: "image" });
         }
     }
 
     const receiveIndex = (i: number) => {
         if (i === 0) {
-            updatePrompt({ file: null, type: "Text", instructions: "" });
+            updatePrompt({ type: "text", text: "" });
         } else if (i === 1) {
-            updatePrompt({ file: null, type: "Audio", instructions: "", isPausable: false, playLimit: 3 } as AudioPrompt);
+            updatePrompt({ type: "audio", isPausable: false, playLimit: 3 });
         } else {
-            updatePrompt({ file: null, type: "Image", instructions: "", timeLimit: null } as ImagePrompt);
+            updatePrompt({ type: "image" });
         }
     };
 
     const removePrompt = () => {
-        const newItem = { ...item };
-        newItem.prompts.splice(promptIndex, 1);
-        updateItems(itemIndex, newItem);
+        const newItem = {
+            ...question };
+        newItem.prompts.filter((_, idx)=>idx != promptIndex);
+        dispatch({type: 'UPDATE_QUESTION', payload: newItem})
     };
 
     return (
         <div className="promptBox">
-            <PromptContent p={items[itemIndex].prompts[promptIndex]} update={updatePrompt}/>
+            <PromptContent p={question.prompts[promptIndex]} update={updatePrompt}/>
             <div className="promptTools">
             <div className="deletePrompt" onClick={removePrompt}>
                     <i className="fa-solid fa-trash-can"></i>
                 </div>
-                {items[itemIndex].prompts[promptIndex].type !== "Text" && <button className="resetPrompt" onClick={resetPrompt}>
+                {question.prompts[promptIndex].type !== "text" && <button className="resetPrompt" onClick={resetPrompt}>
                     <i className="fa-solid fa-rotate-left"></i>
                 </button>}
-                <SelectPopUp value={qTypeList.indexOf(item.prompts[promptIndex].type)} list={list} sendIndex={receiveIndex} />
+                <SelectPopUp value={qTypeList.indexOf(question.prompts[promptIndex].type)} list={list} sendIndex={receiveIndex} />
                 
             </div>
         </div>

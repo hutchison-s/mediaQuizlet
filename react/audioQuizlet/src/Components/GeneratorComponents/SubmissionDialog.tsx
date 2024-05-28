@@ -1,20 +1,20 @@
 import { ChangeEvent, useEffect, useRef, useState } from "react"
+import { useGenerator } from "../../genContext"
 
 type SubmissionDialogProps = {
-    submitQuiz: (formData: FormData) => void,
+    submitQuiz: () => void,
     closeForm: ()=>void
     setRender: (x: boolean)=>void
 }
 
 export default function SubmissionDialog({submitQuiz, closeForm}: SubmissionDialogProps) {
 
+  const {state, dispatch} = useGenerator();
+
     const modal = useRef<HTMLDialogElement>(null)
     const [validPass, setValidPass] = useState(false)
     const [hiddenPass, setHiddenPass] = useState(true)
-    const [hasLimit, setHasLimit] = useState(false)
     const formRef = useRef<HTMLFormElement>(null)
-    const passRef = useRef<HTMLInputElement>(null)
-    const emailRef = useRef<HTMLInputElement>(null)
     const timeRef = useRef<HTMLInputElement>(null)
 
     useEffect(()=>{
@@ -22,22 +22,18 @@ export default function SubmissionDialog({submitQuiz, closeForm}: SubmissionDial
     }, [])
 
     const onSubmit = () =>{
-      console.log(emailRef.current?.value)
-      console.log(passRef.current?.value)
-      console.log(timeRef.current?.value || "not present")
-      const fData = new FormData();
-      fData.append("email", emailRef.current!.value)
-      fData.append("password", passRef.current!.value)
-      fData.append("timeLimit", timeRef.current!.value)
-
-        submitQuiz(fData);
+        submitQuiz();
         modal.current?.close();
         formRef.current?.reset();
     }
 
     const validatePass = (e:ChangeEvent<HTMLInputElement>) => {
         setValidPass(e.target.checkValidity())
-        console.log(e.target.checkValidity())
+        dispatch({type: 'SET_PASSWORD', payload: e.target.value})
+    }
+
+    const handleEmailChange = (e: ChangeEvent<HTMLInputElement>) => {
+        dispatch({type: 'SET_ADMIN', payload: e.target.value})
     }
 
     const toggleVisibility = ()=>{
@@ -45,7 +41,15 @@ export default function SubmissionDialog({submitQuiz, closeForm}: SubmissionDial
     }
 
     const toggleLimit = ()=>{
-      setHasLimit(prev => !prev)
+      if (state.timeLimit) {
+        dispatch({type: 'SET_TIME_LIMIT', payload: undefined})
+      } else {
+        dispatch({type: 'SET_TIME_LIMIT', payload: 10})
+      }
+    }
+
+    const handleLimitChange = (e: ChangeEvent<HTMLInputElement>) => {
+        dispatch({type: 'SET_TIME_LIMIT', payload: parseInt(e.target.value)})
     }
 
     return (
@@ -55,20 +59,20 @@ export default function SubmissionDialog({submitQuiz, closeForm}: SubmissionDial
         <label htmlFor="email">
           <span>Enter your email address:</span>
           <input
-            ref={emailRef} 
             required 
             type="email" 
             id="email"
             name="password" 
             className="softCorner" 
             placeholder="Email Address..."
+            value={state.admin}
+            onChange={handleEmailChange}
           />
         </label>
         <label htmlFor="password">
           <span>Enter a secure password to view responses:</span>
           <div id="passBox">
             <input
-              ref={passRef}
               required
               type={hiddenPass ? "password" : "text"}
               className="softCorner"
@@ -76,6 +80,7 @@ export default function SubmissionDialog({submitQuiz, closeForm}: SubmissionDial
               name="password"
               pattern="^[a-zA-Z0-9!@#%^&*]{4,16}$"
               placeholder="Password..."
+              value={state.password}
               onChange={validatePass}
             />
             <i id="peek" className="fa-solid fa-eye" onPointerDown={toggleVisibility} onPointerUp={toggleVisibility}></i>
@@ -91,7 +96,9 @@ export default function SubmissionDialog({submitQuiz, closeForm}: SubmissionDial
             min="1"
             max="60"
             step="1"
-            hidden={!hasLimit}
+            value={state.timeLimit}
+            onChange={handleLimitChange}
+            hidden={state.timeLimit == undefined}
           />
         </label>
         <button type="button" id="submitButton" className="softCorner primaryBtn" disabled={!validPass} onClick={onSubmit}>Generate Quiz Link</button>

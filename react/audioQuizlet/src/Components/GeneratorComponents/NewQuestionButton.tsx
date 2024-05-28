@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { qType } from "../../types";
+import { GenResponseType } from "../../types-new";
 
 type NewQuestionButtonProps = {
-    onClick: (t: qType)=>void
+    onClick: (t: GenResponseType)=>void
 }
 export default function NewQuestionButton({onClick}: NewQuestionButtonProps) {
     const [isOpen, setIsOpen] = useState(false);

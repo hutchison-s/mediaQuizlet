@@ -1,43 +1,55 @@
 import { ChangeEvent } from "react";
-import { useItems } from "../../Context/ItemsContext";
-import { generatorQuestion, qType } from "../../types";
 import PromptBox from "./PromptBox";
 import ResponseBox from "./ResponseBox";
+import { GenQuestion, GenResponseType } from "../../types-new";
+import { useGenerator } from "../../genContext";
 
 type itemProps = {
     index: number,
-    item: generatorQuestion
+    question: GenQuestion
 }
 
-export default function QuestionItem({index, item}: itemProps) {
+export default function QuestionItem({index, question}: itemProps) {
 
-    const {duplicateItem, swapPositions, updateItems, deleteItem, items} = useItems();
+    const {state, dispatch} = useGenerator();
 
     const addPrompt = ()=>{
-        const newItem = {...item};
-        newItem.prompts.push({file: null, type: "Text", instructions: ""})
-        updateItems(index, newItem)
+        const newItem = {...question};
+        newItem.prompts.push({file: undefined, type: "text", text: ""})
+        dispatch({type: 'UPDATE_QUESTION', payload: newItem})
     }
 
     const changeType = (e:ChangeEvent<HTMLSelectElement>) => {
-        const newItem = {...item};
-        newItem.response.type = e.target.value as qType;
-        if (newItem.response.correct) delete newItem.response.correct;
-        if (newItem.response.options) delete newItem.response.options;
-        updateItems(index, newItem);
+        const newItem = {
+            ...question,
+            response: {
+                type: e.target.value as GenResponseType,
+                correct: e.target.value == 'MC' ? '0' : '',
+                options: e.target.value == 'MC' ? ['', '', '', ''] : undefined
+            }
+        };
+        dispatch({type: 'UPDATE_QUESTION', payload: newItem})
     }
 
     const changePoints = (e:ChangeEvent<HTMLInputElement>) => {
-        const newItem = {...item};
-        newItem.pointValue = e.target.value.includes(".") ? parseFloat(e.target.value) : parseInt(e.target.value);
-        updateItems(index, newItem)
+        const newItem = {
+            ...question,
+            pointValue: e.target.value.includes(".") ? parseFloat(e.target.value) : parseInt(e.target.value)
+        };
+        dispatch({type: 'UPDATE_QUESTION', payload: newItem})
     }
 
     const moveBack = ()=>{
-        swapPositions(index, index-1);
+        dispatch({type: 'MOVE_QUESTION_UP', payload: question.id})
     }
     const moveForward = ()=>{
-        swapPositions(index, index+1);
+        dispatch({type: 'MOVE_QUESTION_UP', payload: question.id})
+    }
+    const deleteItem = ()=>{
+        dispatch({type: 'REMOVE_QUESTION', payload: question.id})
+    }
+    const duplicateItem = ()=>{
+        dispatch({type: 'DUPLICATE_QUESTION', payload: question.id})
     }
 
     return (
@@ -45,7 +57,7 @@ export default function QuestionItem({index, item}: itemProps) {
             <div className="itemBox softCorner flex vertical shadow">
             <h3>Question {index+1}</h3>
                 <div className="itemHeader">
-                        <select className="responseSelect" value={item.response.type} onChange={changeType}>
+                        <select className="responseSelect" value={question.response.type} onChange={changeType}>
                             <option value="SA">Short Answer</option>
                             <option value="MC">Multiple Choice</option>
                             <option value="IMG">Image Upload</option>
@@ -60,22 +72,22 @@ export default function QuestionItem({index, item}: itemProps) {
                                 className="pointValue" 
                                 id={index+"pointValue"} 
                                 min={0} max={100} step={0.5}
-                                value={item.pointValue}
+                                value={question.pointValue}
                                 onChange={changePoints}
                                 required/>
                         </label>  
-                    <button className="deleteItemButton" onClick={()=>{deleteItem(index)}}>Delete</button>
+                    <button className="deleteItemButton" onClick={deleteItem}>Delete</button>
                 </div>
                 <h4 className="itemSectionHeader">Prompts</h4>
-                {item.prompts.map((p, i)=><PromptBox key={"item"+index+item.response.type+p.type} item={items[index]} itemIndex={index} promptIndex={i}/>)}
+                {question.prompts.map((p, i)=><PromptBox key={"item"+index+question.response.type+p.type} question={question} promptIndex={i}/>)}
                 <p><span onClick={addPrompt} className="newPromptButton"><i className="fa-solid fa-circle-plus"></i> Add Prompt</span></p>
                 <h4 className="itemSectionHeader">Response</h4>
-                <ResponseBox t={items[index].response.type} i={index} />
+                <ResponseBox t={question.response.type} i={index} />
                 <div className="itemFooter">
                     {index > 0 ? <button onClick={moveBack}><i className="fa-solid fa-arrow-left"></i></button> : <span></span>}
-                    {items.length > 1 && <span> Move Question </span>}
-                    {index < items.length -1 ? <button onClick={moveForward}><i className="fa-solid fa-arrow-right"></i></button> : <span></span>}
-                    <button style={{gridColumn: "span 3", margin: "1rem auto"}} onClick={()=>{duplicateItem(index)}}><i className="fa-solid fa-copy"></i></button>
+                    {state.questions.length > 1 && <span> Move Question </span>}
+                    {index < state.questions.length - 1 ? <button onClick={moveForward}><i className="fa-solid fa-arrow-right"></i></button> : <span></span>}
+                    <button style={{gridColumn: "span 3", margin: "1rem auto"}} onClick={duplicateItem}><i className="fa-solid fa-copy"></i></button>
                 </div>
             </div>
         </div>

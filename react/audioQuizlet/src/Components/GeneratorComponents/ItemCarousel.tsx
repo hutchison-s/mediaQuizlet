@@ -1,23 +1,30 @@
 import { useEffect, useRef, useState } from "react";
-import { useItems } from "../../Context/ItemsContext"
 import QuestionItem from "./QuestionItem";
 import NewQuestionButton from "./NewQuestionButton";
-import { qType } from "../../types";
+import { useGenerator } from "../../genContext";
+import { GenQuestion, GenResponseType } from "../../types-new";
 
 export default function ItemCarousel() {
-    const {items, addItem, active, setActive} = useItems();
+    const {state, dispatch} = useGenerator();
     const [w, setW] = useState(window.innerWidth <= 900 ? 100 : 75);
 
     const prev = ()=>{
-        const prev = active; 
-        setActive(prev-1)
+        dispatch({type: 'SET_ACTIVE', payload: state.active - 1})
     }
     const next = ()=>{
-        const prev = active;
-        setActive(prev+1)
+        dispatch({type: 'SET_ACTIVE', payload: state.active + 1})
     }
-    const addNewQuestion = (t: qType) => {
-        addItem(t)
+    const addNewQuestion = (t: GenResponseType) => {
+        const newQuestion: GenQuestion = {
+            id: Date.now(),
+            pointValue: 1,
+            prompts: [],
+            response: {
+                type: t,
+                correct: ''
+            }
+        }
+        dispatch({type: 'ADD_QUESTION', payload: newQuestion})
     }
 
     const carRef = useRef<HTMLDivElement>(null);
@@ -38,27 +45,27 @@ export default function ItemCarousel() {
 
     useEffect(()=>{
         if (carRef.current) {
-            const divy = 100 / items.length;
-            carRef.current.style.transform = `translateX(-${active * divy}%)`
+            const divy = 100 / state.questions.length;
+            carRef.current.style.transform = `translateX(-${state.active * divy}%)`
         }
-    }, [items, active])
+    }, [state.questions, state.active])
 
     
 
     return (
         <>
         <NewQuestionButton onClick={addNewQuestion}/>
-        {items.length != 0
+        {state.questions
             ?   <>
-                    <button id="leftForm" disabled={active == 0 || items.length == 0} onClick={prev}>
+                    <button id="leftForm" disabled={state.active == 0 || state.questions.length == 0} onClick={prev}>
                         <i className="fa-solid fa-angles-left"></i>
                     </button>
-                    <button id="rightForm" disabled={active == items.length-1 || items.length == 0} onClick={next}>
+                    <button id="rightForm" disabled={state.active == state.questions.length-1 || state.questions.length == 0} onClick={next}>
                         <i className="fa-solid fa-angles-right"></i>
                     </button>
                     <div id="formWheel">
-                        <div id="formCar" ref={carRef} style={{width: `${items.length * w}vw`}}>
-                            {items.map((item, idx) => <QuestionItem key={"Question"+idx} index={idx} item={item} />)}
+                        <div id="formCar" ref={carRef} style={{width: `${state.questions.length * w}vw`}}>
+                            {state.questions.map((question, idx) => <QuestionItem key={question.id} index={idx} question={question} />)}
                         </div>
                     </div>
                 </>
