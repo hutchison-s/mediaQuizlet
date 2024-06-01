@@ -33,3 +33,49 @@ export type GenPrompt = {
     active: number
   };
   
+  export type userResponse = {
+    quizId: string,
+    timeLimit: number | null,
+    user?: string,
+    responseId?: string,
+    timeStarted?: number,
+    questions?: GenQuestion[],
+    answers?: AnswerObject[],
+    associatedFiles?: string[],
+    timeSubmitted?: string
+}
+
+export type AnswerObject = {
+    answer: string,
+    score: number
+}
+
+export type essentialQuiz = {
+    timeLimit: number | null,
+    questions: GenQuestion[],
+    quizId: string,
+    status: string,
+    title: string,
+    description: string
+}
+
+export type fullQuiz = {
+  URL: string,
+  admin: string,
+  associatedFiles?: string[],
+  expires: string,
+  password: string,
+  quizId: string,
+  title: string,
+  description: string,
+  status: "open" | "closed",
+  timeLimit: string,
+  responses: AnswerObject[],
+  questions: GenQuestion[]
+}
+
+export type ResponseAction = 
+      {type: 'UPDATE_ANSWER', payload: {id: number, answer: AnswerObject}}
+    | {type: 'UPDATE_MANY', payload: {id: number, answer: AnswerObject}[]}
+    | {type: 'INITIALIZE', payload: {user: string, responseId: string, timeStarted: number}}
+    | {type: 'PRE-SUBMIT', payload: {associatedFiles?: string[], timeSubmitted?: string}}

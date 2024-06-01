@@ -21,8 +21,13 @@ export default function ItemCarousel() {
             prompts: [],
             response: {
                 type: t,
-                correct: ''
             }
+        }
+        if (['MC', 'SA'].includes(t)) {
+            newQuestion.response.correct = t === 'MC' ? '0' : ''
+        }
+        if (t === 'MC') {
+            newQuestion.response.options = ['','','','']
         }
         dispatch({type: 'ADD_QUESTION', payload: newQuestion})
     }

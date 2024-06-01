@@ -45,7 +45,7 @@ export default function PromptBox({ question, promptIndex }: PromptBoxProps) {
     const removePrompt = () => {
         const newItem = {
             ...question };
-        newItem.prompts.filter((_, idx)=>idx != promptIndex);
+        newItem.prompts.splice(promptIndex, 1);
         dispatch({type: 'UPDATE_QUESTION', payload: newItem})
     };
 

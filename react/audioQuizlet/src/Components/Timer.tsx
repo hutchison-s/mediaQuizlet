@@ -10,9 +10,8 @@ export default function Timer({timeStarted}: TimerProps) {
     const [remaining, setRemaining] = useState<number>(60);
 
     useEffect(() => {
-        const limit = parseInt(timeLimit)
         // Calculate deadline in milliseconds
-        const deadline = (limit * 60 * 1000) + timeStarted;
+        const deadline = (timeLimit! * 60 * 1000) + timeStarted;
         const timerInterval = setInterval(() => {
             const now = Date.now();
             const timeRemainingInSeconds = Math.max(0, Math.floor((deadline - now) / 1000));

@@ -1,6 +1,8 @@
 import axios from "axios";
+import { AnswerObject, GenQuestion } from "../../types-new";
+import { chunkAndUpload } from "./audio";
 
-export async function resizeAndCompress(file: File): Promise<Blob> {
+export async function resizeAndCompress(file: Blob): Promise<Blob> {
     return new Promise((resolve, reject) => {
         const reader = new FileReader();
         reader.onload = function(event) {
@@ -61,4 +63,51 @@ export async function compressAndUploadImage(file: File): Promise<{link: string,
     photoForm.append("photos", compPhoto, "photoUpload")
     const {link, path} = await axios.post(`http://localhost:8000/api/uploads/image/`, photoForm).then(res => res.data);
     return {link, path}
+}
+
+export async function uploadFileAnswers(questions: GenQuestion[], answers: AnswerObject[]) {
+    const associatedFiles: string[] = [];
+    const newAnswers: AnswerObject[] = [];
+    if (questions) {
+        for (const [idx, q] of questions.entries()) {
+            console.log("Processing answer", answers[idx].answer)
+            if (q.response.type == "IMG") {
+                const objectURL = answers[idx].answer
+                if (objectURL) {
+                    console.log(objectURL)
+                    const photo = await fetch(objectURL).then(res => res.blob()).catch(console.log);
+                    if (!photo) {
+                        continue;
+                    }
+                    const compPhoto: Blob = await resizeAndCompress(photo);
+                    const photoForm = new FormData();
+                    photoForm.append("photos", compPhoto, "photoUpload")
+                    const uploadResponse: {link: string, path: string} = await axios.post(`http://localhost:8000/api/uploads/image`, photoForm)
+                        .then(res => {
+                            if (res.status === 200) {
+                                return res.data
+                            }
+                        });
+                    const {link, path} = uploadResponse;
+                    console.log(uploadResponse)
+                    associatedFiles.push(path);
+                    newAnswers.push({answer: link, score: 0})
+                }
+                
+            } else if (q.response.type == 'AUD' || q.response.type == 'REC') {
+                const audio = await fetch(answers[idx].answer).then(res => res.blob()).catch(console.log);
+                if (!audio) {
+                    continue;
+                }
+                const {id, associated} = await chunkAndUpload(new File([audio], 'newRecording.mp3', {type: 'audio/mpeg'}))
+                associatedFiles.concat(associated);
+                newAnswers.push({answer: id, score: 0})
+            }   else {
+                newAnswers.push({answer: answers[idx].answer, score: q.response.correct?.toLowerCase() === answers[idx].answer.toLowerCase() ? q.pointValue : 0})
+            }
+        }
+        return [associatedFiles, newAnswers];
+    } else {
+        return [];
+    }
 }

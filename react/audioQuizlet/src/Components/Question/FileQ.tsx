@@ -1,4 +1,5 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { MouseEvent, useEffect, useRef, useState } from "react";
+import PromptUploadButton from "../GeneratorComponents/PromptUploadButton";
 
 interface FileQProps {
     accept: string,
@@ -9,6 +10,7 @@ export default function FileQ({accept, setAnswer}: FileQProps) {
     
     const [response, setResponse] = useState<File | null>(null);
     const [uploadedURL, setUploadedURL] = useState<string>("");
+    const inputRef = useRef<HTMLInputElement>(null)
 
     useEffect(()=>{
         if (response) {
@@ -18,30 +20,32 @@ export default function FileQ({accept, setAnswer}: FileQProps) {
         }
     }, [response, setAnswer])
 
-    function handleChange(event: ChangeEvent<HTMLInputElement>) {
-        const target: HTMLInputElement = event.target;
-        if (target.files) {
-            setResponse(target.files[0]);
+    function handleUpload(f: File) {
+        setResponse(f);
+    }
+
+    function undoFile(e: MouseEvent<HTMLButtonElement>){
+        e.preventDefault();
+        e.stopPropagation();
+        setResponse(null);
+        setUploadedURL('')
+        if (inputRef.current) {
+            inputRef.current.value = ''
         }
         
     }
 
     return (
-        <label style={{textAlign: "center"}}>
-            <span className="flexFull">Upload your {accept.split("/")[0]}: </span>
-            <input
-                required 
-                type="file"
-                accept={accept} 
-                onInput={handleChange}
-            />
-            
+        <div className="fileUploadWrapper" style={{textAlign: "center"}}>        
             {response
-                ?   accept == "image/*"
-                        ?   <img src={uploadedURL} width="200px" style={{margin: "0.5rem auto"}}></img>
-                        :   <audio src={uploadedURL} controls />
-                :   null
+                ?   <>
+                        <button className="resetPrompt" onClick={undoFile}><i className="fa-solid fa-rotate-left"></i></button>
+                        {accept == "image/*"
+                            ?   <img src={uploadedURL} width="200px" style={{margin: "0.5rem auto"}}></img>
+                            :   <audio src={uploadedURL} controls />}
+                    </>
+                :   <PromptUploadButton onClick={handleUpload} acceptTypes={accept} divClass="fileUploadLabel" inputID="" />
             }
-        </label>
+        </div>
     )
 }

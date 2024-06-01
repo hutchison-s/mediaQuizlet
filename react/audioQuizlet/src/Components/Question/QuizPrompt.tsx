@@ -1,19 +1,19 @@
-import { quizzerPrompt } from "../../types"
+import { GenPrompt } from "../../types-new"
 import LimitedPlayer from "../LimitedPlayer"
 
 type QuizPromptProps = {
-    p: quizzerPrompt
+    p: GenPrompt
 }
 export default function QuizPrompt({p}: QuizPromptProps) {
     switch(p.type) {
-        case "Audio":
+        case "audio":
             return <LimitedPlayer 
             limit={p.playLimit} 
-            file={p.filePath}
+            file={p.path || ""}
             allowPause={false}/>
-        case "Image":
-            return <img src={p.filePath} width="100%" />
+        case "image":
+            return <img src={p.path || ""} width="100%" />
         default:
-            return <p>{p.instructions}</p>
+            return <p>{p.text}</p>
     }
 }

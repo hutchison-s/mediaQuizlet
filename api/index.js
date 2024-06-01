@@ -5,7 +5,7 @@ dotenv.config();
 import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage(), limits: {} });
 import { authenticate, admin } from "./middleware/auth.js";
-import { deleteQuiz, getAllQuizzes, getFullQuiz, getQuiz, newQuiz, updateQuiz } from "./database/quizFunctions.js";
+import { deleteQuiz, getAllQuizzes, getAllQuizzesByUser, getFullQuiz, getQuiz, getUserId, newQuiz, updateQuiz } from "./database/quizFunctions.js";
 import { deleteOneResponse, getAllResponses, getOneResponse, newResponse, updateResponse } from './database/responseFunctions.js';
 import { uploadAudio, uploadImage } from './database/fileFunctions.js';
 import { createAudioDoc, getAllAudio, getAudioInfo, getChunk, uploadAudioChunk } from './database/audioFunctions.js';
@@ -16,6 +16,11 @@ const PORT = process.env.PORT || 8000;
 // Middleware
 app.use(express.json());
 app.use(cors());
+
+// Retrieve all quizzes created by specific user by email
+app.get('/api/users/:userId/quizzes', getAllQuizzesByUser);
+
+app.get('/api/findUser/:email', getUserId);
 
 // Retrieve all quizzes
 app.get('/api/quizzes', admin, getAllQuizzes);

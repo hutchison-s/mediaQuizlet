@@ -1,6 +1,7 @@
 import { DragEvent, useEffect, useState } from "react";
 import { GenQuestion } from "../../types-new";
 import { useGenerator } from "../../genContext";
+import ItemPreview from "./ItemPreview";
 
 type SideItemProps = {
     question: GenQuestion
@@ -13,7 +14,7 @@ type SideItemProps = {
 export default function SideItem({index, question, dragIndex, targetIndex, setDragIndex, setTargetIndex}: SideItemProps) {
 
     const {state, dispatch} = useGenerator();
-    const [preview, setPreview] = useState<string | File | null>("")
+    const [preview, setPreview] = useState<string | File | undefined>("")
 
     const onDragStart = (e:DragEvent<HTMLDivElement>, i: number) => {
         setDragIndex(i);
@@ -39,7 +40,7 @@ export default function SideItem({index, question, dragIndex, targetIndex, setDr
         e.preventDefault();
         if (dragIndex != null && targetIndex != null) {
             console.log("swap")
-            dispatch({type: 'INSERT_QUESTION_BEFORE', payload: {questionId: dragIndex, targetId: targetIndex}});
+            dispatch({type: 'INSERT_QUESTION_BEFORE', payload: {questionId: state.questions[dragIndex].id, targetIndex: targetIndex}});
             setDragIndex(null);
             setTargetIndex(null);
         }
@@ -57,7 +58,7 @@ export default function SideItem({index, question, dragIndex, targetIndex, setDr
     }
 
     useEffect(()=>{
-        let tempPrev: string | File | null = ""
+        let tempPrev: string | File | undefined = undefined
         
         if (question.prompts.length > 0) {
             for (const p of question.prompts) {
@@ -76,16 +77,7 @@ export default function SideItem({index, question, dragIndex, targetIndex, setDr
         
     }, [question, index])
 
-    const ItemPreview = () =>{
-        if (!preview) {
-            return <></>;
-        }
-        if (typeof preview == 'string') {
-            return <span>{preview}{preview.length > 7 && "..."}</span>
-        } else {
-            return <span><img src={window.URL.createObjectURL(preview)} /></span>
-        }
-    }
+    
 
     return (
         <div 
@@ -107,7 +99,7 @@ export default function SideItem({index, question, dragIndex, targetIndex, setDr
                         <i style={{opacity: "0.2", cursor: "move"}} className="fa-solid fa-grip-vertical"></i>
                         Question {index+1}
                     </div>
-                <ItemPreview />
+                <ItemPreview content={preview} />
                 </div>
     )
 }

@@ -1,8 +1,8 @@
 import { ChangeEvent, useEffect, useState } from "react";
-import { quizzerQuestion } from "../../types";
+import { GenQuestion } from "../../types-new";
 
 interface MCQProps {
-    question: quizzerQuestion,
+    question: GenQuestion,
     setAnswer: (a: string) => void,
 }
 

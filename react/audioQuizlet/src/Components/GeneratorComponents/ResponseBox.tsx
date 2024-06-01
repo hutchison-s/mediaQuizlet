@@ -1,13 +1,12 @@
 import { useGenerator } from "../../genContext";
-import { GenQuestion, GenResponse, GenResponseType } from "../../types-new";
+import { GenQuestion, GenResponse } from "../../types-new";
 import ChoiceResponse from "./ChoiceResponse";
 import TextResponse from "./TextResponse";
 
 type ResponseBoxProps = {
-    t: GenResponseType,
     q: GenQuestion
 }
-export default function ResponseBox({t, q}: ResponseBoxProps) {
+export default function ResponseBox({q}: ResponseBoxProps) {
 
     const {dispatch} = useGenerator();
 
@@ -16,16 +15,16 @@ export default function ResponseBox({t, q}: ResponseBoxProps) {
         dispatch({type: 'UPDATE_QUESTION', payload: newItem})
     }
 
-    switch(t) {
+    switch(q.response.type) {
         case "SA":
-                return <TextResponse qResponse={q.response} update={updateResponse}/>;
-            case "MC":
-                return <ChoiceResponse id={q.id} qResponse={q.response} update={updateResponse}/>
-            case "IMG":
-                return <div>Image Upload <i className="fa-solid fa-camera"></i></div>;
-            case "REC":
-                return <div>Audio Recording <i className="fa-solid fa-microphone"></i></div>
-            default:
-                return <div>Audio Upload <i className="fa-solid fa-circle-play"></i></div>;
+            return <TextResponse qResponse={q.response} update={updateResponse}/>;
+        case "MC":
+            return <ChoiceResponse id={q.id} qResponse={q.response} update={updateResponse}/>
+        case "IMG":
+            return <div>Image Upload <i className="fa-solid fa-camera"></i></div>;
+        case "REC":
+            return <div>Audio Recording <i className="fa-solid fa-microphone"></i></div>
+        default:
+            return <div>Audio Upload <i className="fa-solid fa-circle-play"></i></div>;
     }
 }

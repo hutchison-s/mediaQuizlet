@@ -1,0 +1,29 @@
+#userQuizList li {
+    margin: 1rem auto;
+    text-align: center; 
+    display: grid;
+    position: relative;
+}
+#userQuizList a {
+    color: var(--secondary);
+    font-size: 1.5rem;
+}
+#userQuizList li:before {
+    content: attr(data-description);
+    position: absolute;
+    left: 50%;
+    top: 110%;
+    translate: -50%;
+    background-color: var(--secondary);
+    color: white;
+    padding: 1rem;
+    font-style: italic;
+    font-weight: 200;
+    border-radius: 0.5rem;
+    z-index: 2;
+    box-shadow: var(--shadow);
+    display: none;
+}
+#userQuizList li:hover:before {
+    display: block;
+}

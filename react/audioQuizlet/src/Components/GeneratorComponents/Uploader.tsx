@@ -1,10 +1,11 @@
 import React, { useRef, DragEvent, ChangeEvent } from 'react';
+import { GenQuestion, GenPrompt } from '../../types-new';
 
 interface FileUploaderProps {
-  handleFiles: (files: File[]) => void;
+  callback: (newQuestions: GenQuestion[]) => void;
 }
 
-const FileUploader: React.FC<FileUploaderProps> = ({ handleFiles }) => {
+const FileUploader: React.FC<FileUploaderProps> = ({ callback }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleDrop = (event: DragEvent<HTMLDivElement>) => {
@@ -24,6 +25,22 @@ const FileUploader: React.FC<FileUploaderProps> = ({ handleFiles }) => {
   const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
     event.preventDefault();
   };
+
+  const handleFiles = (files: File[]) => {
+    const newQuestions: GenQuestion[] = [];
+    files.forEach((f, idx) => {
+        const q: GenQuestion = {id: Date.now()+idx, prompts: [], response: {type: "SA", correct: ''}, pointValue: 1}
+        let p;
+        if (f.type.includes("audio")) {
+            p = {file: f, type: "audio", playLimit: 3} as GenPrompt
+        } else {
+            p = {file: f, type: "image"} as GenPrompt
+        }
+        q.prompts.push(p)
+        newQuestions.push(q);
+    })
+    callback(newQuestions);
+}
 
   return (
     <div

@@ -22,6 +22,7 @@ export default function SAQ({setAnswer}: SAQProps) {
                     <input 
                         required 
                         type="text" 
+                        placeholder="Your Answer..."
                         onInput={handleChange}
                     />
                 </label>

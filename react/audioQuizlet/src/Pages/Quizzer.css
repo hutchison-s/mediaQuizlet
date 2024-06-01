@@ -1,3 +1,13 @@
+#introDialog {
+  position: fixed;
+  width: clamp(350px, 80vw, 800px);
+  height: clamp(750px, 80dvh, 1000px);
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+
+}
+
 p:has(#currentUser) {
     text-align: center;
     opacity: 0.5;
@@ -71,6 +81,7 @@ p:has(#currentUser) {
   }
   .questionForm {
     display: grid;
+    width: 90%;
     gap: 0.5rem;
     padding: 2rem 0;
     border-bottom: 2px dashed var(--light-secondary);
@@ -82,6 +93,9 @@ p:has(#currentUser) {
     justify-content: flex-end;
     flex-wrap: wrap;
     align-items: center;
+    margin: auto;
+    width: 80%;
+    min-width: 200px;
   }
   .questionForm input[type="text"] {
     padding: 0.5rem;
@@ -90,10 +104,41 @@ p:has(#currentUser) {
     background: var(--background);
     color: var(--primary);
     border: 1px solid var(--secondary);
-    width: 100%;
+    width: 90%;
+    margin: auto;
+  }
+  .questionForm .recordAudioButton,
+  .questionForm audio {
+    margin: auto;
   }
   .playerBox {
     padding: 2rem 0 0;
+  }
+  .fileUploadLabel {
+    background: var(--secondary);
+    height: 2.5rem;
+    width: 100%;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    border-radius: 0.5rem;
+  }
+  .fileUploadLabel * {
+    color: white;
+  }
+  .fileUploadWrapper {
+    display: flex;
+    gap: 0.5rem;
+    flex-direction: row-reverse;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+    margin: auto;
+    width: 80%;
+    min-width: 200px;
   }
   /* #submitAll {
     padding: 1rem 2rem;

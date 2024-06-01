@@ -29,22 +29,26 @@ export async function uploadChunk(id: string, data: BlobPart, index: number): Pr
 
 export async function chunkAndUpload(file: File): Promise<{id: string, associated: string[]}> {
   const id = await newAudio(file.type); // Create a new audio document and get its ID
-  const chunkSize = 4 * 1024 * 1024; // 4 MB chunk size (adjust as needed)
+  const chunkSize = 4 * 1024 * 1024; // 4 MB chunk size
   const fileReader = new FileReader();
 
   return new Promise((resolve, reject) => {
+
+      // Callback for when file is loaded successfully
       fileReader.onload = async (event: ProgressEvent<FileReader>) => {
           const chunkPaths = [];
+          // Check that file loaded successfully
           if (event.target && event.target.result) {
-            const buffer: ArrayBuffer = event.target.result as ArrayBuffer;
-            const totalChunks = Math.ceil(buffer.byteLength / chunkSize);
-
+            const buffer: ArrayBuffer = event.target.result as ArrayBuffer; // Convert file to array buffer
+            const totalChunks = Math.ceil(buffer.byteLength / chunkSize); // Split buffer into 4MB chunks
+            // iterate through chunks until end is reached
             for (let i = 0; i < totalChunks; i++) {
                 const start = i * chunkSize;
                 const end = Math.min(start + chunkSize, buffer.byteLength);
                 const chunk = buffer.slice(start, end);
                 
                 try {
+                    // Attempt to upload the chunk in the file id directory and retrieve a path to that chunk
                     const {path} = await uploadChunk(id, chunk, i);
                     chunkPaths.push(path);
                     console.log(`Uploaded chunk ${i + 1} of ${totalChunks}`);
@@ -52,7 +56,7 @@ export async function chunkAndUpload(file: File): Promise<{id: string, associate
                     reject(error);
                 }
             }
-
+            // return file id and an array of paths to the chunked data within that file id directory
             resolve({id: id, associated: chunkPaths});
           } else {
             reject("No data present")
@@ -64,6 +68,7 @@ export async function chunkAndUpload(file: File): Promise<{id: string, associate
           reject(error);
       };
 
+      // Read the file
       fileReader.readAsArrayBuffer(file);
   });
 }

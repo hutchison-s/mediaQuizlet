@@ -241,8 +241,9 @@ ul {
   filter: blur(4px);
 }
 .dialogContent {
-  display: grid;
-  grid-template-rows: 1.5fr 1fr 1fr 2fr;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   align-items: center;
   gap: 1.5rem;
   text-align: center;
@@ -258,6 +259,12 @@ ul {
   width: clamp(200px, 50%, 350px);
   margin: auto;
 }
+.dialogInput {
+  font-size: 16px;
+  width: clamp(300px, 90%, 600px);
+  border: 1px solid var(--secondary);
+  position: relative;
+}
 .dialogLogo {
   font-size: clamp(1.2rem, 5vw, 3.5rem);
 }
@@ -265,7 +272,7 @@ ul {
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
-  margin: clamp(0.5rem, 4vw, 3rem) auto;
+  margin: 0.5rem auto;
 }
 .dialog .buttonWrap {
   display: grid;
@@ -276,44 +283,12 @@ ul {
   width: 90vw;
   max-width: 800px;
   margin: 10dvh auto;
-  gap: 2rem;
-}
-
-/* Loading Graphic */
-
-#spinner {
+  gap: 1rem;
   position: fixed;
-  top: 50%;
+  top: 40dvh;
   left: 50%;
   translate: -50% -50%;
-  width: 100vw;
-  height: 100dvh;
-  box-sizing: border-box;
-  background: 
-    linear-gradient(var(--background), var(--light-secondary), var(--background), var(--secondary), var(--background), var(--background), var(--light-secondary), var(--background));
-  background-size: 400vw 400vh;
-  background-repeat: no-repeat;
-  animation: l19 1s infinite linear;
-  z-index: 1000;
-  opacity: 0.5;
 }
-
-#spinner::after {
-  content: "Loading...";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  translate: -50% -50%;
-  z-index: 1;
-  mix-blend-mode: difference;
-  color: var(--secondary);
-}
-
-#spinner.hidden {
-  display: none;
-}
-
-@keyframes l19 {
-  0%   {background-position: top}
-  100%  {background-position:bottom}
+#welcomeMenu h2 {
+  margin-top: 3rem;
 }

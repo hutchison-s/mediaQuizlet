@@ -1,111 +1,70 @@
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { AnswerObject, IndexArray } from "../types";
 import "./Quizzer.css";
-import { resizeAndCompress } from "../Functions/utility/utilFunctions";
 import Timer from "../Components/Timer";
 import Quiz from "../Components/Quiz";
 import QuizzerLogin from "../Components/QuizzerLogin";
 import { useQuiz } from "../Context/QuizContext";
 import { useNavigate } from "react-router-dom";
-import QuizProvider from "../Context/QuizProvider";
+import { useResponse } from "../responseContext";
+import { uploadFileAnswers } from "../Functions/apiCalls/images";
+import { useState } from "react";
+import Loader from "../Components/Loader";
 
 
 
 export default function Quizzer() {
 
     const quiz = useQuiz();
-    const [user, setUser] = useState<string>("");
-    const [responseId, setResponseId] = useState<string>("");
-    const [timeStarted, setTimeStarted] = useState<number | null>(null)
-    const [answers, setAnswers] = useState<IndexArray<AnswerObject>>({})
+    const {state, dispatch} = useResponse();
+    const [isSubmitting, setIsSubmitting] = useState(false)
 
     const navigate = useNavigate()
 
-    useEffect(()=>{
-        if (user) {
-            axios.post(`http://localhost:8000/api/quizzes/${quiz.quizId}/responses`,
-            {user: user, timeStarted: Date.now()}
-        )
+    const onStart = async (s: string) => {
+        axios.post(`http://localhost:8000/api/quizzes/${quiz.quizId}/responses`,
+        {user: s, timeStarted: Date.now()})
             .then(res => {
                 if (res.status === 200) {
-                    setTimeStarted(res.data.timeStarted)
-                    setResponseId(res.data.responseId);
+                    const {user, responseId, timeStarted} = res.data;
+                    dispatch({type: 'INITIALIZE', payload: {user, responseId, timeStarted}})
                 }
             })
-        }
-        
-    }, [user, quiz])
-
-    async function uploadImages() {
-        const associatedFiles: string[] = [];
-        const answers: string[] = [];
-        if (quiz && quiz.questions) {
-            for (const [idx, q] of quiz.questions.entries()) {
-                if (q.response.type == "IMG") {
-                    const photo = answers[idx]
-                    if (photo) {
-                        console.log(photo)
-                        const compPhoto: Blob = await resizeAndCompress(photo);
-                        const photoForm = new FormData();
-                        photoForm.append("photos", compPhoto, "photoUpload")
-                        const uploadResponse: {link: string, path: string} = await axios.post(`http://localhost:8000/api/uploads/image`, photoForm)
-                            .then(res => {
-                                if (res.status === 200) {
-                                    return res.data
-                                }
-                            });
-                        const {link, path} = uploadResponse;
-                        console.log(uploadResponse)
-                        associatedFiles.push(path);
-                        setAnswers((prev: IndexArray<AnswerObject>) => {
-                            const temp = {...prev};
-                            temp[idx].answer = link;
-                            return temp;
-                        })
-                    } else {
-                        setAnswers((prev: IndexArray<AnswerObject>) => {
-                            const temp = {...prev};
-                            temp[idx].answer = "";
-                            return temp;
-                        })
-                    }
-                    }
-                }
-                return associatedFiles;
-        }
     }
 
+   
+
     async function submitResponse() {
-        const associatedFiles: string[] | undefined = await uploadImages();
-        console.log(answers)
-        if (associatedFiles && answers) {
+        setIsSubmitting(true)
+        const [associatedFiles, newAnswers] = await uploadFileAnswers(quiz.questions, state.answers || []);
+        console.log(state.answers)
+        if (associatedFiles && newAnswers) {
             const newResponse = {
-                answers: answers,
+                answers: newAnswers,
                 associatedFiles: associatedFiles,
                 timeSubmitted: Date.now()
             }
-            axios.patch(`http://localhost:8000/api/quizzes/${quiz.quizId}/responses/${responseId}`, newResponse)
+            axios.patch(`http://localhost:8000/api/quizzes/${state.quizId}/responses/${state.responseId}`, newResponse)
                 .then(res => {
                     if (res.status === 200) {
-                        navigate("/success")
+                        navigate("/success/responseSubmitted")
                     }
                 })
         }
     }
 
     return (
-        <QuizProvider>
+        
             <div className="flex vertical even">
-                {user
-                    ?   <>
-                            {timeStarted && <Timer timeStarted={timeStarted}/>}
-                            <Quiz setAnswers={setAnswers} handleSubmit={submitResponse} />
-                        </>
-                    :   <QuizzerLogin setUser={setUser} />
+                {state.user
+                    ?   isSubmitting
+                            ?   <Loader />
+                            :   <>
+                                {state.timeLimit && <Timer timeStarted={state.timeStarted!}/>}
+                                <Quiz handleSubmit={submitResponse} />
+                            </>
+                    :   <QuizzerLogin setUser={onStart} />
                 }
 
             </div>
-        </QuizProvider>
     )
 }

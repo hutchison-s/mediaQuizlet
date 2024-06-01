@@ -79,7 +79,7 @@ export async function updateResponse(req, res) {
             const ref = rCol.doc(responseId);
             const {answers} = (await ref.get()).data();
             for (let i = 0; i<scores.length; i++) {
-                answers[i].score = scores[i];
+                answers[i] = scores[i];
             }
             await ref.update({answers: answers});
             res.send((await ref.get()).data())
@@ -98,9 +98,9 @@ export async function updateResponse(req, res) {
         const graded = Object.values(answers).map((a, idx) => {
             const q = questions[idx];
             switch(q.type) {
-                case "multipleChoice":
+                case "MC":
                     return {answer: q.options[a.answer], score: a.answer == q.correct ? q.pointValue : 0}
-                case "shortAnswer":
+                case "SA":
                     let correct = new RegExp(q.correct.trim().replace(/[^\w-]/g, ""), "i")
                     return {answer: a.answer, score: correct.test(a.answer.trim().replace(/[^\w-]/g, "")) ? q.pointValue : 0}
                 default:

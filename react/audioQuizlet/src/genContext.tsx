@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { ReactNode, Dispatch, createContext, useReducer, useContext } from "react";
+import { Dispatch, createContext, useReducer, useContext, PropsWithChildren } from "react";
 import { GenQuestion, GenQuiz } from "./types-new";
 
 const initialState: GenQuiz= {
@@ -27,21 +27,25 @@ const initialState: GenQuiz= {
     | { type: 'DELETE_ALL_QUESTIONS'; payload: boolean}
     | { type: 'MOVE_QUESTION_DOWN'; payload: number }
     | { type: 'MOVE_QUESTION_UP'; payload: number }
-    | { type: 'INSERT_QUESTION_BEFORE'; payload: {questionId: number, targetId: number} }
+    | { type: 'INSERT_QUESTION_BEFORE'; payload: {questionId: number, targetIndex: number} }
     | { type: 'SET_ACTIVE'; payload: number};
   
   // Reducer function
   const quizReducer = (state: GenQuiz, action: Action): GenQuiz => {
     switch (action.type) {
         case 'ADD_QUESTION':
+            console.log("adding question...", action.payload);
+            
           return {
             ...state,
             questions: [...state.questions, action.payload],
+            active: state.questions.length
           };
         case 'ADD_MULTIPLE_QUESTIONS':
             return {
                 ...state,
-                questions: [...state.questions, ...action.payload]
+                questions: [...state.questions, ...action.payload],
+                active: state.questions.length + action.payload.length - 1
             };
         case 'UPDATE_QUESTION':
           return {
@@ -63,13 +67,11 @@ const initialState: GenQuiz= {
           if (!questionToDuplicate) {
             return state;
           }
-          const newQuestion: GenQuestion = {
-            ...questionToDuplicate,
-            id: Date.now(), // Or another unique ID generator
-          };
+          const newQuestion = {...deepCopy(questionToDuplicate), id: Date.now()};
           return {
             ...state,
             questions: [...state.questions, newQuestion],
+            active: state.active + 1
           };
         case 'DELETE_ALL_QUESTIONS':
             if (action.payload) {
@@ -89,7 +91,7 @@ const initialState: GenQuiz= {
               updatedQuestionsUp[indexUp],
               updatedQuestionsUp[indexUp - 1],
             ];
-            return { ...state, questions: updatedQuestionsUp };
+            return { ...state, questions: updatedQuestionsUp, active: state.active - 1 };
           }
           return state;
         case 'MOVE_QUESTION_DOWN':
@@ -100,17 +102,16 @@ const initialState: GenQuiz= {
               updatedQuestionsDown[indexDown],
               updatedQuestionsDown[indexDown + 1],
             ];
-            return { ...state, questions: updatedQuestionsDown };
+            return { ...state, questions: updatedQuestionsDown, active: state.active + 1 };
           }
           return state;
         case 'INSERT_QUESTION_BEFORE':
-          const { questionId, targetId } = action.payload;
-          const indexInsert = state.questions.findIndex((q) => q.id === targetId);
+          const { questionId, targetIndex } = action.payload;
           const questionToInsert = state.questions.find((q) => q.id === questionId);
-          if (indexInsert !== -1 && questionToInsert) {
+          if (targetIndex >= 0 && targetIndex < state.questions.length && questionToInsert) {
             const updatedQuestionsInsert = state.questions.filter((q) => q.id !== questionId);
-            updatedQuestionsInsert.splice(indexInsert, 0, questionToInsert);
-            return { ...state, questions: updatedQuestionsInsert };
+            updatedQuestionsInsert.splice(targetIndex, 0, questionToInsert);
+            return { ...state, questions: updatedQuestionsInsert, active: targetIndex };
           }
           return state;
         case 'SET_ACTIVE':
@@ -121,6 +122,11 @@ const initialState: GenQuiz= {
             ...state,
             active: action.payload
           }
+        case 'SET_TIME_LIMIT':
+            return {
+                ...state,
+                timeLimit: action.payload
+            }
         case 'SET_ADMIN':
             return {
                 ...state,
@@ -145,11 +151,38 @@ const initialState: GenQuiz= {
           return state;
       }
     };
+
+    function deepCopy<T>(obj: T): T {
+        if (obj === null || typeof obj !== 'object') {
+            return obj;
+        }
+    
+        // Handle Date
+        if (obj instanceof Date) {
+            return new Date(obj.getTime()) as unknown as T;
+        }
+    
+        // Handle Array
+        if (Array.isArray(obj)) {
+            return obj.map((item) => deepCopy(item)) as unknown as T;
+        }
+    
+        // Handle File
+        if (obj instanceof File) {
+            return new File([obj], obj.name, { type: obj.type, lastModified: obj.lastModified }) as unknown as T;
+        }
+    
+        // Handle Object
+        const copiedObj: { [key: string]: unknown } = {};
+        for (const key in obj) {
+            if (Object.prototype.hasOwnProperty.call(obj, key)) {
+                copiedObj[key] = deepCopy((obj as { [key: string]: unknown })[key]);
+            }
+        }
+        return copiedObj as T;
+    }
   
   // Define the context and provider
-  interface GeneratorProviderProps {
-    children: ReactNode;
-  }
   
   interface GeneratorContextType {
     state: GenQuiz;
@@ -158,7 +191,7 @@ const initialState: GenQuiz= {
   
   const QuizContext = createContext<GeneratorContextType | undefined>(undefined);
   
-  export const GeneratorContextProvider = ({ children }: GeneratorProviderProps) => {
+  export const GeneratorContextProvider = ({ children }: PropsWithChildren) => {
     const [state, dispatch] = useReducer(quizReducer, initialState);
   
     return (

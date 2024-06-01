@@ -1,14 +1,13 @@
 import { createContext, useContext } from "react";
-import { quizzerObject } from "../types";
+import { essentialQuiz } from "../types-new";
 
-
-export const QuizContext = createContext<quizzerObject>({
-        timeLimit: "",
-        admin: "",
+export const QuizContext = createContext<essentialQuiz>({
+        timeLimit: null,
         questions: [],
         quizId: "",
         status: "open",
-        URL: ""
+        title: "",
+        description: ""
 })
 
 export const useQuiz = ()=>useContext(QuizContext)

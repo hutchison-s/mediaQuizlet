@@ -43,7 +43,7 @@ export default function QuestionItem({index, question}: itemProps) {
         dispatch({type: 'MOVE_QUESTION_UP', payload: question.id})
     }
     const moveForward = ()=>{
-        dispatch({type: 'MOVE_QUESTION_UP', payload: question.id})
+        dispatch({type: 'MOVE_QUESTION_DOWN', payload: question.id})
     }
     const deleteItem = ()=>{
         dispatch({type: 'REMOVE_QUESTION', payload: question.id})
@@ -79,10 +79,10 @@ export default function QuestionItem({index, question}: itemProps) {
                     <button className="deleteItemButton" onClick={deleteItem}>Delete</button>
                 </div>
                 <h4 className="itemSectionHeader">Prompts</h4>
-                {question.prompts.map((p, i)=><PromptBox key={"item"+index+question.response.type+p.type} question={question} promptIndex={i}/>)}
+                {question.prompts.map((p, i)=><PromptBox key={question.id+"prompt"+i} question={question} promptIndex={i}/>)}
                 <p><span onClick={addPrompt} className="newPromptButton"><i className="fa-solid fa-circle-plus"></i> Add Prompt</span></p>
                 <h4 className="itemSectionHeader">Response</h4>
-                <ResponseBox t={question.response.type} i={index} />
+                <ResponseBox q={question} />
                 <div className="itemFooter">
                     {index > 0 ? <button onClick={moveBack}><i className="fa-solid fa-arrow-left"></i></button> : <span></span>}
                     {state.questions.length > 1 && <span> Move Question </span>}
