@@ -3,8 +3,9 @@ import { useQuiz } from "../Context/QuizContext";
 
 interface TimerProps {
     timeStarted: number
+    callback: ()=>void
 }
-export default function Timer({timeStarted}: TimerProps) {
+export default function Timer({timeStarted, callback}: TimerProps) {
 
     const {timeLimit} = useQuiz();
     const [remaining, setRemaining] = useState<number>(60);
@@ -19,7 +20,8 @@ export default function Timer({timeStarted}: TimerProps) {
             
             // Stop the timer when time runs out
             if (timeRemainingInSeconds <= 0) {
-                clearInterval(timerInterval); 
+                clearInterval(timerInterval);
+                callback() 
             }
         }, 1000);
 

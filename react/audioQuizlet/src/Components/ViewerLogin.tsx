@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from "react"
 import LogoLink from "./Logo"
 
 interface ViewerLoginProps {
-    login: (user: string, pass: string) => void
+    login: (user: string, pass: string) => void,
+    error: number | undefined
 }
 
-export default function ViewerLogin({login}: ViewerLoginProps) {
+export default function ViewerLogin({login, error}: ViewerLoginProps) {
     
     const modalRef = useRef<HTMLDialogElement>(null)
     const [password, setPassword] = useState("")
@@ -29,21 +30,25 @@ export default function ViewerLogin({login}: ViewerLoginProps) {
             <div className="dialogContent">
                 <LogoLink tag={false}/>
                 <h2 className="fontSecondary">Enter credentials to view responses</h2>
-                <form onSubmit={(e)=>{e.preventDefault(); handleClick()}}>
-                    <input
-                        className="pad1 dialogInput softCorner bgBackground fontPrimary"
-                        type="email"
-                        name="email"
-                        id="email"
-                        placeholder="Admin email..."
-                        value={email}
-                        onChange={(e)=>{setEmail(e.target.value)}}
-                        />
-                    <div style={{width: '100%', position: 'relative'}}>
+                <form onSubmit={(e)=>{e.preventDefault(); handleClick()}} style={{width: '80%', position: 'relative'}}>
+                    <div className="textInputWrapper">
+                        <input
+                            className={`textInput ${error === 401 ? "invalid" : ""
+                            }`}
+                            type="email"
+                            name="email"
+                            id="email"
+                            placeholder="Admin email..."
+                            value={email}
+                            onChange={(e)=>{setEmail(e.target.value)}}
+                            />
+                    </div>
+                    <div className="textInputWrapper" id="passBox">
                         <input
                         required
                         type={hiddenPass ? "password" : "text"}
-                        className="pad1 dialogInput softCorner bgBackground fontPrimary"
+                        className={`textInput ${error === 401 ? "invalid" : ""
+                    }`}
                         id="password"
                         name="password"
                         pattern="^[a-zA-Z0-9!@#%^&*]{4,16}$"
@@ -53,8 +58,9 @@ export default function ViewerLogin({login}: ViewerLoginProps) {
                         />
                         <i id="peek" className="fa-solid fa-eye" onPointerDown={toggleVisibility} onPointerUp={toggleVisibility}></i>
                     </div>
+                    <button type="submit" className="primaryBtn softCorner" style={{margin: '0 auto'}}>View Responses</button>
                 </form>
-                <button onClick={handleClick} className="primaryBtn softCorner" style={{margin: '0 auto'}}>View Responses</button>
+                
             </div>
         </dialog>
     )

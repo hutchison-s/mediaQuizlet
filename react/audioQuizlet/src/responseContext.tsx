@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { Dispatch, PropsWithChildren, createContext, useContext, useReducer } from "react"
+import { Dispatch, PropsWithChildren, createContext, useContext, useEffect, useReducer } from "react"
 import { ResponseAction, userResponse } from "./types-new"
 
 import { useQuiz } from "./Context/QuizContext"
@@ -8,6 +8,11 @@ import { useQuiz } from "./Context/QuizContext"
 
 const responseReducer = (state: userResponse, action: ResponseAction): userResponse => {
   switch(action.type) {
+      case 'RESTORE':
+          return {
+            ...state,
+            ...action.payload
+          }
       case 'INITIALIZE':
           if (!state.questions || !state.quizId) {
               return state;
@@ -51,6 +56,14 @@ const responseReducer = (state: userResponse, action: ResponseAction): userRespo
               ...state,
               ...action.payload
           }
+      case 'UPDATE_PROMPT_REMAINING':
+        const newQuestions = [...state.questions!];
+        const {qIndex, pIndex, remaining} = action.payload
+        newQuestions[qIndex].prompts[pIndex].remaining = remaining
+          return {
+            ...state,
+            questions: newQuestions
+          }
       default:
           return state;
   }
@@ -66,13 +79,21 @@ const ResponseContext = createContext<ResponseContextType | undefined>(undefined
 export const ResponseProvider = ({children}: PropsWithChildren) => {
 
     const {questions, quizId} = useQuiz();
-    const initialState: userResponse = {
+    const localResponse = localStorage.getItem("currentQuizResponse:"+quizId);
+    const initialState: userResponse = localResponse ? JSON.parse(localResponse) : {
         quizId: quizId,
         questions: questions,
         timeLimit: null
     }
 
     const [state, dispatch] = useReducer(responseReducer, initialState);
+
+    useEffect(()=>{
+        if (state.user) {
+            localStorage.setItem("currentQuizResponse:"+quizId, JSON.stringify(state))
+        }
+        
+    }, [state])
 
     return (
         <ResponseContext.Provider value={{state, dispatch}}>

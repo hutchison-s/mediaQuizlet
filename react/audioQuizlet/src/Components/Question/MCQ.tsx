@@ -4,16 +4,17 @@ import { GenQuestion } from "../../types-new";
 interface MCQProps {
     question: GenQuestion,
     setAnswer: (a: string) => void,
+    initial: string
 }
 
 interface OptionType {
     opt: string,
     idx: number
 }
-export default function MCQ({question, setAnswer}: MCQProps) {
+export default function MCQ({question, setAnswer, initial}: MCQProps) {
 
     const options = question.response.options!;
-    const [selected, setSelected] = useState(0);
+    const [selected, setSelected] = useState(parseInt(initial) || 0);
 
     useEffect(()=>{
         setAnswer(String(selected))

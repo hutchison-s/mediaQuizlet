@@ -5,6 +5,7 @@ import axios from "axios";
 import { useState } from "react";
 import { fullQuiz, userResponse } from "../types-new";
 import QuizResponses from "../Components/QuizResponses";
+import Loader from "../Components/Loader";
 
 export default function Viewer() {
 
@@ -12,6 +13,8 @@ export default function Viewer() {
     const [quiz, setQuiz] = useState<fullQuiz>()
     const [responses, setResponses] = useState<userResponse[]>()
     const [auth, setAuth] = useState("")
+    const [error, setError] = useState<number | undefined>()
+    const [isLoading, setIsLoading] = useState(false)
     const navigate = useNavigate();
 
     const handleLogin = (user: string, pass: string) => {
@@ -43,6 +46,10 @@ export default function Viewer() {
           })
           .catch(err => {
             console.log(err)
+            setError(401);
+            setTimeout(()=>{
+                setError(undefined)
+            }, 2000)
           })
     }
 
@@ -68,6 +75,7 @@ export default function Viewer() {
         if (!goOn) {
             return;
         }
+        setIsLoading(true)
         axios.patch(`http://localhost:8000/api/quizzes/${quizId}/admin`, {reset: true}, {
             headers: {
                 "Authorization": auth,
@@ -77,6 +85,7 @@ export default function Viewer() {
             if (res.status === 200) {
                 setQuiz(res.data)
                 setResponses(res.data.responses)
+                setIsLoading(false)
             } else {
                 throw new Error("Invalid response: "+res.status)
             }
@@ -90,6 +99,7 @@ export default function Viewer() {
         if (!goOn) {
             return;
         }
+        setIsLoading(true)
         axios.delete(`http://localhost:8000/api/quizzes/${quizId}/admin`, {
             headers: {
                 "Authorization": auth
@@ -113,7 +123,7 @@ export default function Viewer() {
         const prevAnswers = responses!.filter(r => r.responseId === responseId)[0].answers;
         const updated = prevAnswers?.map((a, i)=>i == answerIndex ? {...a, score: newScore} : a);
         setResponses(state => {
-            return state?.map(r => responseId === responseId ? {...r, answers: updated} : r)
+            return state?.map(r => r.responseId === responseId ? {...r, answers: updated} : r)
         })
         axios.patch(`http://localhost:8000/api/quizzes/${quizId}/responses/${responseId}`, {scores: updated}, {
             headers: {
@@ -124,13 +134,25 @@ export default function Viewer() {
         
     }
 
+    const deleteResponse = (responseId: string)=>{
+        axios.delete(`http://localhost:8000/api/quizzes/${quizId}/responses/${responseId}`, {
+            headers: {
+                Authorization: auth
+            }
+        })
+        setResponses(prev => {
+            return prev?.filter(res => res.responseId !== responseId)
+        })
+    }
+
     return (
         quiz && responses
             ?   <section className="responseContainer">
+                {isLoading && <Loader />}
                     <div className="quizHeader">
                         <h2>{quiz.title || "Untitled Quiz"}</h2>
                         <p>{quiz.questions.length} Questions, worth {quiz.questions.reduce((sum, q)=>sum+q.pointValue, 0)} points</p>
-                        <p>{quiz.responses.length} Response{quiz.responses.length !== 1 ? "s" : ""}</p>
+                        <p>{responses.length} Response{responses.length !== 1 ? "s" : ""}</p>
                         <p><small>{quiz.description}</small></p>
                     </div>
                     <div className="quizAdminOptions">
@@ -138,8 +160,8 @@ export default function Viewer() {
                         <button className="secondaryBtn" onClick={resetQuiz}>Reset Quiz</button>
                         <button className="warningButton" onClick={deleteQuiz}>Delete Quiz</button>
                     </div>
-                    <QuizResponses questions={quiz.questions} responses={responses!} updateScore={updateScore}/>
+                    <QuizResponses questions={quiz.questions} responses={responses!} updateScore={updateScore} deleteResponse={deleteResponse}/>
                 </section>
-            :   <ViewerLogin login={handleLogin}/>
+            :   <ViewerLogin login={handleLogin} error={error} />
     )
 }

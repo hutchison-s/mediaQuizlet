@@ -47,6 +47,10 @@ export async function processQuestions(state: GenQuiz) {
                 const {path, link} = await compressAndUploadImage(prompt.file);
                 associatedFiles.push(path);
                 prompt.path = link;
+            } else {
+                if (typeof(prompt.text) == 'string') {
+                    prompt.text = prompt.text?.split('\n')
+                }
             }
         }
         

@@ -2,12 +2,13 @@ export type GenPromptType = "text" | "audio" | "image"
 export type GenResponseType = "MC" | "SA" | "IMG" | "AUD" | "REC"
 export type GenPrompt = {
     type: GenPromptType,
-    text?: string, // Optional text content for text prompts
+    text?: string[] | string, // Optional text content for text prompts
     file?: File, // Optional file object for audio or image prompts
     path?: string // Optional file path for uploaded file after processing
     isPausable?: boolean // Optional variable for audio prompts
     playLimit?: number // Optional variable for audio prompts
     timeLimit?: number // Optional variable for image prompts
+    remaining?: number
   };
   
   export type GenResponse = {
@@ -78,4 +79,6 @@ export type ResponseAction =
       {type: 'UPDATE_ANSWER', payload: {id: number, answer: AnswerObject}}
     | {type: 'UPDATE_MANY', payload: {id: number, answer: AnswerObject}[]}
     | {type: 'INITIALIZE', payload: {user: string, responseId: string, timeStarted: number}}
+    | {type: 'RESTORE', payload: userResponse}
     | {type: 'PRE-SUBMIT', payload: {associatedFiles?: string[], timeSubmitted?: string}}
+    | {type: 'UPDATE_PROMPT_REMAINING', payload: {qIndex: number, pIndex: number, remaining: number}}

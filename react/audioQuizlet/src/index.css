@@ -70,6 +70,9 @@ ul {
 .gapSmall {
   gap: 0.25rem;
 }
+.gapMedium {
+  gap: 1rem;
+}
 
 .textInputWrapper {
   position: relative;
@@ -77,11 +80,11 @@ ul {
 }
 .textInput {
   font-size: clamp(16px, 8vh, 24px);
-  padding: 0.25rem;
+  padding: 0.5rem;
   border: 1px solid var(--secondary);
   color: var(--primary);
   border-radius: 0.25rem;
-  background: transparent;
+  background: var(--background);
   width: 100%;
 }
 .textInput.invalid {

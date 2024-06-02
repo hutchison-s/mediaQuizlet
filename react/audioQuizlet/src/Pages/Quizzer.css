@@ -28,6 +28,7 @@ p:has(#currentUser) {
     width: clamp(340px, 70vw, 700px);
     max-height: 75vh;
     overflow: auto;
+    border-radius: 1rem;
   }
   #quizBox h2 {
     width: 100%;
@@ -43,6 +44,7 @@ p:has(#currentUser) {
     box-shadow: var(--shadow);
     background: var(--background);
     border: 2px solid var(--secondary);
+    border-radius: 0.5rem;
   }
   #timeBox {
     color: var(--primary);
@@ -109,6 +111,12 @@ p:has(#currentUser) {
   }
   .questionForm .recordAudioButton,
   .questionForm audio {
+    margin: auto;
+  }
+  .questionForm audio {
+    min-width: 200px;
+  }
+  .questionForm .resetPrompt {
     margin: auto;
   }
   .playerBox {
@@ -179,6 +187,41 @@ p:has(#currentUser) {
     text-align: center;
     padding: 0.5rem;
   }
+
+  .promptImageWrapper {
+    position: relative;
+    width: 100%;
+    
+}
+.promptImageWrapper button,
+.promptImageWrapper p {
+    margin: auto;
+    background-color: var(--primary);
+    color: var(--background);
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 5rem;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+.promptImageWrapper img {
+    width: 100%;
+    border-radius: 0.5rem;
+}
+.promptImageClock {
+    position: absolute;
+    background: var(--background);
+    color: var(--primary);
+    padding: 0.25rem;
+    text-align: center;
+    width: 3rem;
+    border-radius: 0.5rem;
+    top: 100%;
+    right: 0;
+    border: 1px solid var(--secondary);
+    translate: 0 -50%;
+}
   
   @media screen and (max-width: 450px) {
     h1 {

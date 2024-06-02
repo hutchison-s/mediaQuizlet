@@ -10,6 +10,11 @@
     place-items: center;
 }
 
+#viewerLogin #peek {
+    scale: 1.3;
+    right: 3%;
+}
+
 .responseContainer {
     display: flex;
     flex-direction: column;
@@ -24,6 +29,7 @@
 
 .responseBox {
     background-color: var(--background);
+    background-image: linear-gradient(to bottom, var(--secondary), var(--background) 30px, var(--background) calc(100% - 30px), var(--secondary));
     box-shadow: var(--shadow);
     width: clamp(350px, 90vw, 800px);
     padding: 2rem 1.5rem;
@@ -41,9 +47,19 @@
     justify-content: space-between;
     align-items: center;
 }
+.userScore {
+    min-width: 6rem;
+    text-align: right;
+}
+.userScore * {
+    font-size: x-large;
+    color: var(--secondary);
+    font-weight: 800;
+}
 .quizAdminOptions {
     display: flex;
-    gap: 2rem;
+    width: clamp(350px, 90vw, 600px);
+    justify-content: space-between;
 }
 .quizAdminOptions button {
     margin: 0;
@@ -54,7 +70,9 @@
 .quizHeader {
     text-align: center;
 }
-
+.warningButton .fa-trash-can {
+    color: white;
+}
 .userName {
     font-size: xx-large;
 }
@@ -74,9 +92,12 @@
 
 .questionHeader {
     display: flex;
-    gap: 2rem;
+    column-gap: 2rem;
+    justify-content: space-between;
     align-items: center;
     font-size: x-large;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
 }
 .questionHeader span {
     font-size: larger;
@@ -88,4 +109,80 @@
     color: var(--primary);
     border: 1px solid var(--secondary);
     border-radius: 0.25rem;
+}
+.questionScore {
+    min-width: 6rem;
+    display: flex;
+}
+.toggleAnswers {
+    border: 1px solid var(--secondary);
+    background-color: transparent;
+    width: 2rem;
+    aspect-ratio: 1;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    border-radius: 0.5rem;
+    cursor: pointer;
+}
+.toggleAnswers.open {
+    color: white;
+    background-color: var(--secondary);
+}
+.toggleAnswers.open * {
+    color: white;
+}
+.responseQuestion p {
+    position: relative;
+    width: fit-content;
+    line-height: 2;
+}
+.responsePromptBox {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+.correctAnswer {
+    color: var(--success);
+}
+.correctAnswer::after {
+    font-family: 'Font Awesome 5 Free';
+    content: '\f058';
+    position: absolute;
+    left: 100%;
+    top: 50%;
+    translate: 50% -50%;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--success);
+}
+.questionScore button {
+    border: 1px solid var(--secondary);
+    width: 2rem;
+    aspect-ratio: 1;
+    background: transparent;
+    color: var(--secondary);
+    font-weight: 800;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    border-radius: 0.5rem;
+    margin-left: 0.5rem;
+    cursor: pointer;
+}
+.questionScore button * {
+    color: var(--secondary);
+    font-weight: 800;
+}
+
+@media screen and (max-width: 480px) {
+    .questionScore {
+        flex: 100%;
+        font-size: medium;
+        align-items: center;
+    }
+    .questionScore button {
+        width: 1.7rem;
+        font-size: 1rem;
+    }
 }

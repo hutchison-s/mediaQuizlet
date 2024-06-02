@@ -36,8 +36,7 @@ export default function Quizzer() {
     async function submitResponse() {
         setIsSubmitting(true)
         const [associatedFiles, newAnswers] = await uploadFileAnswers(quiz.questions, state.answers || []);
-        console.log(state.answers)
-        if (associatedFiles && newAnswers) {
+        console.log("sending", associatedFiles)
             const newResponse = {
                 answers: newAnswers,
                 associatedFiles: associatedFiles,
@@ -46,10 +45,11 @@ export default function Quizzer() {
             axios.patch(`http://localhost:8000/api/quizzes/${state.quizId}/responses/${state.responseId}`, newResponse)
                 .then(res => {
                     if (res.status === 200) {
+                        localStorage.removeItem("currentQuizResponse:"+quiz.quizId)
                         navigate("/success/responseSubmitted")
                     }
                 })
-        }
+        
     }
 
     return (
@@ -59,9 +59,10 @@ export default function Quizzer() {
                     ?   isSubmitting
                             ?   <Loader />
                             :   <>
-                                {state.timeLimit && <Timer timeStarted={state.timeStarted!}/>}
-                                <Quiz handleSubmit={submitResponse} />
-                            </>
+                                    <p><small id="currentUser">Quizzing as {state.user}</small></p>
+                                    {quiz.timeLimit && <Timer timeStarted={state.timeStarted!} callback={submitResponse}/>}
+                                    <Quiz handleSubmit={submitResponse} />
+                                </>
                     :   <QuizzerLogin setUser={onStart} />
                 }
 

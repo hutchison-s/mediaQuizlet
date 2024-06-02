@@ -39,13 +39,13 @@ export default function UserQuizzes() {
             <h2 style={{textAlign: "center", marginTop: "2rem"}}>Quizzes created by {email}</h2>
             <ul id="userQuizList">
                 {quizzes
-                    ? quizzes.map(q => 
-                    (<li key={q.created} data-description={q.description || "No description..."}>
+                    ? quizzes.map(quiz => 
+                    (<li key={quiz.created} data-description={quiz.description || "No description..."}>
                         <span>
-                            <Link to={q.URL}>{q.title || "Untitled Quiz"}</Link>
+                            <Link to={quiz.URL}>{quiz.title || "Untitled Quiz"}</Link>
                         </span>
-                        <span>{q.length} question{q.length > 1 ? "s" : ""} in {q.timeLimit ? q.timeLimit + " minutes" : "unlimited time"}</span>
-                        <span><em>Created on {new Date(q.created).toLocaleString()}</em></span>
+                        <span>{quiz.length} question{quiz.length > 1 ? "s" : ""} in {quiz.timeLimit ? quiz.timeLimit + " minutes" : "unlimited time"}</span>
+                        <span><em>Created on {new Date(quiz.created).toLocaleString()}</em></span>
                     </li>))
                     : <Loader />
                 }

@@ -2,11 +2,12 @@ import { ChangeEvent, useEffect, useState } from "react";
 
 interface SAQProps {
     setAnswer: (a: string) => void,
+    initial: string
 }
 
-export default function SAQ({setAnswer}: SAQProps) {
+export default function SAQ({setAnswer, initial}: SAQProps) {
     
-    const [response, setResponse] = useState("");
+    const [response, setResponse] = useState(initial || "");
 
     useEffect(()=>{
         setAnswer(response)
@@ -24,6 +25,7 @@ export default function SAQ({setAnswer}: SAQProps) {
                         type="text" 
                         placeholder="Your Answer..."
                         onInput={handleChange}
+                        value={response}
                     />
                 </label>
         )

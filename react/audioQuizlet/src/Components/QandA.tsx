@@ -13,7 +13,11 @@ export default function QandA({q, a, i, update}: QandAProps) {
     const renderPrompt = (p: GenPrompt) => {
         switch(p.type) {
             case 'text':
-                return <p key={q.id+i+p.type}>{p.text}</p>
+                if (typeof(p.text) == 'object') {
+                    return <div key={q.id+i+p.type}>{p.text.map((line: string, index: number) => <p key={index} style={{textAlign: 'left', width: '100%', lineHeight: '1.25'}} >{line}</p>)}</div>
+                } else {
+                    return <p key={q.id+i+p.type}>{p.text}</p>
+                }
             case 'audio':
                 return <UnLimitedPlayer file={p.path!}  key={q.id+i+p.type}/>;
             case 'image':
@@ -28,29 +32,29 @@ export default function QandA({q, a, i, update}: QandAProps) {
             case 'SA':
                 return (
                     <>
-                        <p>Answered: {a.answer}</p>
-                        <p>Correct answer: {q.response.correct}</p>
+                        <p className={a.score === q.pointValue ? "correctAnswer" : ""}><strong>Answered:</strong> {a.answer}</p>
+                        <p><strong>Correct answer:</strong> {q.response.correct}</p>
                     </>
                 )
             case 'MC':
                 return (
                     <>
-                        <p>Answered: {q.response.options![parseInt(a.answer)]}</p>
-                        <p>Correct answer: {q.response.options![parseInt(q.response.correct!)]}</p>
+                        <p className={a.score === q.pointValue ? "correctAnswer" : ""}><strong>Answered:</strong> {q.response.options![parseInt(a.answer)]}</p>
+                        <p><strong>Correct answer:</strong> {q.response.options![parseInt(q.response.correct!)]}</p>
                     </>
                 )
             case 'REC':
             case 'AUD':
                 return (
                     <>
-                        <p>Answered: </p>
+                        <p className={a.score === q.pointValue ? "correctAnswer" : ""}><strong>Answered:</strong> </p>
                         <UnLimitedPlayer file={a.answer} />
                     </>
                 )
             case 'IMG':
                 return (
                     <>
-                        <p>Answered: </p>
+                        <p className={a.score === q.pointValue ? "correctAnswer" : ""}><strong>Answered:</strong> </p>
                         <img src={a.answer} alt="Quiz Response Photo Upload"  width='100%'/>
                     </>
                 )
@@ -60,16 +64,44 @@ export default function QandA({q, a, i, update}: QandAProps) {
         }
     }
 
+    const handleChange = (floatVal: number) => {
+        if (floatVal < 0 || floatVal > q.pointValue) {
+            return;
+        }
+        update(floatVal, i)
+    }
+
+    const inc = ()=>{
+        handleChange(a.score+0.5)
+    }
+    const dec = ()=>{
+        handleChange(a.score-0.5)
+    }
+    const fullPoints = ()=>{
+        handleChange(q.pointValue)
+    }
+
+
+
+
 
     return (
         <div className="responseQuestion">
             <div className="questionHeader">
                 <h4>Question {i + 1}</h4>
-                <div><input type="number" min={0} max={q.pointValue} value={a.score} onChange={(e)=>{update(parseFloat(e.target.value), i)}}/> / {q.pointValue}</div>
+                <div className="questionScore">
+                    <span>{a.score}</span>
+                     <span>/ {q.pointValue}</span>
+                     <button onClick={dec}>-</button>
+                     <button onClick={inc}>+</button>
+                     <button onClick={fullPoints}><i className="fa-regular fa-circle-check"></i></button>
+                     </div>
             </div>
-            {q.prompts.map(p=>
-                renderPrompt(p)
-            )}
+            <div className="responsePromptBox">
+                {q.prompts.map(p=>
+                    renderPrompt(p)
+                )}
+            </div>
             {<div className="responseAnswer">
                 {renderAnswer()}
             </div>}

@@ -100,7 +100,9 @@ export async function uploadFileAnswers(questions: GenQuestion[], answers: Answe
                     continue;
                 }
                 const {id, associated} = await chunkAndUpload(new File([audio], 'newRecording.mp3', {type: 'audio/mpeg'}))
-                associatedFiles.concat(associated);
+                for (const chunk of associated) {
+                    associatedFiles.push(chunk)
+                }
                 newAnswers.push({answer: id, score: 0})
             }   else {
                 newAnswers.push({answer: answers[idx].answer, score: q.response.correct?.toLowerCase() === answers[idx].answer.toLowerCase() ? q.pointValue : 0})
