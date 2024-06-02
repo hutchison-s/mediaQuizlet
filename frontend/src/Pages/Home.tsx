@@ -10,6 +10,7 @@ export default function Home() {
         <>
             <section id="homePage">
                 <Welcome />
+                <p className="heroText"><strong>Media Quizlet</strong> redefines quiz creation for those who seek expanded media control. Offering unparalleled customization, our platform lets you tailor quizzes with audio, image, and text prompts effortlessly. Plus, enjoy the convenience of diving straight into quizzing without any login hassles.</p>
                 <h2 style={{textAlign: 'center', fontSize: '2.5rem'}}>How to Get Started</h2>
                 <div className="tutorialFrame">
                     <h3>Create custom questions with audio, image, or text.</h3>

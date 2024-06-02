@@ -1,6 +1,6 @@
-# AudioQuizlet Frontend
+# MediaQuizlet Frontend
 
-The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.app](https://audioquizlet.netlify.app/), providing functionalities for generating, accessing, and viewing quizzes.
+The MediaQuizlet frontend is a web application hosted at [mediaquizlet.netlify.app](https://mediaquizlet.netlify.app/), providing functionalities for generating, accessing, and viewing quizzes.
 - Files located in the `frontend` subdirectory.
 - Node.js API files located in the `api` subdirectory.
 
@@ -8,15 +8,15 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
 
 ### 1. Landing Page
 
-- **URL**: [audioquizlet.netlify.app](https://audioquizlet.netlify.app/)
-- **Description**: Homepage of the AudioQuizlet website.
+- **URL**: [mediaquizlet.netlify.app](https://mediaquizlet.netlify.app/)
+- **Description**: Homepage of the MediaQuizlet website.
 - **Features**:
   - Link to generate a new quiz.
   - Link to lookup a quiz by its unique ID.
 
 ### 2. Generate Page
 
-- **URL**: [audioquizlet.netlify.app/generate](https://audioquizlet.netlify.app/generate)
+- **URL**: [mediaquizlet.netlify.app/generate](https://mediaquizlet.netlify.app/generate)
 - **Description**: Page for generating a new quiz.
 - **Features**:
   - Upload audio files.
@@ -33,7 +33,7 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
 
 ### 3. Lookup Page
 
-- **URL**: [audioquizlet.netlify.app/lookup](https://audioquizlet.netlify.app/lookup)
+- **URL**: [mediaquizlet.netlify.app/lookup](https://mediaquizlet.netlify.app/lookup)
 - **Description**: Page for looking up a quiz by its ID.
 - **Features**:
   - Enter a quiz ID to retrieve the quiz from the database.
@@ -41,7 +41,7 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
 
 ### 4. Quizzer Page
 
-- **URL**: [audioquizlet.netlify.app/quizzer](https://audioquizlet.netlify.app/quizzer) + quiz code
+- **URL**: [mediaquizlet.netlify.app/quizzer](https://mediaquizlet.netlify.app/quizzer) + quiz code
 - **Description**: Page for taking a quiz.
 - **Features**:
   - Enter your name.
@@ -51,7 +51,7 @@ The AudioQuizlet frontend is a web application hosted at [audioquizlet.netlify.a
 
 ### 5. Viewer Page
 
-- **URL**: [audioquizlet.netlify.app/viewer](https://audioquizlet.netlify.app/viewer) + quiz code
+- **URL**: [mediaquizlet.netlify.app/viewer](https://mediaquizlet.netlify.app/viewer) + quiz code
 - **Description**: Page for viewing quiz responses and managing quiz.
 - **Features**:
   - Enter the password chosen during quiz generation to view responses.

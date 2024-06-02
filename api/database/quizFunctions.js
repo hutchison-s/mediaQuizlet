@@ -101,7 +101,7 @@ export async function newQuiz(req, res) {
         // Add document id to quiz document so it's accessible client-side
         const quizId = newDoc.id;
 
-        await qCol.doc(newDoc.id).update({quizId: newDoc.id, URL: "https://audioquizlet.netlify.app/quizzer/"+newDoc.id})
+        await qCol.doc(newDoc.id).update({quizId: newDoc.id, URL: "https://mediaquizlet.netlify.app/quizzer/"+newDoc.id})
 
         // Retrieve Newly Created Quiz
         const qRef = qCol.doc(quizId);
@@ -300,17 +300,17 @@ async function sendEmail({quizId, title, password, admin}) {
     const mailOptions = {
         from: process.env.EMAIL_ADDRESS,
         to: admin,
-        subject: "New Audio Quizlet Created!",
+        subject: "New Media Quizlet Created!",
         html: `
         <section style='font-family: "Rubik", sans-serif; border: 2px solid cornflowerblue; border-radius: 1rem; padding: 2rem;'>
             <h1 style='font-size: 3rem'>
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zM188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9V344c0 8.7 4.7 16.7 12.3 20.9s16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88c-7.4-4.5-16.7-4.7-24.3-.5z"/></svg>
-            Audio Quizlet</h1>
+            Media Quizlet</h1>
             <h2>Here's a link to your newly created quiz: ${title}</h2>
-            <a href="https://audioquizlet.netlify.app/quizzer/${quizId}">https://audioquizlet.netlify.app/quizzer/${quizId}</a>
+            <a href="https://mediaquizlet.netlify.app/quizzer/${quizId}">https://mediaquizlet.netlify.app/quizzer/${quizId}</a>
             <p>Your password for viewing responses: ${password}</p>
             <br></br>
-            <p><a href="https://audioquizlet.netlify.app/generator">Create another!</a></p>
+            <p><a href="https://mediaquizlet.netlify.app/generator">Create another!</a></p>
         </section>`,
         
     }

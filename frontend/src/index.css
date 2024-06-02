@@ -296,7 +296,13 @@ ul {
 #welcomeMenu h2 {
   margin-top: 3rem;
 }
-
+.heroText {
+  width: clamp(320px, 80vw, 540px);
+  font-size: x-large;
+  font-weight: 200;
+  margin: 4rem auto;
+  
+}
 .tutorialFrame {
   width: clamp(350px, 90vw, 600px);
   text-align: center;

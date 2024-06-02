@@ -10,9 +10,9 @@ export default function LogoLink({tag}: LogoProps) {
     return (
         tag
         ?   <div>
-                <h1 className="logoHeading"><Link to="/"><i className="fa-solid fa-circle-play logoIcon"></i>Audio&nbsp;Quizlet</Link></h1>
-                <p className='logoTag'>Elevate your quizzes with audio integration - Audio Quizlet makes it effortless.</p>
+                <h1 className="logoHeading"><Link to="/"><i className="fa-solid fa-circle-play logoIcon"></i>Media&nbsp;Quizlet</Link></h1>
+                <p className='logoTag'>Elevate your quizzes with media customization - Media Quizlet makes it effortless.</p>
             </div>
-        :   <h1 className="logoHeading"><Link to="/"><i className="fa-solid fa-circle-play logoIcon"></i>Audio&nbsp;Quizlet</Link></h1>
+        :   <h1 className="logoHeading"><Link to="/"><i className="fa-solid fa-circle-play logoIcon"></i>Media&nbsp;Quizlet</Link></h1>
     )
 }
