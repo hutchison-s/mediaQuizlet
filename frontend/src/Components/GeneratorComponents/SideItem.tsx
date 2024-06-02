@@ -66,7 +66,11 @@ export default function SideItem({index, question, dragIndex, targetIndex, setDr
                     tempPrev = p.file
                     break;
                 } else if (p.type == "text" && p.text) {
-                    tempPrev = p.text?.substring(0, 8);
+                    if (typeof(p.text) == 'string') {
+                        tempPrev = p.text?.substring(0, 8);
+                    } else {
+                        tempPrev = p.text[0].substring(0, 8);
+                    }
                     continue;
                 } else if (p.type == "audio" && p.file != null) {
                     tempPrev = p.file?.name?.substring(0, 8);

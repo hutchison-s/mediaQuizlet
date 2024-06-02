@@ -79,7 +79,7 @@ export default function QuestionItem({index, question}: itemProps) {
                     <button className="deleteItemButton" onClick={deleteItem}>Delete</button>
                 </div>
                 <h4 className="itemSectionHeader">Prompts</h4>
-                {question.prompts.map((p, i)=><PromptBox key={question.id+"prompt"+i} question={question} promptIndex={i}/>)}
+                {question.prompts.map((_, i)=><PromptBox key={question.id+"prompt"+i} question={question} promptIndex={i}/>)}
                 <p><span onClick={addPrompt} className="newPromptButton"><i className="fa-solid fa-circle-plus"></i> Add Prompt</span></p>
                 <h4 className="itemSectionHeader">Response</h4>
                 <ResponseBox q={question} />
