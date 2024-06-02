@@ -14,7 +14,7 @@ interface QuizSubmissionProps {
         status: string
 }
 export async function submitToServer(newQuiz: QuizSubmissionProps): Promise<string | void> {
-    const id = await axios.post("http://localhost:8000/api/quizzes", JSON.stringify(newQuiz), {headers: {"Content-Type": "application/json"}})
+    const id = await axios.post("https://audio-quizlet.vercel.app/api/quizzes", JSON.stringify(newQuiz), {headers: {"Content-Type": "application/json"}})
     .then(res => res.data)
     .then((doc: {URL: string, quizId: string}) => {
         const {URL, quizId} = doc;

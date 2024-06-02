@@ -21,7 +21,7 @@ export default function Quizzer() {
     const navigate = useNavigate()
 
     const onStart = async (s: string) => {
-        axios.post(`http://localhost:8000/api/quizzes/${quiz.quizId}/responses`,
+        axios.post(`https://audio-quizlet.vercel.app/api/quizzes/${quiz.quizId}/responses`,
         {user: s, timeStarted: Date.now()})
             .then(res => {
                 if (res.status === 200) {
@@ -42,7 +42,7 @@ export default function Quizzer() {
                 associatedFiles: associatedFiles,
                 timeSubmitted: Date.now()
             }
-            axios.patch(`http://localhost:8000/api/quizzes/${state.quizId}/responses/${state.responseId}`, newResponse)
+            axios.patch(`https://audio-quizlet.vercel.app/api/quizzes/${state.quizId}/responses/${state.responseId}`, newResponse)
                 .then(res => {
                     if (res.status === 200) {
                         localStorage.removeItem("currentQuizResponse:"+quiz.quizId)

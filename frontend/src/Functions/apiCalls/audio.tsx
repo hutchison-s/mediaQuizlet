@@ -1,10 +1,10 @@
 import axios from "axios";
 
 export async function getAudioFile(id: string) {
-    const {totalChunks, mimeType} = await axios.get(`http://localhost:8000/api/uploads/audio/${id}/chunks`).then(res=>res.data);
+    const {totalChunks, mimeType} = await axios.get(`https://audio-quizlet.vercel.app/api/uploads/audio/${id}/chunks`).then(res=>res.data);
     const promises = [];
     for (let i=0; i<totalChunks; i++) {
-      promises.push(fetch(`http://localhost:8000/api/uploads/audio/${id}/chunks/${i}`).then(res => res.blob()));
+      promises.push(fetch(`https://audio-quizlet.vercel.app/api/uploads/audio/${id}/chunks/${i}`).then(res => res.blob()));
     }
     const chunks = (await Promise.all(promises))
     const blob = new Blob(chunks, {type: mimeType});
@@ -13,7 +13,7 @@ export async function getAudioFile(id: string) {
 
 
 export async function newAudio(mimeType: string): Promise<string> {
-  const response = await axios.post(`http://localhost:8000/api/uploads/audio/`, JSON.stringify({mimeType}), {headers: {"Content-Type": "application/json"}})
+  const response = await axios.post(`https://audio-quizlet.vercel.app/api/uploads/audio/`, JSON.stringify({mimeType}), {headers: {"Content-Type": "application/json"}})
     .then(res => res.data)
   return response.id;
 }
@@ -23,7 +23,7 @@ export async function uploadChunk(id: string, data: BlobPart, index: number): Pr
   const formData = new FormData();
   formData.append('index', String(index));
   formData.append('chunk', new Blob([data], {type: "application/octet-stream"}));
-  const response = await axios.post(`http://localhost:8000/api/uploads/audio/${id}/chunks`, formData).then(res => res.data)
+  const response = await axios.post(`https://audio-quizlet.vercel.app/api/uploads/audio/${id}/chunks`, formData).then(res => res.data)
   return response;
 }
 

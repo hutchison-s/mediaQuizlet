@@ -61,7 +61,7 @@ export async function compressAndUploadImage(file: File): Promise<{link: string,
     const compPhoto = await resizeAndCompress(file);
     const photoForm = new FormData();
     photoForm.append("photos", compPhoto, "photoUpload")
-    const {link, path} = await axios.post(`http://localhost:8000/api/uploads/image/`, photoForm).then(res => res.data);
+    const {link, path} = await axios.post(`https://audio-quizlet.vercel.app/api/uploads/image/`, photoForm).then(res => res.data);
     return {link, path}
 }
 
@@ -82,7 +82,7 @@ export async function uploadFileAnswers(questions: GenQuestion[], answers: Answe
                     const compPhoto: Blob = await resizeAndCompress(photo);
                     const photoForm = new FormData();
                     photoForm.append("photos", compPhoto, "photoUpload")
-                    const uploadResponse: {link: string, path: string} = await axios.post(`http://localhost:8000/api/uploads/image`, photoForm)
+                    const uploadResponse: {link: string, path: string} = await axios.post(`https://audio-quizlet.vercel.app/api/uploads/image`, photoForm)
                         .then(res => {
                             if (res.status === 200) {
                                 return res.data

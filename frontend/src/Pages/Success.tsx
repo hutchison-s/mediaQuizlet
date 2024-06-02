@@ -17,7 +17,7 @@ export default function Success() {
     }
 
     const copyLink = ()=>{
-        navigator.clipboard.writeText(`http://localhost:5173/quizzer/${quizId}`)
+        navigator.clipboard.writeText(`https://audioquizlet.netlify.app/quizzer/${quizId}`)
     }
 
     return (
@@ -25,7 +25,7 @@ export default function Success() {
             <h2>Quizlet Successfully Created</h2>
             <p>Link to Quizlet:</p>
             <div>
-                <a id="successLink" href={`http://localhost:5173/quizzer/${quizId}`}>{`http://localhost:5173/quizzer/${quizId}`}</a>
+                <a id="successLink" href={`https://audioquizlet.netlify.app/quizzer/${quizId}`}>{`https://audioquizlet.netlify.app/quizzer/${quizId}`}</a>
                 <button id="copyLink" onClick={copyLink}><i className="fa-solid fa-copy"></i></button>
             </div>
             <p>Quizlet Code:</p>

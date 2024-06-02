@@ -21,7 +21,7 @@ export default function Viewer() {
 
         const encoding = btoa(`${encodeURIComponent(quizId!)}:${encodeURIComponent(pass)}`);
         setAuth(`Basic ${encoding}`);
-        axios.get(`http://localhost:8000/api/quizzes/${quizId}/admin`, {
+        axios.get(`https://audio-quizlet.vercel.app/api/quizzes/${quizId}/admin`, {
             headers: {
                 Authorization: `Basic ${encoding}`
             }
@@ -34,7 +34,7 @@ export default function Viewer() {
           })
           .then((quizObject) => {
             setQuiz(quizObject)
-            axios.get(`http://localhost:8000/api/quizzes/${quizId}/responses`, {
+            axios.get(`https://audio-quizlet.vercel.app/api/quizzes/${quizId}/responses`, {
                 headers: {
                     Authorization: `Basic ${encoding}`
                 }
@@ -54,7 +54,7 @@ export default function Viewer() {
     }
 
     const updateStatus = ()=>{
-        axios.patch(`http://localhost:8000/api/quizzes/${quizId}/admin`, {status: quiz?.status === 'open' ? 'closed' : 'open'}, {
+        axios.patch(`https://audio-quizlet.vercel.app/api/quizzes/${quizId}/admin`, {status: quiz?.status === 'open' ? 'closed' : 'open'}, {
             headers: {
                 "Authorization": auth,
                 "Content-Type": "application/json"
@@ -76,7 +76,7 @@ export default function Viewer() {
             return;
         }
         setIsLoading(true)
-        axios.patch(`http://localhost:8000/api/quizzes/${quizId}/admin`, {reset: true}, {
+        axios.patch(`https://audio-quizlet.vercel.app/api/quizzes/${quizId}/admin`, {reset: true}, {
             headers: {
                 "Authorization": auth,
                 "Content-Type": "application/json"
@@ -100,7 +100,7 @@ export default function Viewer() {
             return;
         }
         setIsLoading(true)
-        axios.delete(`http://localhost:8000/api/quizzes/${quizId}/admin`, {
+        axios.delete(`https://audio-quizlet.vercel.app/api/quizzes/${quizId}/admin`, {
             headers: {
                 "Authorization": auth
             }
@@ -125,7 +125,7 @@ export default function Viewer() {
         setResponses(state => {
             return state?.map(r => r.responseId === responseId ? {...r, answers: updated} : r)
         })
-        axios.patch(`http://localhost:8000/api/quizzes/${quizId}/responses/${responseId}`, {scores: updated}, {
+        axios.patch(`https://audio-quizlet.vercel.app/api/quizzes/${quizId}/responses/${responseId}`, {scores: updated}, {
             headers: {
                 Authorization: auth,
                 "Content-Type": "application/json"
@@ -135,7 +135,7 @@ export default function Viewer() {
     }
 
     const deleteResponse = (responseId: string)=>{
-        axios.delete(`http://localhost:8000/api/quizzes/${quizId}/responses/${responseId}`, {
+        axios.delete(`https://audio-quizlet.vercel.app/api/quizzes/${quizId}/responses/${responseId}`, {
             headers: {
                 Authorization: auth
             }

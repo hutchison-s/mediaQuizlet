@@ -45,7 +45,7 @@ export default function Lookup() {
     async function handleCodeClick() {
         const valid = /[a-zA-Z0-9]{20}/.test(code);
         if (valid) {
-            axios.get("http://localhost:8000/api/quizzes/"+code)
+            axios.get("https://audio-quizlet.vercel.app/api/quizzes/"+code)
                 .then(response => {
                     if (response.status === 200) {
                         setIsValidCode({type: "code", valid: true, value: code});
@@ -67,7 +67,7 @@ export default function Lookup() {
     async function handleEmailClick() {
         const valid = /[a-zA-Z0-9]{3,40}/.test(email) && /@/g.test(email) && /./g.test(email);
         if (valid) {
-            axios.get(`http://localhost:8000/api/findUser/${btoa(email)}`)
+            axios.get(`https://audio-quizlet.vercel.app/api/findUser/${btoa(email)}`)
                 .then(response => {
                     if (response.status === 200) {
                         setIsValidCode({type: 'email', valid: true, value: response.data});

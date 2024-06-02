@@ -21,7 +21,7 @@ export default function UserQuizzes() {
     const navigate = useNavigate()
 
     useEffect(()=>{
-        axios.get(`http://localhost:8000/api/users/${userId}/quizzes`)
+        axios.get(`https://audio-quizlet.vercel.app/api/users/${userId}/quizzes`)
                 .then(response => {
                     if (response.status === 200) {
                         setQuizzes(response.data.quizzes)

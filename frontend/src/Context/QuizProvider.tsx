@@ -15,7 +15,7 @@ export default function QuizProvider({children}: PropsWithChildren) {
     const {quizId} = useParams();
 
     useEffect(()=>{
-        axios.get("http://localhost:8000/api/quizzes/"+quizId)
+        axios.get("https://audio-quizlet.vercel.app/api/quizzes/"+quizId)
             .then(res => {
                 if (res.status === 200) {
                     const { timeLimit, questions, quizId, status, title, description } = res.data;
