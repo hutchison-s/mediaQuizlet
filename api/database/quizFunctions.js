@@ -73,7 +73,7 @@ export async function newQuiz(req, res) {
         return res.status(400).send({message: "Not a valid request body. Missing required fields."})
     }
     const nQ = {
-        admin,
+        admin: admin.toLowerCase().trim(),
         title,
         description: description ? description : '',
         password,

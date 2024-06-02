@@ -12,7 +12,7 @@ export async function getUserId(req, res) {
         const admin = atob(email);
         const snapshot = await uCol.where("email", "==", admin).get();
         if (snapshot.empty) {
-            return res.status(400).send({message: "Not a valid user."})
+            return res.status(404).send({message: "Not a valid user."})
         } else if (snapshot.docs.length > 1) {
             throw new Error("Duplicate users found.")
         }

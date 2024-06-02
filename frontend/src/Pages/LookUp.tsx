@@ -49,6 +49,8 @@ export default function Lookup() {
                 .then(response => {
                     if (response.status === 200) {
                         setIsValidCode({type: "code", valid: true, value: code});
+                    } else {
+                        setIsValidFormat({type: "code", valid: false});
                     }
                 })
                 .catch(error => {
@@ -67,16 +69,18 @@ export default function Lookup() {
     async function handleEmailClick() {
         const valid = /[a-zA-Z0-9]{3,40}/.test(email) && /@/g.test(email) && /./g.test(email);
         if (valid) {
-            axios.get(`https://audio-quizlet.vercel.app/api/findUser/${btoa(email)}`)
+            axios.get(`https://audio-quizlet.vercel.app/api/findUser/${btoa(email.toLowerCase().trim())}`)
                 .then(response => {
                     if (response.status === 200) {
                         setIsValidCode({type: 'email', valid: true, value: response.data});
+                    } else {
+                        setIsValidFormat({type: 'email', valid: false})
                     }
                 })
                 .catch(error => {
-                    if (error.response.status === 404) {
+                    if (error.response.status !== 500) {
                         setIsValidFormat({type: "email", valid: false});
-                    } else if (error.response.status === 500) {
+                    } else {
                         inputRef.current!.value = "Server Error";
                     }
                 })
