@@ -43,7 +43,8 @@ export async function getAllQuizzesByUser(req, res) {
         const {quizzes, email} = user;
 
         // Transform list of quiz IDs to quiz list info
-        const qList = quizzes.map(async (quizId) => {
+        const qList = []
+        for (const quizId of quizzes) {
             const qRef = qCol.doc(quizId);
             const qDoc = await qRef.get();
             if (!qDoc.exists) {
@@ -53,8 +54,8 @@ export async function getAllQuizzesByUser(req, res) {
             const {title, description, URL, expires, questions, timeLimit} = quiz;
             const exp = new Date(expires);
             exp.setFullYear(exp.getFullYear() - 1);
-            return { title: title, description: description, URL: URL, created: exp.toISOString(), length: questions.length, timeLimit: timeLimit};
-        });
+            qList.push({ title: title, description: description, URL: URL, created: exp.toISOString(), length: questions.length, timeLimit: timeLimit});
+        };
         
         // Send list and email
         return res.send({admin: email, quizzes: qList})
