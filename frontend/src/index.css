@@ -281,17 +281,38 @@ ul {
   display: grid;
   gap: 0.5rem;
 }
-
+#homePage {
+  width: 100%;
+  height: 80vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+}
 #welcomeMenu {
   width: 90vw;
   max-width: 800px;
   margin: 10dvh auto;
   gap: 1rem;
-  position: fixed;
-  top: 40dvh;
-  left: 50%;
-  translate: -50% -50%;
 }
 #welcomeMenu h2 {
   margin-top: 3rem;
+}
+
+.tutorialFrame {
+  width: clamp(350px, 90vw, 600px);
+  text-align: center;
+  margin: 2rem auto;
+  line-height: 1.5;
+}
+.tutorialFrame h3 {
+  margin-bottom: 1.5rem;
+}
+.tutorialFrame p {
+  text-align: left;
+  margin-bottom: 1rem;
+}
+.tutorialFrame img {
+  width: 100%;
+  border-radius: 0.5rem;
+  box-shadow: var(--shadow);
+  margin: 1rem auto;
 }
