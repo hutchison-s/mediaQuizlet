@@ -1,8 +1,9 @@
-import { deleteFile } from "./fileFunctions.js";
+import { deleteAudioDoc, deleteAudioDocsFromAnswers } from "./audioFunctions.js";
+import { deleteAssociatedFiles, deleteFile } from "./fileFunctions.js";
 import { rCol, qCol, fieldValue } from "./firebaseConnect.js";
 
 export async function newResponse(req, res) {
-    const {user, timeStarted} = req.body;
+    const {user, timeStarted } = req.body;
     const {quizId} = req.params;
     if (!user || !quizId || !timeStarted) {
         res.status(400).send({message: "Not a valid request body. Missing required fields."});
@@ -68,6 +69,7 @@ export async function getOneResponse(req, res) {
 
 export async function updateResponse(req, res) {
     const {answers, timeSubmitted, associatedFiles, scores} = req.body;
+    console.log("api received associated: ", associatedFiles);
     const {quizId, responseId} = req.params;
     if (!responseId || !quizId) {
         res.status(400).send({message: "Not a valid request body. Missing required fields."});
@@ -128,25 +130,62 @@ export async function updateResponse(req, res) {
 
 export async function deleteOneResponse(req, res) {
     const {quizId, responseId} = req.params;
+
     if (!quizId || !responseId) {
-        res.status(400).send({message: "Not a valid request body. Missing required fields."});
-        return;
+        return res.status(400).send({message: "Not a valid request body. Missing required fields."});
     }
     try {
-        const response = (await rCol.doc(responseId).get()).data()
-        if (response && response.quizId == quizId) {
-            for (let f of response.associatedFiles) {
-                await deleteFile(f);
-            }
-            await rCol.doc(responseId).delete();
-            await qCol.doc(quizId).update({responses: fieldValue.arrayRemove(responseId)})
-            res.send({message: "Complete"})
-
-        } else {
-            res.status(400).send({message: "Response does not belong to the quiz with this id."})
-        }
+        await deleteResponseAndFiles(quizId, responseId)
+        console.log("Deleted " + responseId);
+        return res.send({message: "Complete"})
     } catch (err) {
         console.log(err);
-        res.status(500).send({error: err, message: "Error retrieving response."})
+        return res.status(500).send({error: err, message: "Error retrieving response."})
     }
+}
+
+export async function deleteResponseAndFiles(quizId, responseId) {
+    console.log("Attempting to delete response " + responseId);
+
+    // Retrieve response doc
+    const rRef = rCol.doc(responseId);
+    const rSnapshot = await rRef.get();
+
+    if (!rSnapshot.exists) {
+        throw new Error("Response does not exist.");
+    }
+
+    const response = rSnapshot.data();
+
+    // Retrieve quiz doc
+    const qRef = qCol.doc(quizId);     
+    const qSnapshot = await qRef.get();
+
+    if (!qSnapshot.exists) {
+        throw new Error("Quiz does not exist.");
+    }
+
+    const quiz = qSnapshot.data();
+
+    if (response.quizId !== quizId) {
+        throw new Error("Response does not belong to the quiz with this id.");
+    };
+
+    // Delete all associated files from response
+    await deleteAssociatedFiles(response.associatedFiles);
+
+    // Delete audio documents in audio and recording responses
+    await deleteAudioDocsFromAnswers(quiz.questions, response.answers);
+
+    // Delete response document
+    await rRef.delete();
+
+    // Delete response id from associated quiz
+    await qRef.update({responses: fieldValue.arrayRemove(responseId)});
+}
+
+export async function deleteAllResponses(quizId, responses) {
+    if (!responses || responses.length == 0) return;
+    const promises = responses.map(responseId => deleteResponseAndFiles(quizId, responseId));
+    await Promise.all(promises)
 }

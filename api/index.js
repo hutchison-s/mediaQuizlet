@@ -5,10 +5,11 @@ dotenv.config();
 import multer from "multer";
 const upload = multer({ storage: multer.memoryStorage(), limits: {} });
 import { authenticate, admin } from "./middleware/auth.js";
-import { deleteQuiz, getAllQuizzes, getAllQuizzesByUser, getFullQuiz, getQuiz, getUserId, newQuiz, updateQuiz } from "./database/quizFunctions.js";
+import { deleteQuiz, getAllQuizzes, getAllQuizzesByUser, getFullQuiz, getQuiz, newQuiz, updateQuiz } from "./database/quizFunctions.js";
 import { deleteOneResponse, getAllResponses, getOneResponse, newResponse, updateResponse } from './database/responseFunctions.js';
-import { uploadAudio, uploadImage } from './database/fileFunctions.js';
+import { uploadImage } from './database/fileFunctions.js';
 import { createAudioDoc, getAllAudio, getAudioInfo, getChunk, uploadAudioChunk } from './database/audioFunctions.js';
+import { getUserId } from './database/userFunctions.js';
 
 const app = express();
 const PORT = process.env.PORT || 8000;

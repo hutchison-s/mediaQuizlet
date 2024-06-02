@@ -1,3 +1,4 @@
+import { deleteFile } from "./fileFunctions.js";
 import { bucket, aCol, fieldValue } from "./firebaseConnect.js";
 
 export async function createAudioDoc(req, res) {
@@ -138,4 +139,26 @@ export async function createAudioDoc(req, res) {
     const ref = aCol.doc(id);
     await ref.delete();
     return {message: "deleted audio document"};
+  }
+
+  export async function deleteAudioDocsFromAnswers(questions, answers) {
+    if (questions.length == 0 || answers.length == 0) return;
+    const potentialPromises = answers.map((a, idx) => {
+      if (['AUD', 'REC'].includes(questions[idx].response.type)) {
+          return deleteAudioDoc(a)
+      } else {
+          return Promise.resolve()
+      }
+    })
+    await Promise.all(potentialPromises)
+  }
+
+  export async function deleteAudioDocsFromPrompts(questions) {
+    if (questions.length == 0) return;
+    const promises = questions.flatMap(q => 
+      q.prompts
+        .filter(p => p.type === 'audio')
+        .map(p => deleteAudioDoc(p.path))
+    )
+    await Promise.all(promises)
   }
