@@ -1,0 +1,20 @@
+.logoIcon::before {
+    background-image: linear-gradient(var(--secondary), var(--light-secondary));
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    margin-right: 0.5rem;
+  }
+  .logoHeading {
+    margin: 2rem;
+    font-size: clamp(24px, 8vw, 60px);
+    text-align: center;
+  }
+  #sideBar .logoHeading {
+    font-size: 36px;
+  }
+  .logoTag {
+      color: var(--primary-half);
+      font-size: large;
+      text-align: center;
+  }

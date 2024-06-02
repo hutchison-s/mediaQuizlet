@@ -1,0 +1,10 @@
+#lightDark {
+    position: fixed;
+    z-index: 1;
+    font-size: 2rem;
+    top: 0.5rem;
+    right: 0.5rem;
+    color: var(--primary);
+    opacity: 0.5;
+    cursor: pointer;
+  }

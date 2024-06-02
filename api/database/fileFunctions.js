@@ -4,6 +4,12 @@ export async function deleteFile(name) {
     await bucket.file(name).delete();
 }
 
+export async function deleteAssociatedFiles(associated) {
+    if (associated.length == 0) return;
+    const promises = associated.map(deleteFile);
+    await Promise.all(promises);
+}
+
 export async function uploadAudio(req, res) {
     const response = await upload(req, res, "audio");
     res.send(response)

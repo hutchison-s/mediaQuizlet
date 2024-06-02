@@ -1,0 +1,766 @@
+#generatorBody {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    background-image: var(--texture);
+}
+#introText p {
+  text-align: center;
+  color: var(--secondary);
+  font-size: 4rem;
+  font-weight: 800;
+  opacity: 0.5;
+  padding: 1rem;
+}
+#sideBar {
+    position: relative;
+    flex: 1;
+    background-image: var(--sidebar);
+    border-right: 2px solid var(--secondary);
+}
+#uploaderTarget {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  width: 80%;
+  left: 10%;
+  text-align: center;
+  padding: 2rem;
+  background-color: var(--secondary);
+  opacity: 0.6;
+  border-radius: 0.5rem;
+  box-shadow: 0 0 4px inset var(--primary-half);
+}
+#uploaderTarget:hover {
+  opacity: 1;
+  animation: pulse 0.5s infinite alternate;
+}
+#uploaderTarget label {
+  color: var(--background);
+  font-weight: 800;
+}
+#sideBar .logoHeading {
+  font-size: 30px;
+  margin: 1.5rem 1rem;
+}
+.itemSummary {
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.sideItem {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  align-items: center;
+  border: 1px solid var(--primary);
+  background: var(--background);
+  filter: brightness(97%);
+  cursor: pointer;
+  overflow: hidden;
+}
+.sideItem:hover {
+  filter: none;
+}
+.sideItem.active {
+  background: var(--secondary);
+  color: var(--background);
+  filter: none;
+}
+.sideItem.dragItem {
+  position: fixed;
+  top: 120%;
+  left: 120%;
+}
+.sideItem:has(.dragOver)::before {
+  content: "Drop Here";
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  align-items: center;
+  border: 1px solid var(--primary);
+  background: var(--primary-half);
+}
+.sideItem img {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 30%;
+  object-position: center;
+}
+.deleteAllItems {
+  padding: 0.5rem;
+  border: 1px solid var(--primary);
+  border-radius: 0.5rem;
+  background-color: var(--warning);
+  color: white;
+  cursor: pointer;
+  margin-top: 1.5rem;
+}
+#genWindow {
+    flex: 3;
+    position: relative;
+    display: grid;
+    place-items: center;
+    /* background: green; */
+}
+#newQuestion {
+    position: absolute;
+    top: 1rem;
+    left: 1rem;
+    padding: 1rem;
+    border-radius: 50%;
+    background: var(--secondary);
+    color: var(--background);
+    border: none;
+    z-index: 2;
+    cursor: pointer;
+}
+#newQuestion * {
+    color: var(--background);
+    font-size: 2.5rem;
+}
+
+#newQuestionType {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  height: 100%;
+  padding: 0.5rem 1rem;
+  padding-left: calc(50% + 1rem);
+  background-color: var(--secondary);
+  color: var(--background);
+  display: flex;
+  gap: 1rem;
+  font-size: medium;
+  border-top-right-radius: 2rem;
+  border-bottom-right-radius: 2rem;
+  z-index: -1;
+  transform-origin: left;
+  animation: growWidth 0.2s both;
+}
+@keyframes growWidth {
+  from {transform: scaleX(0)}
+  to{transform: scaleX(1);}
+}
+#newQuestionType span {
+  background-color: transparent;
+  color: var(--background);
+  font-size: 1.2rem;
+  width: fit-content;
+  padding: 0.25rem 1rem;
+  border-radius: 1rem;
+  border: none;
+  cursor: pointer;
+}
+#newQuestionType span:hover {
+  background: var(--background);
+  color: var(--primary);
+}
+
+#leftForm,
+#rightForm {
+  position: absolute;
+  top: 50%;
+  background: transparent;
+  border: none;
+  font-size: 4rem;
+  translate: 0 -50%;
+  left: 1rem;
+  cursor: pointer;
+  display: block;
+  z-index: 1;
+}
+#leftForm:hover *,
+#rightForm:hover * {
+  transform: scale(1.2);
+  color: var(--primary);
+}
+#leftForm:disabled,
+#rightForm:disabled {
+  display: none;
+}
+#rightForm {
+  left: unset;
+  right: 1rem;
+}
+#leftForm *,
+#rightForm * {
+  color: var(--secondary);
+}
+#formWheel {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+#formCar {
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  min-width: 100%;
+  transform: none;
+  transition: transform 0.4s cubic-bezier(0.08, -0.28, 0.33, 1.17);
+}
+
+.itemFrame {
+    flex: 1;
+    display: grid;
+    place-content: center;
+}
+.itemBox {
+    position: relative;
+    width: 60vw;
+    min-width: 300px;
+    background: var(--background);
+    gap: 0.5rem;
+    padding: 2rem;
+}
+.itemHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  width: 100%;
+}
+.responseSelect,
+.pointValue {
+  font-size: 16px;
+  padding: 0.25rem;
+  background: transparent;
+  color: var(--primary);
+  border-radius: 0.25rem;
+  border: 1px solid var(--primary-half);
+  height: 2rem;
+}
+.deleteItemButton {
+  background: transparent;
+  border: none;
+  color: var(--warning);
+  font-size: 1.2rem;
+  padding: 0.25rem;
+  border-radius: 0.25rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.deleteItemButton:hover {
+  background-color: var(--warning);
+  color: white;
+}
+.itemSectionHeader {
+  font-weight: 200;
+  border-bottom: 1px solid var(--primary);
+  width: 100%;
+}
+
+.promptBox {
+  display: grid;
+  grid-template-columns: 1fr 60px;
+  width: 100%;
+  min-height: 200px;
+  align-items: center;
+  border-radius: 0.5rem;
+  border: 2px solid var(--secondary);
+  overflow: hidden;
+}
+.promptTools {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  border-left: 1px solid var(--secondary);
+  background: var(--sidebar);
+}
+
+.deletePrompt {
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  width: 60px;
+  aspect-ratio: 1;
+  cursor: pointer;
+  filter: brightness(90%);
+}
+.deletePrompt:hover {
+  filter: none;
+}
+.deletePrompt > i {
+  font-size: 1.5rem;
+  color: var(--background);
+}
+.newPromptButton {
+  transform: scale(1);
+  transition: transform 0.2s;
+}
+.newPromptButton:hover {
+  cursor: pointer;
+  transform: scale(1.2);
+}
+.newPromptButton i {
+  color: var(--secondary);
+}
+
+.resetPrompt {
+  border: none;
+  background: none;
+  width: 60px;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+}
+.resetPrompt:hover {
+  filter: brightness(110%);
+}
+.resetPrompt i {
+  color: var(--secondary);
+  font-size: 2rem;
+}
+
+.audioUploadButton,
+.imageUploadButton {
+  background: var(--secondary);
+  height: 100%;
+  font-size: 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  cursor: pointer;
+}
+.audioUploadButton > i,
+.imageUploadButton > i {
+  color: var(--background);
+}
+.audioUploadButton span,
+.imageUploadButton span {
+  color: var(--background);
+  font-size: medium;
+}
+.newAudio {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  height: 100%;
+  
+}
+.recordAudioButton {
+  display: grid;
+  place-items: center;
+  height: 100%;
+}
+.recBtn {
+  position: relative;
+  margin: auto;
+  width: 55px;
+  height: 55px;
+  border-radius: 50%;
+  border: 4px solid red;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+  background-image: var(--sidebar);
+  font-weight: 800;
+  color: var(--primary);
+  z-index: 2;
+}
+.recBtn.recordStop {
+  background-image: none;
+  background-color: red;
+  color: white;
+}
+.recBtn.recordStop::before,
+.recBtn.recordStop::after {
+  position: absolute;
+  content: "";
+  right: 120%;
+  top: 5%;
+  height: 90%;
+  width: 100%;
+  background: red;
+  filter: blur(16px);
+  opacity: 0.3;
+}
+.recBtn.recordStop::after {
+  right: -120%;
+}
+.audioPrompt,
+.textPrompt,
+.imagePrompt {
+  display: grid;
+  place-items: center;
+  background: var(--background);
+  width: 100%;
+}
+.audioPrompt i,
+.imagePrompt i {
+  font-size: 2rem;
+  color: var(--secondary);
+  cursor: pointer;
+  filter: brightness(90%);
+  text-shadow: 0 0 20px var(--primary-half);
+}
+.audioPrompt >i:hover,
+.imagePrompt > i:hover {
+  filter: none;
+}
+.audioPrompt audio {
+  border: 1px solid var(--primary);
+  border-radius: 26px;
+}
+
+.audioPrompt .audioOptions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+  padding: 0.5rem;
+  gap: 0.5rem;
+  width: 100%;
+}
+.textPrompt {
+  min-height: 120px;
+  height: auto;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.textPrompt > textarea {
+  font-size: 16px;
+  border: 1px solid var(--primary-half);
+  background-color: var(--background);
+  color: var(--primary);
+  padding: 0.5rem;
+  border-radius: 0.25rem;
+  width: 90%;
+  resize: none;
+}
+.imagePrompt:has(img) {
+  height: auto;
+  min-height: 120px;
+  gap: 0;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+.imagePrompt img {
+  width: 100%;
+  max-width: 400px;
+  margin: auto;
+}
+.imagePrompt > .imageOptions {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 0.5rem;
+}
+.imageOptions > .checkLabel {
+  margin: auto;
+  flex: 50%;
+}
+
+.imagePrompt i {
+  width: 100%;
+  text-align: center;
+}
+
+.checkLabel {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  align-items: center;
+  padding: 0.5rem;
+}
+.shortAnswer {
+  width: 90%;
+  margin: auto;
+  font-size: 16px;
+  padding: 0.5rem;
+  border: 1px solid var(--secondary);
+  background: transparent;
+  border-radius: 0.5rem;
+}
+.optionBox {
+  width: 100%;
+  margin-top: 0.25rem;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.optionBox input[type='text'] {
+  flex: 70%;
+  font-size: 16px;
+  padding: 0.5rem;
+  border: 1px solid var(--secondary);
+  background: transparent;
+  border-top-left-radius: 0.25rem;
+  border-bottom-left-radius: 0.25rem;
+}
+.optionBox label:has(input[type='radio']) {
+  flex: 30%;
+  display: grid;
+  place-items: center;
+  height: 100%;
+  padding: 0.25rem;
+  border-top-right-radius: 0.25rem;
+  border-bottom-right-radius: 0.25rem;
+  border: 1px solid var(--secondary);
+  border-left: none;
+  cursor: pointer;
+}
+.optionBox label:has(input:checked),
+.optionBox label:has(input:checked) *  {
+  background-color: aqua;
+  color: black;
+}
+:has(> .dragging) {
+  background: var(--primary);
+}
+.dragging {
+  animation: pulse 0.6s infinite alternate;
+}
+
+.itemFooter {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  padding-top: 1rem;
+  text-align: center;
+}
+.itemFooter > button {
+  background: none;
+  border: none;
+  padding: 0 1rem;
+  transition: scale 0.3s;
+  cursor: pointer;
+}
+.itemFooter > button:hover {
+  scale: 1.3;
+  text-shadow: var(--shadow);
+}
+.itemFooter i {
+  font-size: 1.5rem;
+  color: var(--secondary);
+  background-color: transparent;
+}
+
+.hiddenWhenDesktop {
+  display: none;
+}
+
+#generateLink {
+  display: block;
+  margin: 1rem auto;
+}
+
+@keyframes pulse {
+  from {scale: 1}
+  to {scale: 1.15}
+}
+
+
+.promptBox input[type='number'] {
+  background: transparent;
+  color: var(--primary);
+  padding: 0.5rem;
+  font-size: 16px;
+  border: 1px solid var(--secondary);
+  border-radius: 0.5rem;
+}
+
+#submissionTool {
+  position: fixed;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+  width: clamp(350px, 70%, 500px);
+  background-image: var(--sidebar);
+  padding: 2rem;
+  text-align: center;
+  border: 2px solid var(--background);
+  box-shadow: 5px 5px 25px var(--primary-half);
+  z-index: 1000;
+}
+#submissionTool h2 {
+  color: var(--primary);
+}
+#submissionTool form {
+  margin: 2rem auto;
+  padding: 2rem 1rem;
+  border: 2px solid var(--secondary);
+  background: var(--background);
+  display: grid;
+  place-items: center;
+  gap: 1rem;
+}
+#submissionTool form input,
+#submissionTool form textarea {
+  font-size: 16px;
+  padding: 1rem;
+  width: 90%;
+  margin: 0.8rem auto;
+  border: 1px solid var(--primary);
+  background: var(--background);
+  color: var(--secondary);
+  
+}
+#submissionTool label:has(:required):before {
+  content: "required";
+  position: absolute;
+  top: 1rem;
+  right: 1.5rem;
+  color: red;
+  font-size: x-small;
+}
+#submissionTool form textarea {
+  resize: none;
+  padding: 0.5rem;
+}
+#submissionTool form button {
+  width: 250px;
+  margin: 2rem auto;
+}
+#submissionTool form label:has(input[type='text']),
+#submissionTool form label:has(input[type='password']) {
+  display: grid;
+  width: 100%;
+}
+#submissionTool label {
+  position: relative;
+}
+#submissionTool label>span {
+  font-size: small;
+}
+#submissionTool label[for="email"] {
+  width: 100%;
+}
+#cancelSubmission {
+  position: absolute;
+  bottom: 1rem;
+  right: 2rem;
+}
+#passBox {
+  position: relative;
+}
+#peek {
+  position: absolute;
+  top: 50%;
+  right: 13%;
+  translate: -50% -50%;
+  color: var(--secondary);
+  cursor: pointer;
+}
+#timeToggle {
+  cursor: pointer;
+  border: 1px solid var(--secondary);
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+}
+#timeToggle:hover {
+  outline: 2px solid var(--primary);
+  box-shadow: var(--shadow);
+}
+#timeToggle:has(:checked) {
+  background: var(--secondary);
+}
+#timeToggle:has(:checked) * {
+  color: var(--background);
+}
+#timeLimit {
+  min-width: 100px;
+}
+
+
+@media screen and (max-width: 900px) {
+  #generatorBody {
+    flex-direction: column;
+  }
+  #genWindow {
+    flex: 6;
+  }
+  #uploaderTarget {
+    display: none;
+  }
+  .hiddenWhenMobile {
+    display: none;
+  }
+  .hiddenWhenDesktop {
+    display: block;
+  }
+  .itemFrame {
+    overflow-y: auto;
+    padding-top: 4rem;
+    align-content: start;
+  }
+  .itemBox {
+    width: 90vw;
+    padding: 1rem;
+  }
+  #leftForm,
+  #rightForm {
+    top: unset;
+    bottom: 2vh;
+    font-size: 2.5rem;
+  }
+  .itemSummary {
+    display: none;
+  }
+  #newQuestion {
+    top: 0;
+    left: 0;
+    scale: 0.6;
+  }
+  
+}
+@media screen and (max-width: 500px) {
+  .itemBox {
+    width: 95vw;
+    padding: 0.5rem;
+  }
+  .itemHeader {
+    flex-wrap: wrap-reverse;
+    gap: 0.5rem;
+    justify-content: space-evenly;
+  }
+  .promptBox {
+    grid-template-columns: 1fr 40px;
+    min-height: 140px;
+  }
+  .textPrompt textarea {
+    height: 120px;
+  }
+  .audioPrompt .audioPreviewBox {
+    scale: 0.7;
+    text-align: center;
+  }
+  .audioPrompt audio {
+    width: 220px;
+    margin: auto;
+  }
+  .audioUploadButton {
+    flex-direction: column;
+  }
+  .selectCurrent,
+  .deletePrompt,
+  .resetPrompt {
+    width: 40px;
+  }
+  .selectCurrent i,
+  .deletePrompt i,
+  .resetPrompt i {
+    font-size: 1rem;
+  }
+  #submissionTool {
+    padding: 0.2rem;
+    width: 95%;
+  }
+  #cancelSubmission {
+    position: relative;
+    right: unset;
+  }
+}

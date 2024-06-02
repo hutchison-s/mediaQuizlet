@@ -1,0 +1,297 @@
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  --success: #32a852;
+  --warning: #96184b;
+  --danger: linear-gradient(45deg, rgb(35,35,110),rgb(89, 31, 56),rgb(4,5,44));
+  --shadow: 4px 4px 25px var(--primary-half);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: var(--primary);
+  font-family: Rubik;
+}
+
+body {
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  background-image: var(--texture);
+}
+
+h1 > a,
+h2 > a {
+  text-decoration: none;
+}
+
+ul {
+  list-style-type: none;
+}
+
+/* STYLE CLASSES */
+
+.rounded {
+  border-radius: 2rem;
+}
+.softCorner {
+  border-radius: 0.5rem;
+}
+.shadow {
+  box-shadow: var(--shadow);
+}
+.flex {
+  display: flex;
+  align-items: center;
+}
+.flex.wrap {
+  flex-wrap: wrap;
+}
+.flex.vertical {
+  flex-direction: column;
+}
+.flex.even {
+  justify-content: space-evenly;
+}
+
+.flexFull {
+  flex: 100%;
+}
+.marginCenter {
+  margin: auto;
+}
+.block {
+  display: block;
+}
+.gapSmall {
+  gap: 0.25rem;
+}
+.gapMedium {
+  gap: 1rem;
+}
+
+.textInputWrapper {
+  position: relative;
+  width: clamp(250px, 80%, 400px);
+}
+.textInput {
+  font-size: clamp(16px, 8vh, 24px);
+  padding: 0.5rem;
+  border: 1px solid var(--secondary);
+  color: var(--primary);
+  border-radius: 0.25rem;
+  background: var(--background);
+  width: 100%;
+}
+.textInput.invalid {
+  color: red;
+  border-color: red;
+  animation: shake 0.15s linear 0s 3 both;
+}
+.textInput.valid {
+  color: var(--success);
+}
+.validText {
+  position: absolute;
+  top: 120%;
+  left: 50%;
+  translate: -50%;
+  font-size: x-large;
+  color: var(--success);
+  animation: bounceIn 0.5s cubic-bezier(.55,-0.1,.03,1.37) both;
+}
+@keyframes bounceIn {
+  from {scale: 0}
+  to {scale: 1}
+}
+.invalidText {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  translate: -50%;
+  color: red;
+  display: none;
+}
+.textInput.invalid + .invalidText {
+  display: block;
+}
+@keyframes shake {
+  0%, 100% {translate: 0%}
+  25% {translate: -5%}
+  75% {translate: 5%}
+}
+
+.bgPrimary {
+  background-color: var(--primary);
+}
+.bgBackground {
+  background-color: var(--background);
+}
+.bgSecondary {
+  background-color: var(--secondary);
+}
+.bgTexture {
+  background-image: var(--texture);
+}
+
+.fontPrimary {
+  color: var(--primary);
+}
+.fontBackground {
+  color: var(--background);
+}
+.fontSecondary {
+  color: var(--secondary);
+}
+
+.pad1 {
+  padding: 1rem;
+}
+.pad2 {
+  padding: 2rem;
+}
+
+.notAllowed {
+  cursor: no-drop;
+}
+
+/* BUTTON CLASSES */
+
+.primaryBtn,
+.secondaryBtn {
+  border: none;
+  padding: 1rem 2rem;
+  font-size: large;
+  box-shadow: var(--shadow);
+  margin-top: 2rem;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.primaryBtn {
+  background: var(--secondary);
+  color: var(--background);
+}
+.secondaryBtn {
+  background: var(--primary);
+  color: var(--background);
+}
+
+.primaryBtn:hover,
+.secondaryBtn:hover {
+  transform: scale(1.1);
+}
+
+.primaryBtn:disabled,
+.secondaryBtn:disabled {
+  opacity: 0.2;
+  filter: grayscale(50%);
+  transform: none;
+  cursor: not-allowed;
+}
+
+.warningButton {
+  padding: 0.5rem 1rem;
+  background-image: var(--danger);
+  border: none;
+  color: #ffffffcc;
+  cursor: pointer;
+  outline: 1px solid #ffffff33;
+  transition: transform 0.2s;
+}
+
+.warningButton:hover {
+  scale: 1.1;
+  outline: 2px solid #ffffffcc;
+  box-shadow: var(--shadow);
+}
+
+.buttonBox {
+  text-align: center;
+  width: clamp(300px, 50%, 800px);
+}
+.buttonLink {
+  display: block;
+  width: clamp(250px, 50%, 400px);
+  margin: 0.5rem auto;
+  text-decoration: none;
+}
+.buttonBox p {
+  margin-top: 1rem;
+  color: var(--primary);
+  opacity: 0.7;
+}
+.buttonLink.primaryBtn {
+  font-size: xx-large;
+}
+
+
+/* DIALOG CLASS */
+
+.dialog {
+  background-image: var(--sidebar);
+  width: clamp(300px, 75vw, 800px);
+  height: 60vh;
+  left: 50%;
+  top: 50%;
+  translate: -50% -50%;
+}
+.dialog::backdrop {
+  background: #00000088;
+  filter: blur(4px);
+}
+.dialogContent {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
+  text-align: center;
+  padding: 2rem 1rem;
+  height: 100%;
+}
+.dialog p,
+.dialog span {
+  color: var(--secondary);
+  font-size: clamp(16px, 4vw, 24px);
+}
+.dialog button {
+  width: clamp(200px, 50%, 350px);
+  margin: auto;
+}
+.dialogInput {
+  font-size: 16px;
+  width: clamp(300px, 90%, 600px);
+  border: 1px solid var(--secondary);
+  position: relative;
+}
+.dialogLogo {
+  font-size: clamp(1.2rem, 5vw, 3.5rem);
+}
+.dialogInstructions {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  margin: 0.5rem auto;
+}
+.dialog .buttonWrap {
+  display: grid;
+  gap: 0.5rem;
+}
+
+#welcomeMenu {
+  width: 90vw;
+  max-width: 800px;
+  margin: 10dvh auto;
+  gap: 1rem;
+  position: fixed;
+  top: 40dvh;
+  left: 50%;
+  translate: -50% -50%;
+}
+#welcomeMenu h2 {
+  margin-top: 3rem;
+}
