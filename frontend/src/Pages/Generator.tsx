@@ -66,7 +66,11 @@ export default function Generator() {
         const nextYear = new Date();
         nextYear.setFullYear(nextYear.getFullYear()+1);
         setIsSubmitting(true)
+        console.log(state.questions[0].prompts[0]);
+        
         const {updatedQuestions, associatedFiles} = await processQuestions(state);
+        console.log(updatedQuestions[0].prompts[0]);
+        
         const newQuiz = {
             questions: updatedQuestions,
             associatedFiles: associatedFiles,

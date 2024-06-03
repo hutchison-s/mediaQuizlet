@@ -18,7 +18,7 @@ export default function QuizPrompt({p, i, updateRemaining}: QuizPromptProps) {
             return <LimitedPlayer 
             limit={p.playLimit} 
             file={p.path || ""}
-            allowPause={false}/>
+            allowPause={p.isPausable}/>
         case "image":
             if (p.timeLimit) {
                 return <LimitedImage prompt={p} update={sendRemaining}/>
