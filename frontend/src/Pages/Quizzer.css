@@ -224,9 +224,6 @@ p:has(#currentUser) {
 }
   
   @media screen and (max-width: 450px) {
-    h1 {
-      margin: 3rem 0 0;
-    }
     body{
       gap: 1rem;
     }

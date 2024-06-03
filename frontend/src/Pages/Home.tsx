@@ -1,14 +1,40 @@
 import { useNavigate } from "react-router-dom";
 import Welcome from "../Components/Welcome";
+import { useEffect, useRef } from "react";
 
 export default function Home() {
 
     const navigate = useNavigate();
     const exampleQuizLink = '/quizzer/gKt1qhUMDCzwRUykUTge'
+    const homeScroller = useRef<HTMLElement>(null)
+
+    const fadeTutorials = ()=>{
+        console.log("fade control")
+        const tuts = Array.from(document.querySelectorAll('.tutorialFrame'));
+
+        tuts.forEach(tut => {
+            const {top, bottom} = tut.getBoundingClientRect()
+            if (top < window.innerHeight * 0.8 && bottom > window.innerHeight / 3.3) {
+                tut.classList.add("inView")
+            } else {
+                tut.classList.remove("inView")
+            }
+        })
+    }
+
+    useEffect(()=>{
+        fadeTutorials();
+        const home = homeScroller.current
+        homeScroller.current?.addEventListener("scroll", fadeTutorials)
+
+        return ()=>{
+            home?.removeEventListener("scroll", fadeTutorials)
+        }
+    }, [homeScroller])
 
     return (
         <>
-            <section id="homePage">
+            <section id="homePage" ref={homeScroller}>
                 <Welcome />
                 <p className="heroText"><strong>Media Quizlet</strong> redefines quiz creation for those who seek expanded media control. Offering unparalleled customization, our platform lets you tailor quizzes with audio, image, and text prompts effortlessly. Plus, enjoy the convenience of diving straight into quizzing without any login hassles.</p>
                 <h2 style={{textAlign: 'center', fontSize: '2.5rem'}}>How to Get Started</h2>

@@ -16,7 +16,9 @@
   color: var(--primary);
   font-family: Rubik;
 }
-
+html {
+  background-color: var(--background);
+}
 body {
   width: 100vw;
   height: 100vh;
@@ -286,6 +288,7 @@ ul {
   height: 80vh;
   overflow-y: auto;
   overflow-x: hidden;
+  padding-bottom: 4rem;
 }
 #welcomeMenu {
   width: 90vw;
@@ -308,6 +311,11 @@ ul {
   text-align: center;
   margin: 2rem auto;
   line-height: 1.5;
+  opacity: 0;
+  transition: opacity 1s;
+}
+.tutorialFrame.inView {
+  opacity: 1;
 }
 .tutorialFrame h3 {
   margin-bottom: 1.5rem;

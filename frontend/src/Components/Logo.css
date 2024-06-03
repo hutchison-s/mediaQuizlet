@@ -6,7 +6,7 @@
     margin-right: 0.5rem;
   }
   .logoHeading {
-    margin: 2rem;
+    padding: 2rem;
     font-size: clamp(24px, 8vw, 60px);
     text-align: center;
   }
@@ -17,4 +17,5 @@
       color: var(--primary-half);
       font-size: large;
       text-align: center;
+      padding-bottom: 1rem;
   }
