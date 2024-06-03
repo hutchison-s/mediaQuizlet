@@ -2,9 +2,7 @@ import { deleteAudioDocsFromPrompts } from "./audioFunctions.js";
 import { deleteAssociatedFiles } from "./fileFunctions.js";
 import { deleteAllResponses } from "./responseFunctions.js";
 import { fieldValue, qCol, uCol } from "./firebaseConnect.js";
-import nodemailer from 'nodemailer';
-import dotenv from "dotenv";
-dotenv.config();
+import { sendEmail } from "../nodemailer/emailFunctions.js";
 
 export async function getAllQuizzes(req, res) {
     try {
@@ -285,35 +283,4 @@ export async function deleteQuiz(req, res) {
     } catch (err) {
         return res.status(500).send({error: err.message, message: "Could not delete document."})
     }
-}
-
-async function sendEmail({quizId, title, password, admin}) {
-    const transporter = nodemailer.createTransport({
-        host: 'smtp-relay.brevo.com',
-        port: 587,
-        secure: false,
-        auth: {
-            user: process.env.BREVO_USER,
-            pass: process.env.BREVO_PASS
-        }
-    });
-    const mailOptions = {
-        from: process.env.EMAIL_ADDRESS,
-        to: admin,
-        subject: "New Media Quizlet Created!",
-        html: `
-        <section style='font-family: "Rubik", sans-serif; border: 2px solid cornflowerblue; border-radius: 1rem; padding: 2rem;'>
-            <h1 style='font-size: 3rem'>
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.5.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zM188.3 147.1c-7.6 4.2-12.3 12.3-12.3 20.9V344c0 8.7 4.7 16.7 12.3 20.9s16.8 4.1 24.3-.5l144-88c7.1-4.4 11.5-12.1 11.5-20.5s-4.4-16.1-11.5-20.5l-144-88c-7.4-4.5-16.7-4.7-24.3-.5z"/></svg>
-            Media Quizlet</h1>
-            <h2>Here's a link to your newly created quiz: ${title}</h2>
-            <a href="https://mediaquizlet.netlify.app/quizzer/${quizId}">https://mediaquizlet.netlify.app/quizzer/${quizId}</a>
-            <p>Your password for viewing responses: ${password}</p>
-            <br></br>
-            <p><a href="https://mediaquizlet.netlify.app/generator">Create another!</a></p>
-        </section>`,
-        
-    }
-    const info = await transporter.sendMail(mailOptions).catch(err => console.log);
-    console.log(info.messageId)
 }

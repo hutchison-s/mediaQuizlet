@@ -10,6 +10,7 @@ import { deleteOneResponse, getAllResponses, getOneResponse, newResponse, update
 import { uploadImage } from './database/fileFunctions.js';
 import { createAudioDoc, getAllAudio, getAudioInfo, getChunk, uploadAudioChunk } from './database/audioFunctions.js';
 import { getUserId } from './database/userFunctions.js';
+import { receiveContact } from './nodemailer/emailFunctions.js';
 
 const app = express();
 const PORT = process.env.PORT || 8000;
@@ -18,10 +19,14 @@ const PORT = process.env.PORT || 8000;
 app.use(express.json());
 app.use(cors());
 
+// USERS ------------------
+
 // Retrieve all quizzes created by specific user by email
 app.get('/api/users/:userId/quizzes', getAllQuizzesByUser);
 
 app.get('/api/findUser/:email', getUserId);
+
+// QUIZZES ------------------
 
 // Retrieve all quizzes
 app.get('/api/quizzes', admin, getAllQuizzes);
@@ -41,6 +46,8 @@ app.patch('/api/quizzes/:quizId/admin', authenticate, updateQuiz);
 // Delete a quiz
 app.delete('/api/quizzes/:quizId/admin', authenticate, deleteQuiz);
 
+// RESPONSES ------------------
+
 // Retrieve all responses for a quiz
 app.get('/api/quizzes/:quizId/responses', authenticate, getAllResponses);
 
@@ -55,6 +62,8 @@ app.patch('/api/quizzes/:quizId/responses/:responseId', updateResponse);
 
 // Delete specific response
 app.delete('/api/quizzes/:quizId/responses/:responseId', authenticate, deleteOneResponse);
+
+// FILES ------------------
 
 // Create new audio document and return id
 app.post('/api/uploads/audio', createAudioDoc); 
@@ -73,6 +82,11 @@ app.get('/api/uploads/audio/:id/chunks/:index', getChunk)
 
 // Compress and upload image file
 app.post('/api/uploads/image', upload.single("photos"), uploadImage);
+
+// CONTACT FORM ------------------
+
+// Receive formdata from contact form and send email to website administrator
+app.post('api/contact', upload.single("file"), receiveContact);
 
 // Start the server
 app.listen(PORT, () => {
