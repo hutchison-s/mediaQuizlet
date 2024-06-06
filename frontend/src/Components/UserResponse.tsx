@@ -59,7 +59,13 @@ export default function UserResponse({response, questions, updateScore, deleteRe
                     </div>
                     <div className="userScore">
                         {response.timeSubmitted && <p>{pointsEarned} / {pointsPossible}</p>}
-                        <div style={{display: 'flex', justifyContent: 'flex-end', width: '100%'}}><button className={`toggleAnswers ${isOpen ? "open" : ""}`} onClick={()=>{setIsOpen(current => !current)}}><i className={`fa-solid fa-chevron-${isOpen ? 'up' : 'down'}`}></i></button></div>
+                        <div style={{display: 'flex', justifyContent: 'flex-end', width: '100%'}}>
+                            <button 
+                                className={`toggleAnswers ${isOpen ? "open" : ""}`} 
+                                onClick={()=>{setIsOpen(current => !current)}}>
+                                <i className={`fa-solid fa-chevron-${isOpen ? 'up' : 'down'}`}></i>
+                            </button>
+                        </div>
                     </div>
                 </div>
                     {isOpen && response.answers?.map((a, i)=>

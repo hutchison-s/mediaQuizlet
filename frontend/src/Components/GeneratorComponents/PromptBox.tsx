@@ -53,10 +53,10 @@ export default function PromptBox({ question, promptIndex }: PromptBoxProps) {
         <div className="promptBox">
             <PromptContent p={question.prompts[promptIndex]} update={updatePrompt}/>
             <div className="promptTools">
-            <div className="deletePrompt" onClick={removePrompt}>
+            <button className="deletePrompt" onClick={removePrompt} aria-label="Delete Prompt">
                     <i className="fa-solid fa-trash-can"></i>
-                </div>
-                {question.prompts[promptIndex].type !== "text" && <button className="resetPrompt" onClick={resetPrompt}>
+                </button>
+                {question.prompts[promptIndex].type !== "text" && <button className="resetPrompt" onClick={resetPrompt} tabIndex={0} aria-label="Reset Prompt">
                     <i className="fa-solid fa-rotate-left"></i>
                 </button>}
                 <SelectPopUp value={qTypeList.indexOf(question.prompts[promptIndex].type)} list={list} sendIndex={receiveIndex} />

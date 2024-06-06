@@ -32,16 +32,23 @@ export default function SelectPopUp({value, list, sendIndex}: SelectProps) {
         }
     }
 
+    const handleOptionClick = (index: number) => {
+        sendIndex(index);
+        setCurrent(index);
+    }
+
     return (
         <>
-            <div className={isOpen ? "open selectCurrent" : "selectCurrent" }
-                onClick={()=>{setIsOpen(prev=>!prev)}}>
+            <div className={isOpen ? "open selectCurrent" : "selectCurrent" } aria-label="Prompt Type Selector" aria-expanded={isOpen}
+                onClick={()=>{setIsOpen(prev=>!prev)}} role="button" tabIndex={0} onKeyDown={(e)=>{return e.key == 'Enter' ? setIsOpen(prev=>!prev) : null}}>
                 {isOpen && 
-                <div className={"selectOptions"} ref={menuRef}>
+                <div className={"selectOptions"} ref={menuRef} role="combobox">
                     {list.map((item, index)=>
-                        index != current && <span key={index as Key}
-                            onClick={()=>{sendIndex(index); setCurrent(index);}}
-                            >{item}</span>
+                        index != current && <button key={index as Key}
+                            onClick={()=>handleOptionClick(index)}
+                            onKeyDown={(e)=>{return e.key == 'Enter' && handleOptionClick(index)}}
+                            role="option"
+                            >{item}</button>
                     )}
                     </div>}
                 {list[current]}

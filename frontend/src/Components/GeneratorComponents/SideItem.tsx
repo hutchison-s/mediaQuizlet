@@ -92,12 +92,16 @@ export default function SideItem({index, question, dragIndex, targetIndex, setDr
                         outline: targetIndex == index ? "2px solid lime" : "none"
                     }} 
                     onClick={()=>{updateActive(index)}}
+                    onKeyDown={(e)=>{return e.key === 'Enter' ? updateActive(index) : null}}
                     onDragStart={(e)=>{onDragStart(e, index)}}
                     onDragOver={(e)=>{onDragOver(e, index)}}
                     onDragLeave={onDragLeave}
                     onDrop={onDrop}
                     onDragEnd={onDragEnd}
                     draggable
+                    tabIndex={0}
+                    role="button"
+                    aria-label={`Show me question ${index+1}`}
                 >
                     <div className="flex gapSmall">
                         <i style={{opacity: "0.2", cursor: "move"}} className="fa-solid fa-grip-vertical"></i>

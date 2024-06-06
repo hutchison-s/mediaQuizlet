@@ -13,7 +13,10 @@ export default function PromptUploadButton({onClick, acceptTypes, divClass, inpu
 
     return (
         <div className={divClass}
+            tabIndex={0}
+            role="button"
             onClick={()=>{inputRef.current?.click()}}
+            onKeyDown={(e)=>e.key === 'Enter' && inputRef.current?.click()}
             onDragOver={(e:DragEvent)=>{
                 e.preventDefault();
                 if (e.dataTransfer.items.length == 1 && Array.from(e.dataTransfer.items).some(item => item.type.includes(acceptTypes.split("/")[0]))) {
@@ -39,7 +42,7 @@ export default function PromptUploadButton({onClick, acceptTypes, divClass, inpu
             }}
         >
             {isDragging && hasError && <p className="notAllowed" style={{color: "var(--background)", fontSize: "1rem"}}>Only one {acceptTypes.split("/")[0].toUpperCase()} file may be uploaded</p>}
-            {!hasError && <><span>Upload</span><i className={isDragging ? "dragging fa-solid fa-file-arrow-up" : "fa-solid fa-file-arrow-up"}></i><span>{acceptTypes.split("/")[0]}</span></>}
+            {!hasError && <><span>Upload</span><i className={`${isDragging && 'dragging'} fa-solid fa-file-arrow-up`}></i><span>{acceptTypes.split("/")[0]}</span></>}
             <input 
                 type="file" 
                 accept={acceptTypes} 

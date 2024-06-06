@@ -80,14 +80,14 @@ export default function QuestionItem({index, question}: itemProps) {
                 </div>
                 <h4 className="itemSectionHeader">Prompts</h4>
                 {question.prompts.map((_, i)=><PromptBox key={question.id+"prompt"+i} question={question} promptIndex={i}/>)}
-                <p><span onClick={addPrompt} className="newPromptButton"><i className="fa-solid fa-circle-plus"></i> Add Prompt</span></p>
+                <p><button onClick={addPrompt} className="newPromptButton" aria-label="Add a prompt"><i className="fa-solid fa-circle-plus"></i> Add Prompt</button></p>
                 <h4 className="itemSectionHeader">Response</h4>
                 <ResponseBox q={question} />
                 <div className="itemFooter">
-                    {index > 0 ? <button onClick={moveBack}><i className="fa-solid fa-arrow-left"></i></button> : <span></span>}
+                    {index > 0 ? <button onClick={moveBack}><i className="fa-solid fa-arrow-left" aria-label="Shift question before the previous"></i></button> : <span></span>}
                     {state.questions.length > 1 && <span> Move Question </span>}
-                    {index < state.questions.length - 1 ? <button onClick={moveForward}><i className="fa-solid fa-arrow-right"></i></button> : <span></span>}
-                    <button style={{gridColumn: "span 3", margin: "1rem auto"}} onClick={duplicateItem}><i className="fa-solid fa-copy"></i></button>
+                    {index < state.questions.length - 1 ? <button onClick={moveForward} aria-label="Shift question after the next"><i className="fa-solid fa-arrow-right"></i></button> : <span></span>}
+                    <button style={{gridColumn: "span 3", margin: "1rem auto"}} onClick={duplicateItem} aria-label="Duplicate Question"><i className="fa-solid fa-copy"></i></button>
                 </div>
             </div>
         </div>

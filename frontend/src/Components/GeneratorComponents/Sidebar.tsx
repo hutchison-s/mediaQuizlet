@@ -17,7 +17,7 @@ export default function SideBar({generateButton}: SideBarProps) {
     }
 
     return (
-        <aside id="sideBar">
+        <aside id="sideBar" aria-label="Quiz organization toolbar">
             <LogoLink tag={false}/>
             <ItemSummary />
             {state.questions.length > 0 && generateButton}

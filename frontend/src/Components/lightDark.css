@@ -4,6 +4,8 @@
     font-size: 2rem;
     top: 0.5rem;
     right: 0.5rem;
+    background-color: transparent;
+    border: none;
     color: var(--primary);
     opacity: 0.5;
     cursor: pointer;

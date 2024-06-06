@@ -9,6 +9,7 @@ export default function TextPromptBox({p, update}: TextPromptProps) {
     return (
         <div className="textPrompt">
             <textarea
+                aria-label="Instructions or Text Prompt..." 
                 placeholder="Instructions or Text Prompt..." 
                 rows={6}
                 value={p.text}

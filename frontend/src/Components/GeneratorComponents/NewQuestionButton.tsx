@@ -7,7 +7,7 @@ type NewQuestionButtonProps = {
 export default function NewQuestionButton({onClick}: NewQuestionButtonProps) {
     const [isOpen, setIsOpen] = useState(false);
 
-    const buttonRef = useRef<HTMLButtonElement>(null)
+    const buttonRef = useRef<HTMLDivElement>(null)
 
     const handleClickWhenOpen = (e:PointerEvent)=>{
         if (buttonRef.current && !buttonRef.current.contains(e.target as Node)) {
@@ -26,15 +26,18 @@ export default function NewQuestionButton({onClick}: NewQuestionButtonProps) {
     }, [isOpen])
 
     return (
-        <button ref={buttonRef} id="newQuestion" className="shadow" onClick={()=>{setIsOpen(prev=>!prev)}}>
-            <i className="fa-solid fa-plus"></i>
-            {isOpen && <div id="newQuestionType">
-                <span onClick={()=>{onClick("MC")}}>Multiple Choice</span>
-                <span onClick={()=>{onClick("SA")}}>Short Answer</span>
-                <span onClick={()=>{onClick("IMG")}}>Image Upload</span>
-                <span onClick={()=>{onClick("AUD")}}>Audio Upload</span>
-                <span onClick={()=>{onClick("REC")}}>Audio Recording</span>
+        <div id="newQuestionType" ref={buttonRef} role="combobox" aria-expanded={isOpen}>
+            <button  id="newQuestion" className="shadow" onClick={()=>{setIsOpen(prev=>!prev)}} role="button" aria-label="Show/Hide new question menuu">
+                <i className="fa-solid fa-plus"></i>
+            </button>
+            {isOpen && <div className="questionTypes">
+                <button className='questionTypeOption' onClick={()=>{onClick("MC"); setIsOpen(false)}} role="option">Multiple Choice</button>
+                <button className='questionTypeOption' onClick={()=>{onClick("SA"); setIsOpen(false)}} role="option">Short Answer</button>
+                <button className='questionTypeOption' onClick={()=>{onClick("IMG"); setIsOpen(false)}} role="option">Image Upload</button>
+                <button className='questionTypeOption' onClick={()=>{onClick("AUD"); setIsOpen(false)}} role="option">Audio Upload</button>
+                <button className='questionTypeOption' onClick={()=>{onClick("REC"); setIsOpen(false)}} role="option">Audio Recording</button>
             </div>}
-        </button>
+            
+        </div>
     )
 }

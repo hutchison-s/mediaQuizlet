@@ -62,10 +62,10 @@ export default function ItemCarousel() {
         <NewQuestionButton onClick={addNewQuestion}/>
         {state.questions
             ?   <>
-                    <button id="leftForm" disabled={state.active == 0 || state.questions.length == 0} onClick={prev}>
+                    <button id="leftForm" disabled={state.active == 0 || state.questions.length == 0} onClick={prev} aria-label="Previous Question">
                         <i className="fa-solid fa-angles-left"></i>
                     </button>
-                    <button id="rightForm" disabled={state.active == state.questions.length-1 || state.questions.length == 0} onClick={next}>
+                    <button id="rightForm" disabled={state.active == state.questions.length-1 || state.questions.length == 0} onClick={next} aria-label="Next Question">
                         <i className="fa-solid fa-angles-right"></i>
                     </button>
                     <div id="formWheel">
@@ -74,7 +74,7 @@ export default function ItemCarousel() {
                         </div>
                     </div>
                 </>
-            :   <div id="introText">
+            :   <div id="introText" aria-label="Getting Started Instructions">
                     <p className="hiddenWhenMobile">Drag and drop files to the sidebar or get started by clicking the "+" button to add a new question!</p>
                     <p className="hiddenWhenDesktop">Get started by clicking the "+" button to add a new question!</p>
                 </div>}

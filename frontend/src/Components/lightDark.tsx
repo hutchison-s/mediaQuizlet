@@ -76,11 +76,11 @@ export default function LightModeControl() {
     
     return (
         <>
-            <i 
-                id="lightDark" 
-                className="fa-solid fa-circle-half-stroke"
-                onClick={changeMode}
-            ></i>
+            <button id="lightDark" onClick={changeMode} tabIndex={0} aria-label="toggle dark mode">
+                <i
+                    className="fa-solid fa-circle-half-stroke"
+                ></i>
+            </button>
         </>
     )
 

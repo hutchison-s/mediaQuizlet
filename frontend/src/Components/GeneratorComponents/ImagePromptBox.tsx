@@ -31,7 +31,6 @@ export default function ImagePromptBox({p, update}: ImagePromptProps) {
             ?   <div className="imagePrompt">
                     <img src={url} className="imagePreview"/>
                     <div className="imageOptions">
-                        <i onClick={()=>{update(undefined, undefined)}} className="fa-solid fa-rotate-left"></i>
                         <label className="checkLabel" htmlFor={p.file.name+"timeLimit"}><input type="checkbox" name={p.file.name+"timeLimit"} id={p.file.name+"timeLimit"} onChange={()=>{updateTimeLimit(30)}} checked={p.timeLimit !== undefined}/> Limit Time</label>
                         {p.timeLimit && <label className="checkLabel"><input type="number" min={1} max={600} value={p.timeLimit} onChange={(e)=>{updateTimeLimit(parseInt(e.target.value))}}/> Seconds</label> }
                     </div>

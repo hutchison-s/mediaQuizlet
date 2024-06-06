@@ -17,7 +17,7 @@ export default function Success() {
     }
 
     const copyLink = ()=>{
-        navigator.clipboard.writeText(`https://mediaquizlet.netlify.app/quizzer/${quizId}`)
+        navigator.clipboard.writeText(`https://www.mediaquizlet.com/quizzer/${quizId}`)
     }
 
     return (
@@ -25,13 +25,13 @@ export default function Success() {
             <h2>Quizlet Successfully Created</h2>
             <p>Link to Quizlet:</p>
             <div>
-                <a id="successLink" href={`https://mediaquizlet.netlify.app/quizzer/${quizId}`}>{`https://mediaquizlet.netlify.app/quizzer/${quizId}`}</a>
-                <button id="copyLink" onClick={copyLink}><i className="fa-solid fa-copy"></i></button>
+                <a id="successLink" href={`https://www.mediaquizlet.com/quizzer/${quizId}`}>{`https://www.mediaquizlet.com/quizzer/${quizId}`}</a>
+                <button id="copyLink" onClick={copyLink} onKeyDown={e=>e.key==='Enter'&&copyLink()}><i className="fa-solid fa-copy"></i></button>
             </div>
             <p>Quizlet Code:</p>
             <div>
                 <p id="successCode">{quizId}</p>
-                <button id="copyCode" onClick={copyCode}><i className="fa-solid fa-copy"></i></button>
+                <button id="copyCode" onClick={copyCode} onKeyDown={e=>e.key==='Enter'&&copyCode()}><i className="fa-solid fa-copy"></i></button>
             </div>
             <button id="createAnother" onClick={()=>{navigate("/generator")}} className="softCorner primaryBtn">Create another Quizlet</button>
         

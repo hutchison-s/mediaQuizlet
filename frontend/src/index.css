@@ -16,6 +16,10 @@
   color: var(--primary);
   font-family: Rubik;
 }
+* :focus-visible {
+  outline: 2px solid var(--secondary);
+  outline-offset: 0.5rem;
+}
 html {
   background-color: var(--background);
 }
@@ -176,6 +180,7 @@ ul {
 .primaryBtn {
   background: var(--secondary);
   color: var(--background);
+  text-shadow: 0 0 20px var(--primary);
 }
 .secondaryBtn {
   background: var(--primary);
@@ -183,7 +188,9 @@ ul {
 }
 
 .primaryBtn:hover,
-.secondaryBtn:hover {
+.secondaryBtn:hover,
+.primaryBtn:focus-visible,
+.secondaryBtn:focus-visible {
   transform: scale(1.1);
 }
 
@@ -205,10 +212,12 @@ ul {
   transition: transform 0.2s;
 }
 
-.warningButton:hover {
+.warningButton:hover,
+.warningButton:focus-visible {
   scale: 1.1;
   outline: 2px solid #ffffffcc;
   box-shadow: var(--shadow);
+  transition: transform 0.2s;
 }
 
 .buttonBox {

@@ -32,7 +32,7 @@
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
 }
-.selectOptions > span {
+.selectOptions > button {
     display: grid;
     place-items: center;
     width: 100%;
@@ -40,11 +40,14 @@
     font-size: 1.5rem;
     cursor: pointer;
     filter: brightness(85%);
+    background-color: transparent;
+    border: none;
 }
-.selectOptions > span:hover {
+.selectOptions > button:hover,
+.selectOptions > button:focus {
     filter: brightness(110%);
 }
-.selectOptions > span * {
+.selectOptions > button * {
     color: var(--background);
 }
 @media screen and (max-width: 500px) {

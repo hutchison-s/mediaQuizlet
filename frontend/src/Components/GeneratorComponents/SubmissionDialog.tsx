@@ -120,7 +120,10 @@ export default function SubmissionDialog({submitQuiz, closeForm}: SubmissionDial
           </div>
         </label>
         <label htmlFor="timeLimit">
-          <label id="timeToggle" ><input type="checkbox" checked={isLimiting} onChange={toggleLimit} hidden/><span ><i className="fa-regular fa-hourglass-half"></i> Time limit</span></label>
+          <label id="timeToggle" aria-hidden='false' >
+            <input type="checkbox" checked={isLimiting} onChange={toggleLimit} hidden/>
+            <button type="button" id='timeToggleButton' onClick={()=>{setIsLimiting(prev=>!prev); toggleLimit()}}><i className="fa-regular fa-hourglass-half"></i> Time limit</button>
+          </label>
           <input
             type="number"
             name="timeLimit"

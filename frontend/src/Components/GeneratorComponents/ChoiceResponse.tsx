@@ -10,8 +10,8 @@ type ChoiceResponseProps = {
 export default function ChoiceResponse({qResponse, id, update}: ChoiceResponseProps) {
 
 
-    const handleRadioChange = (e:ChangeEvent<HTMLInputElement>, i: number) => {
-        if (e.target.checked) {
+    const handleRadioChange = (isChecked: boolean, i: number) => {
+        if (isChecked) {
             console.log(i+" is checked")
             const newResponse = {
                 ...qResponse,
@@ -31,7 +31,7 @@ export default function ChoiceResponse({qResponse, id, update}: ChoiceResponsePr
 
     return (
         <>
-            <div className="optionBox">
+            <div className="optionBox" aria-label="Multiple Choice Options">
                 <input 
                     type="text" 
                     name={"option"+id+"-1"} 
@@ -41,15 +41,15 @@ export default function ChoiceResponse({qResponse, id, update}: ChoiceResponsePr
                     value={qResponse.options![0]}
                     onChange={(e)=>{handleOptionChange(e, 0)}}
                     />
-                <label htmlFor={"radio"+id+"-1"}>
+                <label tabIndex={0} htmlFor={"radio"+id+"-1"} onKeyDown={(e)=>e.key==='Enter'&&handleRadioChange(qResponse.correct !== '0', 0)}>
                 <span>Correct</span>
                 <input 
                     type="radio" 
                     name={"radio"+id} 
                     id={"radio"+id+"-1"} 
                     checked={qResponse.correct === '0'}
-                    onChange={(e)=>{handleRadioChange(e, 0)}}
-                    hidden
+                    onChange={()=>{handleRadioChange(qResponse.correct !== '0', 0)}}
+                    style={{display: 'none'}}
                     />
                     </label>
                 </div>
@@ -63,15 +63,15 @@ export default function ChoiceResponse({qResponse, id, update}: ChoiceResponsePr
                     value={qResponse.options![1]}
                     onChange={(e)=>{handleOptionChange(e, 1)}}
                     />
-                <label htmlFor={"radio"+id+"-2"}>
+                <label tabIndex={0} htmlFor={"radio"+id+"-2"} onKeyDown={(e)=>e.key==='Enter'&&handleRadioChange(qResponse.correct !== '1', 1)}>
                 <span>Correct</span>
                     <input
                         type="radio"
                         name={"radio"+id}
                         id={"radio"+id+"-2"}
                         checked={qResponse.correct === '1'}
-                        onChange={(e)=>{handleRadioChange(e, 1)}}
-                        hidden
+                        onChange={()=>{handleRadioChange(qResponse.correct !== '1', 1)}}
+                        style={{display: 'none'}}
                     />
                 </label>
                 </div>
@@ -85,15 +85,15 @@ export default function ChoiceResponse({qResponse, id, update}: ChoiceResponsePr
                     value={qResponse.options![2]}
                     onChange={(e)=>{handleOptionChange(e, 2)}}
                     />
-                <label htmlFor={"radio"+id+"-3"}>
+                <label tabIndex={0} htmlFor={"radio"+id+"-3"} onKeyDown={(e)=>e.key==='Enter'&&handleRadioChange(qResponse.correct !== '2', 2)}>
                     <span>Correct</span>
                     <input
                         type="radio"
                         name={"radio"+id}
                         id={"radio"+id+'-3'}
                         checked={qResponse.correct === '2'}
-                        onChange={(e)=>{handleRadioChange(e, 2)}}
-                        hidden/>
+                        onChange={()=>{handleRadioChange(qResponse.correct !== '2', 2)}}
+                        style={{display: 'none'}}/>
                 </label>
                 </div>
             <div className="optionBox">
@@ -106,15 +106,15 @@ export default function ChoiceResponse({qResponse, id, update}: ChoiceResponsePr
                     value={qResponse.options![3]}
                     onChange={(e)=>{handleOptionChange(e, 3)}}
                     />
-                <label htmlFor={"radio"+id+"-4"}>
+                <label tabIndex={0} htmlFor={"radio"+id+"-4"} onKeyDown={(e)=>e.key==='Enter'&&handleRadioChange(qResponse.correct !== '3', 3)}>
                     <span >Correct</span>
                     <input 
                         type="radio" 
                         name={"radio"+id} 
                         id={"radio"+id+"-4"}  
                         checked={qResponse.correct === '3'}
-                        onChange={(e)=>{handleRadioChange(e, 3)}}
-                        hidden
+                        onChange={()=>{handleRadioChange(qResponse.correct !== '3', 3)}}
+                        style={{display: 'none'}}
                         />
                 </label>
                 </div>

@@ -8,23 +8,51 @@ interface FileUploaderProps {
 const FileUploader: React.FC<FileUploaderProps> = ({ callback }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleDrop = (event: DragEvent<HTMLDivElement>) => {
+  const handleDrop = (event: DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
-    const files = event.dataTransfer.files;
-    const filteredFiles = Array.from(files).filter(x => (x.type.includes("audio") || x.type.includes("image")))
-    handleFiles(filteredFiles)
+    cleanFiles(Array.from(event.dataTransfer.files))
   };
 
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
-      handleFiles(Array.from(files));
+      cleanFiles(Array.from(files));
     }
   };
 
-  const handleDragOver = (event: DragEvent<HTMLDivElement>) => {
+  const handleDragOver = (event: DragEvent<HTMLLabelElement>) => {
     event.preventDefault();
   };
+
+  const handleDragLeave = (event: DragEvent<HTMLLabelElement>) => {
+    event.preventDefault();
+    
+  }
+
+  const cleanFiles = (files: File[]) => {
+    if (files.length > 20) {
+      alert("Uploading limited to 20 files at a time.")
+      return;
+    }
+    const maxSize = 1024 * 1024 * 20;
+    const cleaned = files.filter(file => {
+      if (file.size > maxSize) {
+        alert(file.name+" is too large and will be skipped")
+        return false;
+      } else if (!file.type.includes('audio') && !file.type.includes('image')) {
+        alert(file.name+" is not a valid file type and will be skipped")
+        return false;
+      } else {
+        return true;
+      }
+    })
+    if (cleaned.length > 0) {
+      return handleFiles(cleaned);
+    } else {
+      return;
+    }
+    
+  }
 
   const handleFiles = (files: File[]) => {
     const newQuestions: GenQuestion[] = [];
@@ -43,24 +71,27 @@ const FileUploader: React.FC<FileUploaderProps> = ({ callback }) => {
 }
 
   return (
-    <div
+    <label
+      htmlFor='fileInput'
       onDrop={handleDrop}
       onDragOver={handleDragOver}
-      id='uploaderTarget'
+      onDragLeave={handleDragLeave}
+      id='uploaderTarget'      
     >
-      <label htmlFor="fileInput">
+      
         Drag & drop files here or click to upload
-      </label>
+
       <input
         type="file"
         id="fileInput"
+        tabIndex={0}
         ref={fileInputRef}
         style={{ display: 'none' }}
         onChange={handleInputChange}
         accept='audio/*,image/*'
         multiple
       />
-    </div>
+    </label>
   );
 };
 

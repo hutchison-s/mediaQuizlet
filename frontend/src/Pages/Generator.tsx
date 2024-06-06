@@ -93,7 +93,7 @@ export default function Generator() {
             <main id="generatorBody">
                 <LightModeControl />
                     <SideBar generateButton={generateButton}/>
-                    <section id="genWindow">
+                    <section id="genWindow" aria-label='Question building window'>
                         <ItemCarousel />
                     </section>
                     {isFinished && <SubmissionDialog setRender={setIsFinished} closeForm={()=>{setIsFinished(false)}} submitQuiz={submitQuiz}/>}
