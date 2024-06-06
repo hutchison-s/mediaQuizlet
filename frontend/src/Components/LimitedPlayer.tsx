@@ -1,16 +1,16 @@
 import { useState, useRef, useEffect } from 'react';
 import { getAudioFile } from '../Functions/apiCalls/audio';
+import { GenPrompt } from '../types-new';
 
 // Define the interface for the props expected by the LimitedPlayer component
 interface playerProps {
-    file: string,
-    limit: number | null | undefined,
-    allowPause: boolean | undefined
+    prompt: GenPrompt,
+    update: (remaining: number) => void
 }
 
-export default function LimitedPlayer({ file, limit, allowPause }: playerProps) {
+export default function LimitedPlayer({ prompt, update }: playerProps) {
     // State to track the remaining play limit
-    const [remaining, setRemaining] = useState(limit);
+    const [remaining, setRemaining] = useState(prompt.remaining == undefined ? prompt.playLimit : prompt.remaining);
     // State to track if the audio is currently playing
     const [isPlaying, setIsPlaying] = useState(false);
     // State to track the progress of the audio playback
@@ -36,16 +36,16 @@ export default function LimitedPlayer({ file, limit, allowPause }: playerProps) 
         };
     
 
-        collectChunks(file);
+        collectChunks(prompt.path!);
 
-        // Cleanup function to remove event listeners when the component unmounts or the `file` prop changes
+        // Cleanup function to remove event listeners when the component unmounts or the `prompt.file` prop changes
         return () => {
             audio.ontimeupdate = null;
             audio.onplay = null;
             audio.onpause = null;
             audio.onended = null;
         };
-    }, [file]);
+    }, [prompt.path]);
 
     // Effect to update the progress bar background style based on the `progress` state
     useEffect(() => {
@@ -59,7 +59,7 @@ export default function LimitedPlayer({ file, limit, allowPause }: playerProps) 
         const audio = audioRef.current;
         if (isPlaying) {
             audio.pause();
-            if (!allowPause) {
+            if (!prompt.isPausable) {
                 audio.currentTime = 0; // Reset the audio to the beginning if pausing is not allowed
             }
         } else {
@@ -82,8 +82,9 @@ export default function LimitedPlayer({ file, limit, allowPause }: playerProps) 
     // Function to handle when the audio is paused
     const handlePause = () => {
         setIsPlaying(false);
-        if (remaining && !allowPause) {
-            setRemaining((prevRemaining) => prevRemaining! - 1); // Decrement remaining plays if pausing is not allowed
+        if (remaining && !prompt.isPausable) {
+            setRemaining((prevRemaining) => prevRemaining! - 1);
+            update(remaining - 1) // Decrement remaining plays if pausing is not allowed
         }
     };
 
@@ -91,7 +92,8 @@ export default function LimitedPlayer({ file, limit, allowPause }: playerProps) 
     const handleEnded = () => {
         setIsPlaying(false);
         if (remaining) {
-            setRemaining((prevRemaining) => prevRemaining! - 1); // Decrement remaining plays
+            setRemaining((prevRemaining) => prevRemaining! - 1);
+            update(remaining - 1) // Decrement remaining plays
         }
     };
 
@@ -102,7 +104,7 @@ export default function LimitedPlayer({ file, limit, allowPause }: playerProps) 
 
     // Set button icon depending on isPlaying and allowPause states
     const setIcon = ()=>{
-        const icon = isPlaying ? (allowPause ? 'pause' : 'stop') : 'play';
+        const icon = isPlaying ? (prompt.isPausable ? 'pause' : 'stop') : 'play';
         return <i className={`fa-solid fa-${icon}`}></i>
     }
 
@@ -117,11 +119,9 @@ export default function LimitedPlayer({ file, limit, allowPause }: playerProps) 
                     {setIcon()}
                 </button>
             </div>
-            {remaining 
-                ? <p className="remaining">{remaining} remaining plays</p> 
-                : <p className="remaining">Unlimited Plays</p>}
+                <p className="remaining">{remaining} remaining play{remaining != 1 ? "s" : ""}</p> 
             <p style={{ textAlign: "center", marginBottom: "1rem" }}>
-                <small>{`Pausing ${allowPause ? "en" : "dis"}abled`}</small>
+                <small>{`Pausing ${prompt.isPausable ? "en" : "dis"}abled`}</small>
             </p>
             <audio
                 ref={audioRef}

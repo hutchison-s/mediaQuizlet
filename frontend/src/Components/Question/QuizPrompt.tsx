@@ -16,9 +16,8 @@ export default function QuizPrompt({p, i, updateRemaining}: QuizPromptProps) {
     switch(p.type) {
         case "audio":
             return <LimitedPlayer 
-            limit={p.playLimit} 
-            file={p.path || ""}
-            allowPause={p.isPausable}/>
+            prompt={p}
+            update={sendRemaining}/>
         case "image":
             if (p.timeLimit) {
                 return <LimitedImage prompt={p} update={sendRemaining}/>
