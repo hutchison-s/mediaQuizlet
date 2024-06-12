@@ -9,7 +9,7 @@
     gap: 1rem;
     min-height: 70dvh;
   }
-  .successWrap div {
+  .successWrap > div {
     display: flex;
     flex-wrap: wrap;
     width: 100%;
@@ -39,6 +39,17 @@
     padding: 0.5rem;
     cursor: pointer;
     flex: 100%;
+  }
+  div:has(>#classroom) {
+    flex: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 3rem;
+  }
+  #copyLink,
+  #classroom {
+    flex: unset;
+    width: 40px;
   }
   #createAnother {
     width: 80%;
