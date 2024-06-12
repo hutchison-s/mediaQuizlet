@@ -58,11 +58,14 @@ export default function LimitedPlayer({ prompt, update }: playerProps) {
     const handlePlayPause = () => {
         const audio = audioRef.current;
         if (isPlaying) {
+            console.log("pause/stop pressed");
             audio.pause();
             if (!prompt.isPausable) {
                 audio.currentTime = 0; // Reset the audio to the beginning if pausing is not allowed
             }
         } else {
+            console.log("play pressed");
+            
             // Pause all other audio elements on the page
             document.querySelectorAll('audio').forEach((a) => {
                 if (a.currentTime !== 0 && a !== audio) {
@@ -76,24 +79,19 @@ export default function LimitedPlayer({ prompt, update }: playerProps) {
 
     // Function to handle when the audio starts playing
     const handlePlay = () => {
+        console.log("playing");
+        
         setIsPlaying(true);
     };
 
     // Function to handle when the audio is paused
     const handlePause = () => {
+        console.log("paused");
+        
         setIsPlaying(false);
         if (remaining && !prompt.isPausable) {
             setRemaining((prevRemaining) => prevRemaining! - 1);
             update(remaining - 1) // Decrement remaining plays if pausing is not allowed
-        }
-    };
-
-    // Function to handle when the audio ends
-    const handleEnded = () => {
-        setIsPlaying(false);
-        if (remaining) {
-            setRemaining((prevRemaining) => prevRemaining! - 1);
-            update(remaining - 1) // Decrement remaining plays
         }
     };
 
@@ -127,7 +125,6 @@ export default function LimitedPlayer({ prompt, update }: playerProps) {
                 ref={audioRef}
                 onPlay={handlePlay}
                 onPause={handlePause}
-                onEnded={handleEnded}
                 onTimeUpdate={handleTimeUpdate}
             ></audio>
         </div>
