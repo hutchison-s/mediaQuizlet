@@ -14,15 +14,15 @@ interface OptionType {
 export default function MCQ({question, setAnswer, initial}: MCQProps) {
 
     const options = question.response.options!;
-    const [selected, setSelected] = useState(parseInt(initial) || 0);
+    const [selected, setSelected] = useState(initial || "0");
 
     useEffect(()=>{
-        setAnswer(String(selected))
+        setAnswer(selected)
     }, [selected, setAnswer])
 
     function handleChange(event: ChangeEvent<HTMLInputElement>) {
         const target: HTMLInputElement = event.target;
-        setSelected(parseInt(target.value));
+        setSelected(target.value);
     }
 
     function Option({opt, idx}: OptionType) {
@@ -34,8 +34,8 @@ export default function MCQ({question, setAnswer, initial}: MCQProps) {
                         type="radio" 
                         value={idx} 
                         onChange={handleChange}
-                        name={question.response.type+String(idx)}
-                        checked={selected === idx}
+                        name={question.id+"options"}
+                        checked={selected === String(idx)}
                     />
                 </label>
         )
@@ -43,7 +43,7 @@ export default function MCQ({question, setAnswer, initial}: MCQProps) {
 
     return (
         <>
-            {options.map((opt, idx) => <Option key={idx} opt={opt} idx={idx}/>)}
+            {options.map((opt, idx) => <Option key={question.id+"option"+idx} opt={opt} idx={idx}/>)}
         </>
     )
 }
