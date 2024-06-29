@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes } from "react-router-dom";
+import { Navigate, Outlet, Route, Routes } from "react-router-dom";
 import Home from "../Pages/Home";
 import Header from "../Components/Header";
 import Generator from "../Pages/Generator";
@@ -28,6 +28,7 @@ export default function ReactRoutes() {
                 <Route path="/" element={<Frame />}>
                     <Route index element={<Home />}/>
                     <Route path="quizzer">
+                        <Route index element={<Navigate to='/lookup'/>} />
                         <Route path=":quizId" element={
                             <QuizProvider>
                                 <ResponseProvider>
@@ -37,13 +38,16 @@ export default function ReactRoutes() {
                         }/>
                     </Route>
                     <Route path="viewer">
+                        <Route index element={<Navigate to='/lookup'/>} />
                         <Route path=":quizId" element={<Viewer />} />
                     </Route> 
                     <Route path="lookup" element={<Lookup />} />
                     <Route path="users" >
+                        <Route index element={<Navigate to='/lookup'/>} />
                         <Route path=":userId" element={<UserQuizzes />} />
                     </Route>
                     <Route path="success">
+                        <Route index element={<PageNotFound />}/>
                         <Route path=":quizId" element={<Success />} />
                     </Route>
                 </Route>
