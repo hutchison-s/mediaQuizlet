@@ -26,7 +26,7 @@ html {
 body {
   width: 100vw;
   height: 100vh;
-  overflow: hidden;
+  overflow-x: hidden;
   background-image: var(--texture);
 }
 
@@ -245,7 +245,7 @@ ul {
 .dialog {
   background-image: var(--sidebar);
   width: clamp(300px, 75vw, 800px);
-  height: 60vh;
+  min-height: 60vh;
   left: 50%;
   top: 50%;
   translate: -50% -50%;
@@ -302,7 +302,7 @@ ul {
 #welcomeMenu {
   width: 90vw;
   max-width: 800px;
-  margin: 10dvh auto;
+  margin: 5dvh auto;
   gap: 1rem;
 }
 #welcomeMenu h2 {
